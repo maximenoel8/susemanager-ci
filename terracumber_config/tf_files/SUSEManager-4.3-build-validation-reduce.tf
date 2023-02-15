@@ -330,9 +330,6 @@ module "sles15sp4-sshminion" {
 }
 
 module "monitoring-server" {
-  providers = {
-    libvirt = libvirt.coruscant
-  }
   source             = "./modules/minion"
   base_configuration = module.base_core.configuration
   product_version    = "4.3-released"
