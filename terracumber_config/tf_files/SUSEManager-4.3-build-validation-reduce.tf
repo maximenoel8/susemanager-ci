@@ -313,9 +313,6 @@ module "sles15sp3-sshminion" {
 }
 
 module "sles15sp4-sshminion" {
-  providers = {
-    libvirt = libvirt.giediprime
-  }
   source             = "./modules/sshminion"
   base_configuration = module.base_core.configuration
   product_version    = "4.3-released"
