@@ -105,8 +105,8 @@ module "base_core" {
   testsuite          = true
 
   provider_settings = {
-    pool        = "ssd"
-    bridge      = "br1"
+    pool        = "mnoel_disks"
+    bridge      = "br0"
     additional_network = "192.168.43.0/24"
   }
 }
