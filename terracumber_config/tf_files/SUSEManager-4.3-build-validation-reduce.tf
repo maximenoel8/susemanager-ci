@@ -117,7 +117,6 @@ module "server" {
   product_version    = "4.3-released"
   name               = "srv"
   provider_settings = {
-    mac                = "aa:b2:92:42:00:a1"
     memory             = 40960
     vcpu               = 10
     data_pool          = "ssd"
@@ -153,7 +152,6 @@ module "proxy" {
   product_version    = "4.3-released"
   name               = "pxy"
   provider_settings = {
-    mac                = "aa:b2:92:42:00:a2"
     memory             = 4096
   }
   server_configuration = {
