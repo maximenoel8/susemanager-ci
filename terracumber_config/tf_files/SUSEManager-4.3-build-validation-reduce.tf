@@ -175,214 +175,214 @@ module "proxy" {
 
 }
 
-module "sles15sp3-client" {
-  source             = "./modules/client"
-  base_configuration = module.base_core.configuration
-  product_version    = "4.3-released"
-  name               = "cli-sles15sp3"
-  image              = "sles15sp3o"
-  provider_settings = {
-    mac                = "aa:b2:92:42:00:ad"
-    memory             = 4096
-  }
-  server_configuration = {
-    hostname = "suma-bv-43-pxy.mgr.prv.suse.net"
-  }
-  auto_register           = false
-  use_os_released_updates = false
-  ssh_key_path            = "./salt/controller/id_rsa.pub"
+//module "sles15sp3-client" {
+//  source             = "./modules/client"
+//  base_configuration = module.base_core.configuration
+//  product_version    = "4.3-released"
+//  name               = "cli-sles15sp3"
+//  image              = "sles15sp3o"
+//  provider_settings = {
+//    mac                = "aa:b2:92:42:00:ad"
+//    memory             = 4096
+//  }
+//  server_configuration = {
+//    hostname = "suma-bv-43-pxy.mgr.prv.suse.net"
+//  }
+//  auto_register           = false
+//  use_os_released_updates = false
+//  ssh_key_path            = "./salt/controller/id_rsa.pub"
+//
+//  //sle15sp3-client_additional_repos
+//
+//}
+//
+//module "sles15sp4-client" {
+//  source             = "./modules/client"
+//  base_configuration = module.base_core.configuration
+//  product_version    = "4.3-released"
+//  name               = "cli-sles15sp4"
+//  image              = "sles15sp4o"
+//  provider_settings = {
+//    mac                = "aa:b2:92:42:00:ae"
+//    memory             = 4096
+//  }
+//  server_configuration = {
+//    hostname = "suma-bv-43-pxy.mgr.prv.suse.net"
+//  }
+//  auto_register           = false
+//  use_os_released_updates = false
+//  ssh_key_path            = "./salt/controller/id_rsa.pub"
+//
+//  //sle15sp4-client_additional_repos
+//
+//}
+//
+//
+//module "sles15sp2-minion" {
+//  source             = "./modules/minion"
+//  base_configuration = module.base_core.configuration
+//  product_version    = "4.3-released"
+//  name               = "min-sles15sp2"
+//  image              = "sles15sp2o"
+//  provider_settings = {
+//    mac                = "aa:b2:92:42:00:b4"
+//    memory             = 4096
+//  }
+//
+//  server_configuration = {
+//    hostname = "suma-bv-43-pxy.mgr.prv.suse.net"
+//  }
+//  auto_connect_to_master  = false
+//  use_os_released_updates = false
+//  ssh_key_path            = "./salt/controller/id_rsa.pub"
+//
+//  //sle15sp2-minion_additional_repos
+//
+//}
+//
+//module "sles15sp3-minion" {
+//  source             = "./modules/minion"
+//  base_configuration = module.base_core.configuration
+//  product_version    = "4.3-released"
+//  name               = "min-sles15sp3"
+//  image              = "sles15sp3o"
+//  provider_settings = {
+//    mac                = "aa:b2:92:42:00:b5"
+//    memory             = 4096
+//  }
+//
+//  server_configuration = {
+//    hostname = "suma-bv-43-pxy.mgr.prv.suse.net"
+//  }
+//  auto_connect_to_master  = false
+//  use_os_released_updates = false
+//  ssh_key_path            = "./salt/controller/id_rsa.pub"
+//
+//  //sle15sp3-minion_additional_repos
+//
+//}
+//
+//module "sles15sp4-minion" {
+//  source             = "./modules/minion"
+//  base_configuration = module.base_core.configuration
+//  product_version    = "4.3-released"
+//  name               = "min-sles15sp4"
+//  image              = "sles15sp4o"
+//  provider_settings = {
+//    mac                = "aa:b2:92:42:00:b6"
+//    memory             = 4096
+//  }
+//
+//  server_configuration = {
+//    hostname = "suma-bv-43-pxy.mgr.prv.suse.net"
+//  }
+//  auto_connect_to_master  = false
+//  use_os_released_updates = false
+//  ssh_key_path            = "./salt/controller/id_rsa.pub"
+//
+//  //sle15sp4-minion_additional_repos
+//
+//}
+//
+//module "sles15sp2-sshminion" {
+//  source             = "./modules/sshminion"
+//  base_configuration = module.base_core.configuration
+//  product_version    = "4.3-released"
+//  name               = "minssh-sles15sp2"
+//  image              = "sles15sp2o"
+//  provider_settings = {
+//    mac                = "aa:b2:92:42:00:d4"
+//    memory             = 4096
+//  }
+//  use_os_released_updates = false
+//  ssh_key_path            = "./salt/controller/id_rsa.pub"
+//}
+//
+//module "sles15sp3-sshminion" {
+//  source             = "./modules/sshminion"
+//  base_configuration = module.base_core.configuration
+//  product_version    = "4.3-released"
+//  name               = "minssh-sles15sp3"
+//  image              = "sles15sp3o"
+//  provider_settings = {
+//    mac                = "aa:b2:92:42:00:d5"
+//    memory             = 4096
+//  }
+//  use_os_released_updates = false
+//  ssh_key_path            = "./salt/controller/id_rsa.pub"
+//}
+//
+//module "sles15sp4-sshminion" {
+//  source             = "./modules/sshminion"
+//  base_configuration = module.base_core.configuration
+//  product_version    = "4.3-released"
+//  name               = "minssh-sles15sp4"
+//  image              = "sles15sp4o"
+//  provider_settings = {
+//    mac                = "aa:b2:92:42:00:d6"
+//    memory             = 4096
+//  }
+//  use_os_released_updates = false
+//  ssh_key_path            = "./salt/controller/id_rsa.pub"
+//}
+//
+//module "monitoring-server" {
+//  source             = "./modules/minion"
+//  base_configuration = module.base_core.configuration
+//  product_version    = "4.3-released"
+//  name               = "monitoring"
+//  image              = "sles15sp4o"
+//  provider_settings = {
+//    mac                = "aa:b2:92:42:00:a3"
+//    memory             = 2048
+//  }
+//
+//  server_configuration = {
+//    hostname = "suma-bv-43-pxy.mgr.prv.suse.net"
+//  }
+//  auto_connect_to_master  = false
+//  use_os_released_updates = false
+//  ssh_key_path            = "./salt/controller/id_rsa.pub"
+//
+//  //monitoring_additional_repos
+//}
+//
+//module "controller" {
+//  source             = "./modules/controller"
+//  base_configuration = module.base_core.configuration
+//  name               = "ctl"
+//  provider_settings = {
+//    mac                = "aa:b2:92:42:00:a0"
+//    memory             = 16384
+//    vcpu               = 8
+//  }
+//  swap_file_size = null
+//
+//  // Cucumber repository configuration for the controller
+//  git_username = var.GIT_USER
+//  git_password = var.GIT_PASSWORD
+//  git_repo     = var.CUCUMBER_GITREPO
+//  branch       = var.CUCUMBER_BRANCH
+//
+//  server_configuration = module.server.configuration
+//  proxy_configuration  = module.proxy.configuration
+//
+//  sle15sp2_minion_configuration    = module.sles15sp2-minion.configuration
+//  sle15sp2_sshminion_configuration = module.sles15sp2-sshminion.configuration
+//
+//  sle15sp3_client_configuration    = module.sles15sp3-client.configuration
+//  sle15sp3_minion_configuration    = module.sles15sp3-minion.configuration
+//  sle15sp3_sshminion_configuration = module.sles15sp3-sshminion.configuration
+//
+//  sle15sp4_client_configuration    = module.sles15sp4-client.configuration
+//  sle15sp4_minion_configuration    = module.sles15sp4-minion.configuration
+//  sle15sp4_sshminion_configuration = module.sles15sp4-sshminion.configuration
+//
+//  monitoringserver_configuration = module.monitoring-server.configuration
+//}
 
-  //sle15sp3-client_additional_repos
-
-}
-
-module "sles15sp4-client" {
-  source             = "./modules/client"
-  base_configuration = module.base_core.configuration
-  product_version    = "4.3-released"
-  name               = "cli-sles15sp4"
-  image              = "sles15sp4o"
-  provider_settings = {
-    mac                = "aa:b2:92:42:00:ae"
-    memory             = 4096
-  }
-  server_configuration = {
-    hostname = "suma-bv-43-pxy.mgr.prv.suse.net"
-  }
-  auto_register           = false
-  use_os_released_updates = false
-  ssh_key_path            = "./salt/controller/id_rsa.pub"
-
-  //sle15sp4-client_additional_repos
-
-}
-
-
-module "sles15sp2-minion" {
-  source             = "./modules/minion"
-  base_configuration = module.base_core.configuration
-  product_version    = "4.3-released"
-  name               = "min-sles15sp2"
-  image              = "sles15sp2o"
-  provider_settings = {
-    mac                = "aa:b2:92:42:00:b4"
-    memory             = 4096
-  }
-
-  server_configuration = {
-    hostname = "suma-bv-43-pxy.mgr.prv.suse.net"
-  }
-  auto_connect_to_master  = false
-  use_os_released_updates = false
-  ssh_key_path            = "./salt/controller/id_rsa.pub"
-
-  //sle15sp2-minion_additional_repos
-
-}
-
-module "sles15sp3-minion" {
-  source             = "./modules/minion"
-  base_configuration = module.base_core.configuration
-  product_version    = "4.3-released"
-  name               = "min-sles15sp3"
-  image              = "sles15sp3o"
-  provider_settings = {
-    mac                = "aa:b2:92:42:00:b5"
-    memory             = 4096
-  }
-
-  server_configuration = {
-    hostname = "suma-bv-43-pxy.mgr.prv.suse.net"
-  }
-  auto_connect_to_master  = false
-  use_os_released_updates = false
-  ssh_key_path            = "./salt/controller/id_rsa.pub"
-
-  //sle15sp3-minion_additional_repos
-
-}
-
-module "sles15sp4-minion" {
-  source             = "./modules/minion"
-  base_configuration = module.base_core.configuration
-  product_version    = "4.3-released"
-  name               = "min-sles15sp4"
-  image              = "sles15sp4o"
-  provider_settings = {
-    mac                = "aa:b2:92:42:00:b6"
-    memory             = 4096
-  }
-
-  server_configuration = {
-    hostname = "suma-bv-43-pxy.mgr.prv.suse.net"
-  }
-  auto_connect_to_master  = false
-  use_os_released_updates = false
-  ssh_key_path            = "./salt/controller/id_rsa.pub"
-
-  //sle15sp4-minion_additional_repos
-
-}
-
-module "sles15sp2-sshminion" {
-  source             = "./modules/sshminion"
-  base_configuration = module.base_core.configuration
-  product_version    = "4.3-released"
-  name               = "minssh-sles15sp2"
-  image              = "sles15sp2o"
-  provider_settings = {
-    mac                = "aa:b2:92:42:00:d4"
-    memory             = 4096
-  }
-  use_os_released_updates = false
-  ssh_key_path            = "./salt/controller/id_rsa.pub"
-}
-
-module "sles15sp3-sshminion" {
-  source             = "./modules/sshminion"
-  base_configuration = module.base_core.configuration
-  product_version    = "4.3-released"
-  name               = "minssh-sles15sp3"
-  image              = "sles15sp3o"
-  provider_settings = {
-    mac                = "aa:b2:92:42:00:d5"
-    memory             = 4096
-  }
-  use_os_released_updates = false
-  ssh_key_path            = "./salt/controller/id_rsa.pub"
-}
-
-module "sles15sp4-sshminion" {
-  source             = "./modules/sshminion"
-  base_configuration = module.base_core.configuration
-  product_version    = "4.3-released"
-  name               = "minssh-sles15sp4"
-  image              = "sles15sp4o"
-  provider_settings = {
-    mac                = "aa:b2:92:42:00:d6"
-    memory             = 4096
-  }
-  use_os_released_updates = false
-  ssh_key_path            = "./salt/controller/id_rsa.pub"
-}
-
-module "monitoring-server" {
-  source             = "./modules/minion"
-  base_configuration = module.base_core.configuration
-  product_version    = "4.3-released"
-  name               = "monitoring"
-  image              = "sles15sp4o"
-  provider_settings = {
-    mac                = "aa:b2:92:42:00:a3"
-    memory             = 2048
-  }
-
-  server_configuration = {
-    hostname = "suma-bv-43-pxy.mgr.prv.suse.net"
-  }
-  auto_connect_to_master  = false
-  use_os_released_updates = false
-  ssh_key_path            = "./salt/controller/id_rsa.pub"
-
-  //monitoring_additional_repos
-}
-
-module "controller" {
-  source             = "./modules/controller"
-  base_configuration = module.base_core.configuration
-  name               = "ctl"
-  provider_settings = {
-    mac                = "aa:b2:92:42:00:a0"
-    memory             = 16384
-    vcpu               = 8
-  }
-  swap_file_size = null
-
-  // Cucumber repository configuration for the controller
-  git_username = var.GIT_USER
-  git_password = var.GIT_PASSWORD
-  git_repo     = var.CUCUMBER_GITREPO
-  branch       = var.CUCUMBER_BRANCH
-
-  server_configuration = module.server.configuration
-  proxy_configuration  = module.proxy.configuration
-
-  sle15sp2_minion_configuration    = module.sles15sp2-minion.configuration
-  sle15sp2_sshminion_configuration = module.sles15sp2-sshminion.configuration
-
-  sle15sp3_client_configuration    = module.sles15sp3-client.configuration
-  sle15sp3_minion_configuration    = module.sles15sp3-minion.configuration
-  sle15sp3_sshminion_configuration = module.sles15sp3-sshminion.configuration
-
-  sle15sp4_client_configuration    = module.sles15sp4-client.configuration
-  sle15sp4_minion_configuration    = module.sles15sp4-minion.configuration
-  sle15sp4_sshminion_configuration = module.sles15sp4-sshminion.configuration
-
-  monitoringserver_configuration = module.monitoring-server.configuration
-}
-
-output "configuration" {
-  value = {
-    controller = module.controller.configuration
-  }
-}
+//output "configuration" {
+//  value = {
+//    controller = module.controller.configuration
+//  }
+//}
