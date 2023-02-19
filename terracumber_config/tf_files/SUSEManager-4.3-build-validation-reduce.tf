@@ -74,6 +74,11 @@ variable "GIT_PASSWORD" {
   default = null // Not needed for master, as it is public
 }
 
+variable "SERVER_REGISTRATION_CODE" {
+  type = string
+  default = null
+}
+
 terraform {
   required_version = "1.0.10"
   required_providers {
@@ -124,6 +129,7 @@ module "server" {
 
   server_mounted_mirror = "minima-mirror-bv.mgr.prv.suse.net"
   repository_disk_size = 1700
+  server_registration_code   = var.SERVER_REGISTRATION_CODE
 
   auto_accept                    = false
   monitored                      = true
