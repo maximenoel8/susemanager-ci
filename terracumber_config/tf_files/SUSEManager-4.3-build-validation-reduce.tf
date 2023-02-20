@@ -101,7 +101,7 @@ module "base_core" {
   cc_password = var.SCC_PASSWORD
   name_prefix = "mnoel-bv-43-"
   use_avahi   = false
-  domain      = "mgr.prv.suse.net"
+  domain      = "tf.local"
   images      = [ "opensuse154o", "sles15sp4o" ]
 
   mirror = "minima-mirror-bv.mgr.prv.suse.net"
@@ -161,7 +161,7 @@ module "proxy" {
     memory             = 4096
   }
   server_configuration = {
-    hostname = "mnoel-bv-43-srv.mgr.prv.suse.net"
+    hostname = "mnoel-bv-43-srv.tf.local"
     username = "admin"
     password = "admin"
   }
@@ -190,7 +190,7 @@ module "proxy" {
 //    memory             = 4096
 //  }
 //  server_configuration = {
-//    hostname = "mnoel-bv-43-pxy.mgr.prv.suse.net"
+//    hostname = "mnoel-bv-43-pxy.tf.local"
 //  }
 //  auto_register           = false
 //  use_os_released_updates = false
@@ -211,7 +211,7 @@ module "proxy" {
 //    memory             = 4096
 //  }
 //  server_configuration = {
-//    hostname = "mnoel-bv-43-pxy.mgr.prv.suse.net"
+//    hostname = "mnoel-bv-43-pxy.tf.local"
 //  }
 //  auto_register           = false
 //  use_os_released_updates = false
@@ -234,7 +234,7 @@ module "proxy" {
 //  }
 //
 //  server_configuration = {
-//    hostname = "mnoel-bv-43-pxy.mgr.prv.suse.net"
+//    hostname = "mnoel-bv-43-pxy.tf.local"
 //  }
 //  auto_connect_to_master  = false
 //  use_os_released_updates = false
@@ -256,7 +256,7 @@ module "proxy" {
 //  }
 //
 //  server_configuration = {
-//    hostname = "mnoel-bv-43-pxy.mgr.prv.suse.net"
+//    hostname = "mnoel-bv-43-pxy.tf.local"
 //  }
 //  auto_connect_to_master  = false
 //  use_os_released_updates = false
@@ -278,7 +278,7 @@ module "proxy" {
 //  }
 //
 //  server_configuration = {
-//    hostname = "mnoel-bv-43-pxy.mgr.prv.suse.net"
+//    hostname = "mnoel-bv-43-pxy.tf.local"
 //  }
 //  auto_connect_to_master  = false
 //  use_os_released_updates = false
@@ -342,7 +342,7 @@ module "proxy" {
 //  }
 //
 //  server_configuration = {
-//    hostname = "mnoel-bv-43-pxy.mgr.prv.suse.net"
+//    hostname = "mnoel-bv-43-pxy.tf.local"
 //  }
 //  auto_connect_to_master  = false
 //  use_os_released_updates = false
