@@ -100,7 +100,7 @@ module "base_core" {
   cc_username = var.SCC_USER
   cc_password = var.SCC_PASSWORD
   name_prefix = "mnoel-bv-43-"
-  use_avahi   = false
+  use_avahi   = true
   domain      = "tf.local"
   images      = [ "opensuse154o", "sles15sp4o" ]
 
