@@ -177,54 +177,151 @@ module "proxy" {
   //proxy_additional_repos
 
 }
-
-module "sles15sp3-client" {
+module "centos7-client" {
   source             = "./modules/client"
   base_configuration = module.base_core.configuration
   product_version    = "4.3-released"
-  name               = "cli-sles15sp3"
-  image              = "sles15sp3o"
+  name               = "cli-centos7"
+  image              = "centos7o"
   provider_settings = {
     memory             = 4096
   }
   server_configuration = {
-    hostname = "mnoel-bv-43-pxy.tf.local"
+    hostname = "suma-bv-43-pxy.tf.local"
   }
   auto_register           = false
   use_os_released_updates = false
   ssh_key_path            = "./salt/controller/id_rsa.pub"
 
-  //sle15sp3-client_additional_repos
+  //ceos7-client_additional_repos
 
 }
 
-module "sles15sp4-client" {
-  source             = "./modules/client"
+module "centos7-minion" {
+  source             = "./modules/minion"
   base_configuration = module.base_core.configuration
   product_version    = "4.3-released"
-  name               = "cli-sles15sp4"
-  image              = "sles15sp4o"
+  name               = "min-centos7"
+  image              = "centos7o"
   provider_settings = {
     memory             = 4096
   }
   server_configuration = {
     hostname = "mnoel-bv-43-pxy.tf.local"
   }
-  auto_register           = false
+  auto_connect_to_master  = false
   use_os_released_updates = false
   ssh_key_path            = "./salt/controller/id_rsa.pub"
 
-  //sle15sp4-client_additional_repos
+  //ceos7-minion_additional_repos
 
 }
 
-
-module "sles15sp2-minion" {
+module "rocky8-minion" {
   source             = "./modules/minion"
   base_configuration = module.base_core.configuration
   product_version    = "4.3-released"
-  name               = "min-sles15sp2"
-  image              = "sles15sp2o"
+  name               = "min-rocky8"
+  image              = "rocky8o"
+  provider_settings = {
+    memory             = 4096
+  }
+  server_configuration = {
+    hostname = "mnoel-bv-43-pxy.tf.local"
+  }
+  auto_connect_to_master  = false
+  use_os_released_updates = false
+  ssh_key_path            = "./salt/controller/id_rsa.pub"
+
+  //rocky8-minion_additional_repos
+
+}
+
+module "rocky9-minion" {
+  source             = "./modules/minion"
+  base_configuration = module.base_core.configuration
+  product_version    = "4.3-released"
+  name               = "min-rocky9"
+  image              = "rocky9o"
+  provider_settings = {
+    memory             = 4096
+  }
+  server_configuration = {
+    hostname = "mnoel-bv-43-pxy.tf.local"
+  }
+  auto_connect_to_master  = false
+  use_os_released_updates = false
+  ssh_key_path            = "./salt/controller/id_rsa.pub"
+
+  //rocky9-minion_additional_repos
+
+}
+
+module "ubuntu1804-minion" {
+  source             = "./modules/minion"
+  base_configuration = module.base_core.configuration
+  product_version    = "4.3-released"
+  name               = "min-ubuntu1804"
+  image              = "ubuntu1804o"
+  provider_settings = {
+    memory             = 4096
+  }
+  server_configuration = {
+    hostname = "mnoel-bv-43-pxy.tf.local"
+  }
+  auto_connect_to_master  = false
+  use_os_released_updates = false
+  ssh_key_path            = "./salt/controller/id_rsa.pub"
+
+  //ubuntu1804-minion_additional_repos
+
+}
+
+module "ubuntu2004-minion" {
+  source             = "./modules/minion"
+  base_configuration = module.base_core.configuration
+  product_version    = "4.3-released"
+  name               = "min-ubuntu2004"
+  image              = "ubuntu2004o"
+  provider_settings = {
+    memory             = 4096
+  }
+  server_configuration = {
+    hostname = "mnoel-bv-43-pxy.tf.local"
+  }
+  auto_connect_to_master  = false
+  use_os_released_updates = false
+  ssh_key_path            = "./salt/controller/id_rsa.pub"
+
+  //ubuntu2004-minion_additional_repos
+
+}
+
+module "ubuntu2204-minion" {
+  source             = "./modules/minion"
+  base_configuration = module.base_core.configuration
+  product_version    = "4.3-released"
+  name               = "min-ubuntu2204"
+  image              = "ubuntu2204o"
+  provider_settings = {
+    memory             = 4096
+  }
+  server_configuration = {
+    hostname = "mnoel-bv-43-pxy.tf.local"
+  }
+  auto_connect_to_master  = false
+  use_os_released_updates = false
+  ssh_key_path            = "./salt/controller/id_rsa.pub"
+}
+
+// Debian 9 is not supported by 4.3
+
+module "debian10-minion" {
+  source             = "./modules/minion"
+  base_configuration = module.base_core.configuration
+  product_version    = "4.3-released"
+  name               = "min-debian10"
+  image              = "debian10o"
   provider_settings = {
     memory             = 4096
   }
@@ -236,16 +333,16 @@ module "sles15sp2-minion" {
   use_os_released_updates = false
   ssh_key_path            = "./salt/controller/id_rsa.pub"
 
-  //sle15sp2-minion_additional_repos
+  //debian10-minion_additional_repos
 
 }
 
-module "sles15sp3-minion" {
+module "debian11-minion" {
   source             = "./modules/minion"
   base_configuration = module.base_core.configuration
   product_version    = "4.3-released"
-  name               = "min-sles15sp3"
-  image              = "sles15sp3o"
+  name               = "min-debian11"
+  image              = "debian11o"
   provider_settings = {
     memory             = 4096
   }
@@ -257,20 +354,21 @@ module "sles15sp3-minion" {
   use_os_released_updates = false
   ssh_key_path            = "./salt/controller/id_rsa.pub"
 
-  //sle15sp3-minion_additional_repos
+  //debian11-minion_additional_repos
 
 }
 
-module "sles15sp4-minion" {
+module "opensuse154arm-minion" {
   source             = "./modules/minion"
-  base_configuration = module.base_core.configuration
+  base_configuration = module.base_arm.configuration
   product_version    = "4.3-released"
-  name               = "min-sles15sp4"
-  image              = "sles15sp4o"
+  name               = "min-opensuse154arm"
+  image              = "opensuse154armo"
   provider_settings = {
-    memory             = 4096
+    memory             = 2048
+    vcpu               = 2
+    xslt               = file("../../susemanager-ci/terracumber_config/tf_files/common/tune-aarch64.xslt")
   }
-
   server_configuration = {
     hostname = "mnoel-bv-43-pxy.tf.local"
   }
@@ -278,55 +376,16 @@ module "sles15sp4-minion" {
   use_os_released_updates = false
   ssh_key_path            = "./salt/controller/id_rsa.pub"
 
-  //sle15sp4-minion_additional_repos
+  //opensuse154arm-minion_additional_repos
 
 }
 
-module "sles15sp2-sshminion" {
-  source             = "./modules/sshminion"
-  base_configuration = module.base_core.configuration
-  product_version    = "4.3-released"
-  name               = "minssh-sles15sp2"
-  image              = "sles15sp2o"
-  provider_settings = {
-    memory             = 4096
-  }
-  use_os_released_updates = false
-  ssh_key_path            = "./salt/controller/id_rsa.pub"
-}
-
-module "sles15sp3-sshminion" {
-  source             = "./modules/sshminion"
-  base_configuration = module.base_core.configuration
-  product_version    = "4.3-released"
-  name               = "minssh-sles15sp3"
-  image              = "sles15sp3o"
-  provider_settings = {
-    memory             = 4096
-  }
-  use_os_released_updates = false
-  ssh_key_path            = "./salt/controller/id_rsa.pub"
-}
-
-module "sles15sp4-sshminion" {
-  source             = "./modules/sshminion"
-  base_configuration = module.base_core.configuration
-  product_version    = "4.3-released"
-  name               = "minssh-sles15sp4"
-  image              = "sles15sp4o"
-  provider_settings = {
-    memory             = 4096
-  }
-  use_os_released_updates = false
-  ssh_key_path            = "./salt/controller/id_rsa.pub"
-}
-
-module "monitoring-server" {
+module "slemicro52-minion" {
   source             = "./modules/minion"
   base_configuration = module.base_core.configuration
   product_version    = "4.3-released"
-  name               = "monitoring"
-  image              = "sles15sp4o"
+  name               = "min-slemicro52"
+  image              = "slemicro52-ign"
   provider_settings = {
     memory             = 2048
   }
@@ -338,7 +397,178 @@ module "monitoring-server" {
   use_os_released_updates = false
   ssh_key_path            = "./salt/controller/id_rsa.pub"
 
-  //monitoring_additional_repos
+  //slemicro52-minion_additional_repos
+
+}
+
+module "alma9-minion" {
+  source             = "./modules/minion"
+  base_configuration = module.base_core.configuration
+  product_version    = "4.3-released"
+  name               = "min-alma9"
+  image              = "almalinux9o"
+  provider_settings = {
+    memory             = 4096
+  }
+  server_configuration = {
+    hostname = "mnoel-bv-43-pxy.tf.local"
+  }
+  auto_connect_to_master  = false
+  use_os_released_updates = false
+  ssh_key_path            = "./salt/controller/id_rsa.pub"
+
+  //alma9-minion_additional_repos
+
+}
+
+module "oracle9-minion" {
+  source             = "./modules/minion"
+  base_configuration = module.base_core.configuration
+  product_version    = "4.3-released"
+  name               = "min-oracle9"
+  image              = "oraclelinux9o"
+  provider_settings = {
+    memory             = 4096
+  }
+  server_configuration = {
+    hostname = "mnoel-bv-43-pxy.tf.local"
+  }
+  auto_connect_to_master  = false
+  use_os_released_updates = false
+  ssh_key_path            = "./salt/controller/id_rsa.pub"
+
+  //oracle9-minion_additional_repos
+
+}
+
+module "slemicro53-minion" {
+  source             = "./modules/minion"
+  base_configuration = module.base_core.configuration
+  product_version    = "4.3-released"
+  name               = "min-slemicro53"
+  image              = "slemicro53-ign"
+  provider_settings = {
+    memory             = 2048
+  }
+
+  server_configuration = {
+    hostname = "mnoel-bv-43-pxy.tf.local"
+  }
+  auto_connect_to_master  = false
+  use_os_released_updates = false
+  ssh_key_path            = "./salt/controller/id_rsa.pub"
+
+  //slemicro52-minion_additional_repos
+
+}
+
+module "centos7-sshminion" {
+  source             = "./modules/sshminion"
+  base_configuration = module.base_core.configuration
+  product_version    = "4.3-released"
+  name               = "minssh-centos7"
+  image              = "centos7o"
+  provider_settings = {
+    memory             = 4096
+  }
+  use_os_released_updates = false
+  ssh_key_path            = "./salt/controller/id_rsa.pub"
+}
+
+module "rocky8-sshminion" {
+  source             = "./modules/sshminion"
+  base_configuration = module.base_core.configuration
+  product_version    = "4.3-released"
+  name               = "minssh-rocky8"
+  image              = "rocky8o"
+  provider_settings = {
+    memory             = 4096
+  }
+  use_os_released_updates = false
+  ssh_key_path            = "./salt/controller/id_rsa.pub"
+}
+
+module "rocky9-sshminion" {
+  source             = "./modules/sshminion"
+  base_configuration = module.base_core.configuration
+  product_version    = "4.3-released"
+  name               = "minssh-rocky9"
+  image              = "rocky9o"
+  provider_settings = {
+    memory             = 4096
+  }
+  use_os_released_updates = false
+  ssh_key_path            = "./salt/controller/id_rsa.pub"
+}
+
+module "ubuntu1804-sshminion" {
+  source             = "./modules/sshminion"
+  base_configuration = module.base_core.configuration
+  product_version    = "4.3-released"
+  name               = "minssh-ubuntu1804"
+  image              = "ubuntu1804o"
+  provider_settings = {
+    memory             = 4096
+  }
+  use_os_released_updates = false
+  ssh_key_path            = "./salt/controller/id_rsa.pub"
+}
+
+module "ubuntu2004-sshminion" {
+  source             = "./modules/sshminion"
+  base_configuration = module.base_core.configuration
+  product_version    = "4.3-released"
+  name               = "minssh-ubuntu2004"
+  image              = "ubuntu2004o"
+  provider_settings = {
+    memory             = 4096
+  }
+  use_os_released_updates = false
+  ssh_key_path            = "./salt/controller/id_rsa.pub"
+}
+
+module "ubuntu2204-sshminion" {
+  source             = "./modules/sshminion"
+  base_configuration = module.base_core.configuration
+  product_version    = "4.3-released"
+  name               = "minssh-ubuntu2204"
+  image              = "ubuntu2204o"
+  provider_settings = {
+    memory             = 4096
+  }
+  use_os_released_updates = false
+  ssh_key_path            = "./salt/controller/id_rsa.pub"
+}
+
+module "sles15sp4-buildhost" {
+  source             = "./modules/build_host"
+  base_configuration = module.base_core.configuration
+  product_version    = "4.3-released"
+  name               = "build-sles15sp4"
+  image              = "sles15sp4o"
+  provider_settings = {
+    memory             = 2048
+    vcpu               = 2
+  }
+  server_configuration = {
+    hostname = "mnoel-bv-43-pxy.tf.local"
+  }
+  auto_connect_to_master  = false
+  use_os_released_updates = false
+  ssh_key_path            = "./salt/controller/id_rsa.pub"
+}
+
+module "sles15sp4-terminal" {
+  source             = "./modules/pxe_boot"
+  base_configuration = module.base_core.configuration
+  name               = "terminal-sles15sp4"
+  image              = "sles15sp4o"
+  provider_settings = {
+    memory             = 2048
+    vcpu               = 2
+    manufacturer       = "HP"
+    product            = "ProLiant DL360 Gen9"
+  }
 }
 
 module "controller" {
@@ -360,18 +590,44 @@ module "controller" {
   server_configuration = module.server.configuration
   proxy_configuration  = module.proxy.configuration
 
-  sle15sp2_minion_configuration    = module.sles15sp2-minion.configuration
-  sle15sp2_sshminion_configuration = module.sles15sp2-sshminion.configuration
 
-  sle15sp3_client_configuration    = module.sles15sp3-client.configuration
-  sle15sp3_minion_configuration    = module.sles15sp3-minion.configuration
-  sle15sp3_sshminion_configuration = module.sles15sp3-sshminion.configuration
+  centos7_client_configuration    = module.centos7-client.configuration
+  centos7_minion_configuration    = module.centos7-minion.configuration
+  centos7_sshminion_configuration = module.centos7-sshminion.configuration
 
-  sle15sp4_client_configuration    = module.sles15sp4-client.configuration
-  sle15sp4_minion_configuration    = module.sles15sp4-minion.configuration
-  sle15sp4_sshminion_configuration = module.sles15sp4-sshminion.configuration
+  rocky8_minion_configuration    = module.rocky8-minion.configuration
+  rocky8_sshminion_configuration = module.rocky8-sshminion.configuration
 
-  monitoringserver_configuration = module.monitoring-server.configuration
+  rocky9_minion_configuration    = module.rocky9-minion.configuration
+  rocky9_sshminion_configuration = module.rocky9-sshminion.configuration
+
+  alma9_minion_configuration    = module.alma9-minion.configuration
+
+  oracle9_minion_configuration    = module.oracle9-minion.configuration
+
+  ubuntu1804_minion_configuration    = module.ubuntu1804-minion.configuration
+  ubuntu1804_sshminion_configuration = module.ubuntu1804-sshminion.configuration
+
+  ubuntu2004_minion_configuration    = module.ubuntu2004-minion.configuration
+  ubuntu2004_sshminion_configuration = module.ubuntu2004-sshminion.configuration
+
+  ubuntu2204_minion_configuration    = module.ubuntu2204-minion.configuration
+  ubuntu2204_sshminion_configuration = module.ubuntu2204-sshminion.configuration
+
+  debian10_minion_configuration    = module.debian10-minion.configuration
+
+  debian11_minion_configuration    = module.debian11-minion.configuration
+
+  opensuse154arm_minion_configuration    = module.opensuse154arm-minion.configuration
+
+  slemicro52_minion_configuration    = module.slemicro52-minion.configuration
+
+  slemicro53_minion_configuration    = module.slemicro53-minion.configuration
+
+  sle15sp4_buildhost_configuration = module.sles15sp4-buildhost.configuration
+
+  sle15sp4_terminal_configuration = module.sles15sp4-terminal.configuration
+
 }
 
 output "configuration" {
