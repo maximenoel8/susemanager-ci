@@ -360,7 +360,7 @@ module "debian11-minion" {
 
 module "opensuse154arm-minion" {
   source             = "./modules/minion"
-  base_configuration = module.base_arm.configuration
+  base_configuration = module.base_core.configuration
   product_version    = "4.3-released"
   name               = "min-opensuse154arm"
   image              = "opensuse154armo"
