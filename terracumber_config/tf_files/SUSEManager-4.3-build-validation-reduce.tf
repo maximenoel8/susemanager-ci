@@ -102,7 +102,7 @@ module "base_core" {
   name_prefix = "mnoel-bv-43-"
   use_avahi   = true
   domain      = "tf.local"
-  images      = [ "opensuse154o", "sles15sp2o", "sles15sp3o", "sles15sp4o" ]
+  images      = [ "opensuse154o", "sles15sp2o", "sles15sp3o", "sles15sp4o", "centos7o", "rocky8o", "rocky9o", "oraclelinux9o", "almalinux9o", "slemicro52-ign", "slemicro53-ign", "ubuntu1804o", "ubuntu2004o", "ubuntu2204o", "debian10o", "debian11o" ]
 
   mirror = "minima-mirror-bv.mgr.prv.suse.net"
   use_mirror_images = true
