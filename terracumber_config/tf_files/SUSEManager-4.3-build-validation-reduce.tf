@@ -102,7 +102,7 @@ module "base_core" {
   name_prefix = "mnoel-bv-43-"
   use_avahi   = true
   domain      = "tf.local"
-  images      = [ "opensuse154o", "sles15sp2o", "sles15sp3o", "sles15sp4o", "centos7o", "rocky8o", "rocky9o", "oraclelinux9o", "almalinux9o", "ubuntu1804o", "ubuntu2004o", "ubuntu2204o", "debian11o", "opensuse154armo" ]
+  images      = [ "opensuse154o", "sles15sp2o", "sles15sp3o", "sles15sp4o", "centos7o", "rocky8o", "rocky9o", "oraclelinux9o", "almalinux9o", "ubuntu1804o", "ubuntu2004o", "ubuntu2204o", "debian11o" ]
 
   mirror = "minima-mirror-bv.mgr.prv.suse.net"
   use_mirror_images = true
@@ -337,28 +337,6 @@ module "debian11-minion" {
 
 }
 
-module "opensuse154arm-minion" {
-  source             = "./modules/minion"
-  base_configuration = module.base_core.configuration
-  product_version    = "4.3-released"
-  name               = "min-opensuse154arm"
-  image              = "opensuse154armo"
-  provider_settings = {
-    memory             = 2048
-    vcpu               = 2
-    xslt               = file("../../susemanager-ci/terracumber_config/tf_files/common/tune-aarch64.xslt")
-  }
-  server_configuration = {
-    hostname = "mnoel-bv-43-pxy.tf.local"
-  }
-  auto_connect_to_master  = false
-  use_os_released_updates = false
-  ssh_key_path            = "./salt/controller/id_rsa.pub"
-
-  //opensuse154arm-minion_additional_repos
-
-}
-
 module "alma9-minion" {
   source             = "./modules/minion"
   base_configuration = module.base_core.configuration
@@ -552,8 +530,6 @@ module "controller" {
   ubuntu2204_sshminion_configuration = module.ubuntu2204-sshminion.configuration
 
   debian11_minion_configuration    = module.debian11-minion.configuration
-
-  opensuse154arm_minion_configuration    = module.opensuse154arm-minion.configuration
 
   sle15sp4_buildhost_configuration = module.sles15sp4-buildhost.configuration
 
