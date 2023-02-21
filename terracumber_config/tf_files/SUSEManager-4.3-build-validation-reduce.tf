@@ -102,7 +102,7 @@ module "base_core" {
   name_prefix = "mnoel-bv-43-"
   use_avahi   = true
   domain      = "tf.local"
-  images      = [ "opensuse154o", "sles15sp2o", "sles15sp3o", "sles15sp4o", "centos7o", "rocky8o", "rocky9o", "oraclelinux9o", "almalinux9o", "slemicro52-ign", "slemicro53-ign", "ubuntu1804o", "ubuntu2004o", "ubuntu2204o", "debian10o", "debian11o" ]
+  images      = [ "opensuse154o", "sles15sp2o", "sles15sp3o", "sles15sp4o", "centos7o", "rocky8o", "rocky9o", "oraclelinux9o", "almalinux9o", "ubuntu1804o", "ubuntu2004o", "ubuntu2204o", "debian11o", "opensuse154armo" ]
 
   mirror = "minima-mirror-bv.mgr.prv.suse.net"
   use_mirror_images = true
@@ -316,27 +316,6 @@ module "ubuntu2204-minion" {
 
 // Debian 9 is not supported by 4.3
 
-module "debian10-minion" {
-  source             = "./modules/minion"
-  base_configuration = module.base_core.configuration
-  product_version    = "4.3-released"
-  name               = "min-debian10"
-  image              = "debian10o"
-  provider_settings = {
-    memory             = 4096
-  }
-
-  server_configuration = {
-    hostname = "mnoel-bv-43-pxy.tf.local"
-  }
-  auto_connect_to_master  = false
-  use_os_released_updates = false
-  ssh_key_path            = "./salt/controller/id_rsa.pub"
-
-  //debian10-minion_additional_repos
-
-}
-
 module "debian11-minion" {
   source             = "./modules/minion"
   base_configuration = module.base_core.configuration
@@ -380,27 +359,6 @@ module "opensuse154arm-minion" {
 
 }
 
-module "slemicro52-minion" {
-  source             = "./modules/minion"
-  base_configuration = module.base_core.configuration
-  product_version    = "4.3-released"
-  name               = "min-slemicro52"
-  image              = "slemicro52-ign"
-  provider_settings = {
-    memory             = 2048
-  }
-
-  server_configuration = {
-    hostname = "mnoel-bv-43-pxy.tf.local"
-  }
-  auto_connect_to_master  = false
-  use_os_released_updates = false
-  ssh_key_path            = "./salt/controller/id_rsa.pub"
-
-  //slemicro52-minion_additional_repos
-
-}
-
 module "alma9-minion" {
   source             = "./modules/minion"
   base_configuration = module.base_core.configuration
@@ -438,27 +396,6 @@ module "oracle9-minion" {
   ssh_key_path            = "./salt/controller/id_rsa.pub"
 
   //oracle9-minion_additional_repos
-
-}
-
-module "slemicro53-minion" {
-  source             = "./modules/minion"
-  base_configuration = module.base_core.configuration
-  product_version    = "4.3-released"
-  name               = "min-slemicro53"
-  image              = "slemicro53-ign"
-  provider_settings = {
-    memory             = 2048
-  }
-
-  server_configuration = {
-    hostname = "mnoel-bv-43-pxy.tf.local"
-  }
-  auto_connect_to_master  = false
-  use_os_released_updates = false
-  ssh_key_path            = "./salt/controller/id_rsa.pub"
-
-  //slemicro52-minion_additional_repos
 
 }
 
@@ -614,15 +551,9 @@ module "controller" {
   ubuntu2204_minion_configuration    = module.ubuntu2204-minion.configuration
   ubuntu2204_sshminion_configuration = module.ubuntu2204-sshminion.configuration
 
-  debian10_minion_configuration    = module.debian10-minion.configuration
-
   debian11_minion_configuration    = module.debian11-minion.configuration
 
   opensuse154arm_minion_configuration    = module.opensuse154arm-minion.configuration
-
-  slemicro52_minion_configuration    = module.slemicro52-minion.configuration
-
-  slemicro53_minion_configuration    = module.slemicro53-minion.configuration
 
   sle15sp4_buildhost_configuration = module.sles15sp4-buildhost.configuration
 
