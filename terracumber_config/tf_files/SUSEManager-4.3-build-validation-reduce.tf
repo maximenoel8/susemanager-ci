@@ -197,46 +197,6 @@ module "centos7-client" {
 
 }
 
-module "centos7-minion" {
-  source             = "./modules/minion"
-  base_configuration = module.base_core.configuration
-  product_version    = "4.3-released"
-  name               = "min-centos7"
-  image              = "centos7o"
-  provider_settings = {
-    memory             = 4096
-  }
-  server_configuration = {
-    hostname = "mnoel-bv-43-pxy.tf.local"
-  }
-  auto_connect_to_master  = false
-  use_os_released_updates = false
-  ssh_key_path            = "./salt/controller/id_rsa.pub"
-
-  //ceos7-minion_additional_repos
-
-}
-
-module "rocky8-minion" {
-  source             = "./modules/minion"
-  base_configuration = module.base_core.configuration
-  product_version    = "4.3-released"
-  name               = "min-rocky8"
-  image              = "rocky8o"
-  provider_settings = {
-    memory             = 4096
-  }
-  server_configuration = {
-    hostname = "mnoel-bv-43-pxy.tf.local"
-  }
-  auto_connect_to_master  = false
-  use_os_released_updates = false
-  ssh_key_path            = "./salt/controller/id_rsa.pub"
-
-  //rocky8-minion_additional_repos
-
-}
-
 module "rocky9-minion" {
   source             = "./modules/minion"
   base_configuration = module.base_core.configuration
@@ -274,26 +234,6 @@ module "ubuntu1804-minion" {
   ssh_key_path            = "./salt/controller/id_rsa.pub"
 
   //ubuntu1804-minion_additional_repos
-
-}
-
-module "ubuntu2004-minion" {
-  source             = "./modules/minion"
-  base_configuration = module.base_core.configuration
-  product_version    = "4.3-released"
-  name               = "min-ubuntu2004"
-  image              = "ubuntu2004o"
-  provider_settings = {
-    memory             = 4096
-  }
-  server_configuration = {
-    hostname = "mnoel-bv-43-pxy.tf.local"
-  }
-  auto_connect_to_master  = false
-  use_os_released_updates = false
-  ssh_key_path            = "./salt/controller/id_rsa.pub"
-
-  //ubuntu2004-minion_additional_repos
 
 }
 
@@ -357,45 +297,12 @@ module "alma9-minion" {
 
 }
 
-module "oracle9-minion" {
-  source             = "./modules/minion"
-  base_configuration = module.base_core.configuration
-  product_version    = "4.3-released"
-  name               = "min-oracle9"
-  image              = "oraclelinux9o"
-  provider_settings = {
-    memory             = 4096
-  }
-  server_configuration = {
-    hostname = "mnoel-bv-43-pxy.tf.local"
-  }
-  auto_connect_to_master  = false
-  use_os_released_updates = false
-  ssh_key_path            = "./salt/controller/id_rsa.pub"
-
-  //oracle9-minion_additional_repos
-
-}
-
 module "centos7-sshminion" {
   source             = "./modules/sshminion"
   base_configuration = module.base_core.configuration
   product_version    = "4.3-released"
   name               = "minssh-centos7"
   image              = "centos7o"
-  provider_settings = {
-    memory             = 4096
-  }
-  use_os_released_updates = false
-  ssh_key_path            = "./salt/controller/id_rsa.pub"
-}
-
-module "rocky8-sshminion" {
-  source             = "./modules/sshminion"
-  base_configuration = module.base_core.configuration
-  product_version    = "4.3-released"
-  name               = "minssh-rocky8"
-  image              = "rocky8o"
   provider_settings = {
     memory             = 4096
   }
@@ -422,19 +329,6 @@ module "ubuntu1804-sshminion" {
   product_version    = "4.3-released"
   name               = "minssh-ubuntu1804"
   image              = "ubuntu1804o"
-  provider_settings = {
-    memory             = 4096
-  }
-  use_os_released_updates = false
-  ssh_key_path            = "./salt/controller/id_rsa.pub"
-}
-
-module "ubuntu2004-sshminion" {
-  source             = "./modules/sshminion"
-  base_configuration = module.base_core.configuration
-  product_version    = "4.3-released"
-  name               = "minssh-ubuntu2004"
-  image              = "ubuntu2004o"
   provider_settings = {
     memory             = 4096
   }
@@ -507,24 +401,15 @@ module "controller" {
 
 
   centos7_client_configuration    = module.centos7-client.configuration
-  centos7_minion_configuration    = module.centos7-minion.configuration
   centos7_sshminion_configuration = module.centos7-sshminion.configuration
-
-  rocky8_minion_configuration    = module.rocky8-minion.configuration
-  rocky8_sshminion_configuration = module.rocky8-sshminion.configuration
 
   rocky9_minion_configuration    = module.rocky9-minion.configuration
   rocky9_sshminion_configuration = module.rocky9-sshminion.configuration
 
   alma9_minion_configuration    = module.alma9-minion.configuration
 
-  oracle9_minion_configuration    = module.oracle9-minion.configuration
-
   ubuntu1804_minion_configuration    = module.ubuntu1804-minion.configuration
   ubuntu1804_sshminion_configuration = module.ubuntu1804-sshminion.configuration
-
-  ubuntu2004_minion_configuration    = module.ubuntu2004-minion.configuration
-  ubuntu2004_sshminion_configuration = module.ubuntu2004-sshminion.configuration
 
   ubuntu2204_minion_configuration    = module.ubuntu2204-minion.configuration
   ubuntu2204_sshminion_configuration = module.ubuntu2204-sshminion.configuration
