@@ -218,28 +218,6 @@ module "sles15sp4-client" {
 
 }
 
-
-module "sles15sp2-minion" {
-  source             = "./modules/minion"
-  base_configuration = module.base_core.configuration
-  product_version    = "4.3-released"
-  name               = "min-sles15sp2"
-  image              = "sles15sp2o"
-  provider_settings = {
-    memory             = 4096
-  }
-
-  server_configuration = {
-    hostname = "mnoel-bv-43-pxy.tf.local"
-  }
-  auto_connect_to_master  = false
-  use_os_released_updates = false
-  ssh_key_path            = "./salt/controller/id_rsa.pub"
-
-  //sle15sp2-minion_additional_repos
-
-}
-
 module "sles15sp3-minion" {
   source             = "./modules/minion"
   base_configuration = module.base_core.configuration
@@ -280,19 +258,6 @@ module "sles15sp4-minion" {
 
   //sle15sp4-minion_additional_repos
 
-}
-
-module "sles15sp2-sshminion" {
-  source             = "./modules/sshminion"
-  base_configuration = module.base_core.configuration
-  product_version    = "4.3-released"
-  name               = "minssh-sles15sp2"
-  image              = "sles15sp2o"
-  provider_settings = {
-    memory             = 4096
-  }
-  use_os_released_updates = false
-  ssh_key_path            = "./salt/controller/id_rsa.pub"
 }
 
 module "sles15sp3-sshminion" {
@@ -359,9 +324,6 @@ module "controller" {
 
   server_configuration = module.server.configuration
   proxy_configuration  = module.proxy.configuration
-
-  sle15sp2_minion_configuration    = module.sles15sp2-minion.configuration
-  sle15sp2_sshminion_configuration = module.sles15sp2-sshminion.configuration
 
   sle15sp3_client_configuration    = module.sles15sp3-client.configuration
   sle15sp3_minion_configuration    = module.sles15sp3-minion.configuration
