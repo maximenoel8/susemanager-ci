@@ -33,7 +33,7 @@ def run(params) {
             }
 
             stage('Deploy') {
-                if(params.must_deploy) {
+                if (params.must_deploy) {
                     // Provision the environment
                     if (params.terraform_init) {
                         env.TERRAFORM_INIT = '--init'
