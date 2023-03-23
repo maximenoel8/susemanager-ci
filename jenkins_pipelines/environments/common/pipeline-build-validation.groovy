@@ -33,11 +33,13 @@ def run(params) {
             }
 
             // Load json matching non MU repositories data
-            env.json_matching_non_MU_data = readJSON(file: params.non_MU_channels_tasks_file)
-            echo "Json text ${json_text}"
+            def json_matching_non_MU_data = readJSON(file: params.non_MU_channels_tasks_file)
+            echo "Json text ${json_matching_non_MU_data}"
 //            env.json_matching_non_MU_data = new groovy.json.JsonSlurper().parseText(json_text)
 //            echo "Json data ${env.json_matching_non_MU_data}"
-            echo "LIberty value ${env.json_matching_non_MU_data['liberty9_minion']}"
+            echo "setup variable"
+            def value = env.json_matching_non_MU_data['liberty9_minion']
+            echo "LIberty value ${value}"
 
 
             stage('Deploy') {
