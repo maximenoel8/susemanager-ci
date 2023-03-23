@@ -33,8 +33,8 @@ def run(params) {
             }
 
             // Load json matching non MU repositories data
-            def json_matching_non_MU_data = readJSON file: params.matching_minion_non_MU_channel_json_file
-            echo "Json data ${json_matching_non_MU_data}"
+            env.json_matching_non_MU_data = readJSON file: params.matching_minion_non_MU_channel_json_file
+            echo "Json data ${env.json_matching_non_MU_data}"
 
             stage('Deploy') {
                 if (params.must_deploy) {
@@ -305,9 +305,9 @@ def clientTestingStages() {
                     }
                 }
             }
-            echo "Json data ${json_matching_non_MU_data}"
-            echo ("Check key value ${json_matching_non_MU_data.contains(minion)}")
-            if (params.must_add_non_MU_repositories && json_matching_non_MU_data.contains(minion)) {
+            echo "Json data ${env.json_matching_non_MU_data}"
+            echo ("Check key value ${env.json_matching_non_MU_data.containsKey(minion)}")
+            if (params.must_add_non_MU_repositories && env.json_matching_non_MU_data.containsKey(minion)) {
                 stage('Add non MU Repositories') {
                     def build_validation_non_MU_script = json_matching_non_MU_data[minion]
                     if (params.confirm_before_continue) {
