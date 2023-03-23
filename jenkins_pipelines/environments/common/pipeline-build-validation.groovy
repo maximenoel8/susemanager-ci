@@ -33,12 +33,8 @@ def run(params) {
             }
 
             // Load json matching non MU repositories data
-//            env.json_matching_non_MU_data = readJSON(file: params.non_MU_channels_tasks_file)
-//            echo "Json data ${env.json_matching_non_MU_data}"
-            echo "Load file"
-            def file = new File(params.non_MU_channels_tasks_file)
-            def json_text = file.text
-            echo "LOad json file"
+            def json_text = readJSON(file: params.non_MU_channels_tasks_file)
+            echo "Json data ${json_text}"
             env.json_matching_non_MU_data = new groovy.json.JsonSlurper().parseText(json_text)
             echo "Json data ${env.json_matching_non_MU_data}"
             echo "Data data ${env.json_matching_non_MU_data.get('liberty9_minion')}"
