@@ -1,4 +1,5 @@
 {
+  "_comment":  "List of minions that require specific custom channels with corresponding run_set",
   "alma9_minion" : "build_validation_alma9_minion_build_clm",
   "centos7_minion" : "build_validation_centos7_minion_add_iso",
   "liberty9_minion" : "build_validation_liberty9_minion_build_clm",
