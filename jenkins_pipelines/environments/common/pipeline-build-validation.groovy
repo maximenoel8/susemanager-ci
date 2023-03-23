@@ -305,6 +305,7 @@ def clientTestingStages() {
                     }
                 }
             }
+            echo ("Check key value ${json_matching_non_MU_data.containsKey(minion)}")
             if (params.must_add_non_MU_repositories && json_matching_non_MU_data.containsKey(minion)) {
                 stage('Add non MU Repositories') {
                     def build_validation_non_MU_script = json_matching_non_MU_data[minion]
