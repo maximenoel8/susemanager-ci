@@ -288,7 +288,7 @@ module "sles15sp4-sshminion" {
 
 module "liberty9-minion" {
   source             = "./modules/minion"
-  base_configuration = module.base_res.configuration
+  base_configuration = module.base_core.configuration
   product_version    = "4.3-released"
   name               = "min-liberty9"
   image              = "libertylinux9o"
