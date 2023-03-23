@@ -309,7 +309,7 @@ def clientTestingStages() {
             echo ("Check key value ${env.json_matching_non_MU_data.contains(minion)}")
             if (params.must_add_non_MU_repositories && env.json_matching_non_MU_data.contains(minion)) {
                 stage('Add non MU Repositories') {
-                    def build_validation_non_MU_script = json_matching_non_MU_data.minion
+                    def build_validation_non_MU_script = env.json_matching_non_MU_data.minion
                     echo ("Value ${build_validation_non_MU_script}")
                     if (params.confirm_before_continue) {
                         input 'Press any key to start adding common channels'
