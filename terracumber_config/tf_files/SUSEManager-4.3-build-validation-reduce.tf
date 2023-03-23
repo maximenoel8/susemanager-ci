@@ -102,7 +102,7 @@ module "base_core" {
   name_prefix = "mnoel-bv-43-"
   use_avahi   = true
   domain      = "tf.local"
-  images      = [ "opensuse154o", "sles15sp2o", "sles15sp3o", "sles15sp4o" ]
+  images      = [ "opensuse154o", "sles15sp2o", "sles15sp3o", "sles15sp4o", "libertylinux9o" ]
 
   mirror = "minima-mirror-bv.mgr.prv.suse.net"
   use_mirror_images = true
@@ -286,24 +286,21 @@ module "sles15sp4-sshminion" {
   ssh_key_path            = "./salt/controller/id_rsa.pub"
 }
 
-module "monitoring-server" {
+module "liberty9-minion" {
   source             = "./modules/minion"
-  base_configuration = module.base_core.configuration
+  base_configuration = module.base_res.configuration
   product_version    = "4.3-released"
-  name               = "monitoring"
-  image              = "sles15sp4o"
-  provider_settings = {
-    memory             = 2048
-  }
-
-  server_configuration = {
-    hostname = "mnoel-bv-43-pxy.tf.local"
-  }
+  name               = "min-liberty9"
+  image              = "libertylinux9o"
   auto_connect_to_master  = false
   use_os_released_updates = false
   ssh_key_path            = "./salt/controller/id_rsa.pub"
+  server_configuration = {
+    hostname = "mnoel-bv-43-pxy.tf.local"
+  }
 
-  //monitoring_additional_repos
+  //liberty9-minion_additional_repos
+
 }
 
 module "controller" {
@@ -333,7 +330,7 @@ module "controller" {
   sle15sp4_minion_configuration    = module.sles15sp4-minion.configuration
   sle15sp4_sshminion_configuration = module.sles15sp4-sshminion.configuration
 
-  monitoringserver_configuration = module.monitoring-server.configuration
+  liberty9_minion_configuration    = module.liberty9-minion.configuration
 }
 
 output "configuration" {
