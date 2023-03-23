@@ -33,7 +33,7 @@ def run(params) {
             }
 
             // Load json matching non MU repositories data
-            def json_matching_non_MU_data = readJSON(file: params.non_MU_channels_tasks_file)
+            env.json_matching_non_MU_data = readJSON(file: params.non_MU_channels_tasks_file)
             echo "Json text ${json_text}"
 //            env.json_matching_non_MU_data = new groovy.json.JsonSlurper().parseText(json_text)
 //            echo "Json data ${env.json_matching_non_MU_data}"
