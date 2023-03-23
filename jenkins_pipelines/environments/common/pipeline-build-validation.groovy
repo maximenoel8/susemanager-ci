@@ -32,16 +32,6 @@ def run(params) {
                 }
             }
 
-            // Load json matching non MU repositories data
-            def json_matching_non_MU_data = readJSON(file: params.non_MU_channels_tasks_file)
-            echo "Json text ${json_matching_non_MU_data}"
-//            env.json_matching_non_MU_data = new groovy.json.JsonSlurper().parseText(json_text)
-//            echo "Json data ${env.json_matching_non_MU_data}"
-            echo "setup variable"
-            def value = json_matching_non_MU_data['liberty9_minion']
-            echo "LIberty value ${value}"
-
-
             stage('Deploy') {
                 if (params.must_deploy) {
                     // Provision the environment
@@ -264,6 +254,9 @@ def clientTestingStages() {
     // Implement a hash map to store the various stages of nodes.
     def tests = [:]
 
+    // Load json matching non MU repositories data
+    def json_matching_non_MU_data = readJSON(file: params.non_MU_channels_tasks_file)
+
     // Employ the terraform state list command to generate the list of nodes.
     // Due to the disparity between the node names in the test suite and those in the environment variables of the controller, two separate lists are maintained.
     Set<String> nodeList = new HashSet<String>()
@@ -311,12 +304,12 @@ def clientTestingStages() {
                     }
                 }
             }
-            echo "Json data ${env.json_matching_non_MU_data}"
-            echo ("Check key value ${env.json_matching_non_MU_data.contains(minion)}")
-            if (params.must_add_non_MU_repositories && env.json_matching_non_MU_data.contains(minion)) {
+            echo "Json data ${json_matching_non_MU_data}"
+            echo ("Check key value ${json_matching_non_MU_data.containsKey(minion)}")
+            if (params.must_add_non_MU_repositories && json_matching_non_MU_data.containsKey(minion)) {
                 stage('Add non MU Repositories') {
                     echo ("Check value in stage")
-                    def build_validation_non_MU_script = env.json_matching_non_MU_data["${minion}"]
+                    def build_validation_non_MU_script = json_matching_non_MU_data["${minion}"]
                     echo ("Value ${build_validation_non_MU_script}")
                     if (params.confirm_before_continue) {
                         input 'Press any key to start adding common channels'
