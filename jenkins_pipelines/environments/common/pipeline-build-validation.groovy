@@ -38,7 +38,7 @@ def run(params) {
 //            env.json_matching_non_MU_data = new groovy.json.JsonSlurper().parseText(json_text)
 //            echo "Json data ${env.json_matching_non_MU_data}"
             echo "setup variable"
-            def value = env.json_matching_non_MU_data['liberty9_minion']
+            def value = json_matching_non_MU_data.liberty9_minion
             echo "LIberty value ${value}"
 
 
