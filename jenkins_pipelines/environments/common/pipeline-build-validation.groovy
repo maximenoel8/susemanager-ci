@@ -6,9 +6,6 @@ def run(params) {
         // The junit plugin doesn't affect full paths
         junit_resultdir = "results/${BUILD_NUMBER}/results_junit"
 
-        // Load json matching non MU repositories data
-        def json_matching_non_MU_data = readJSON file: params.matching_minion_non_MU_channel_json_file
-
         // Declare lock resource use during node bootstrap
         mgrCreateBootstrapRepo = 'share resource to avoid running mgr create bootstrap repo in parallel'
         env.client_stage_result_fail = false
@@ -34,6 +31,9 @@ def run(params) {
                     copyArtifacts projectName: currentBuild.projectName, selector: specific("${currentBuild.previousBuild.number}")
                 }
             }
+
+            // Load json matching non MU repositories data
+            def json_matching_non_MU_data = readJSON file: params.matching_minion_non_MU_channel_json_file
 
             stage('Deploy') {
                 if (params.must_deploy) {
