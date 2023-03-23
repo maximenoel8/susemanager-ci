@@ -52,9 +52,9 @@ def run(params) {
                 }
             }
 
-//            stage('Sanity check') {
-//                sh "./terracumber-cli ${common_params} --logfile ${resultdirbuild}/testsuite.log --runstep cucumber --cucumber-cmd 'cd /root/spacewalk/testsuite; rake cucumber:build_validation_sanity_check'"
-//            }
+            stage('Sanity check') {
+                sh "./terracumber-cli ${common_params} --logfile ${resultdirbuild}/testsuite.log --runstep cucumber --cucumber-cmd 'cd /root/spacewalk/testsuite; rake cucumber:build_validation_sanity_check'"
+            }
 
             stage('Run core features') {
                 if (params.must_run_core && (deployed || !params.must_deploy)) {
@@ -304,13 +304,9 @@ def clientTestingStages() {
                     }
                 }
             }
-            echo "Json data ${json_matching_non_MU_data}"
-            echo ("Check key value ${json_matching_non_MU_data.containsKey(minion)}")
             if (params.must_add_non_MU_repositories && json_matching_non_MU_data.containsKey(minion)) {
                 stage('Add non MU Repositories') {
-                    echo ("Check value in stage")
                     def build_validation_non_MU_script = json_matching_non_MU_data["${minion}"]
-                    echo ("Value ${build_validation_non_MU_script}")
                     if (params.confirm_before_continue) {
                         input 'Press any key to start adding common channels'
                     }
