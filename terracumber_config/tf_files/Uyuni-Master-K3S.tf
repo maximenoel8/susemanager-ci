@@ -1,13 +1,13 @@
 // Mandatory variables for terracumber
 variable "URL_PREFIX" {
   type = string
-  default = "https://ci.suse.de/view/Manager/view/Manager-Test/job/manager-TEST-Ion-acceptance-tests"
+  default = "https://ci.suse.de/view/Manager/view/Uyuni/job/uyuni-master-dev-acceptance-tests-K3S"
 }
 
 // Not really used as this is for --runall parameter, and we run cucumber step by step
 variable "CUCUMBER_COMMAND" {
   type = string
-  default = "export PRODUCT='SUSE-Manager' && run-testsuite"
+  default = "export PRODUCT='Uyuni' && run-testsuite"
 }
 
 variable "CUCUMBER_GITREPO" {
@@ -27,7 +27,7 @@ variable "CUCUMBER_RESULTS" {
 
 variable "MAIL_SUBJECT" {
   type = string
-  default = "Results TEST-ION $status: $tests scenarios ($failures failed, $errors errors, $skipped skipped, $passed passed)"
+  default = "Results Uyuni-Master $status: $tests scenarios ($failures failed, $errors errors, $skipped skipped, $passed passed)"
 }
 
 variable "MAIL_TEMPLATE" {
@@ -37,7 +37,7 @@ variable "MAIL_TEMPLATE" {
 
 variable "MAIL_SUBJECT_ENV_FAIL" {
   type = string
-  default = "Results TEST-ION: Environment setup failed"
+  default = "Results Uyuni-Master K3S: Environment setup failed"
 }
 
 variable "MAIL_TEMPLATE_ENV_FAIL" {
@@ -85,13 +85,13 @@ terraform {
 }
 
 provider "libvirt" {
-  uri = "qemu+tcp://cthulhu.mgr.suse.de/system"
+  uri = "qemu+tcp://rocheworld.mgr.prv.suse.net/system"
 }
 
 module "cucumber_testsuite" {
   source = "./modules/cucumber_testsuite"
 
-  product_version = "head"
+  product_version = "uyuni-master"
 
   // Cucumber repository configuration for the controller
   git_username = var.GIT_USER
@@ -105,49 +105,44 @@ module "cucumber_testsuite" {
   images = ["rocky8o", "opensuse154o", "sles15sp4o", "ubuntu2204o"]
 
   use_avahi    = false
-  name_prefix  = "suma-test-ion-"
-  domain       = "mgr.suse.de"
+  name_prefix  = "uyuni-master-k3s-"
+  domain       = "mgr.prv.suse.net"
   from_email   = "root@suse.de"
 
   no_auth_registry = "registry.mgr.suse.de"
-  auth_registry = "registry.mgr.suse.de:5000/cucutest"
+  auth_registry      = "registry.mgr.suse.de:5000/cucutest"
   auth_registry_username = "cucutest"
   auth_registry_password = "cucusecret"
   git_profiles_repo = "https://github.com/uyuni-project/uyuni.git#:testsuite/features/profiles/internal_nue"
 
+  // Comment the next two lines if no mirror should be used
+  # mirror = "minima-mirror.mgr.suse.de"
+  # use_mirror_images = true
+
   server_http_proxy = "http-proxy.mgr.suse.de:3128"
   custom_download_endpoint = "ftp://minima-mirror.mgr.suse.de:445"
 
+  # when changing images, please also keep in mind to adjust the image matrix at the end of the README.
   host_settings = {
     controller = {
       provider_settings = {
-        mac = "aa:b2:93:01:00:40"
+        mac = "aa:b2:92:04:00:e0"
       }
     }
     server = {
       provider_settings = {
-        mac = "aa:b2:93:01:00:41"
-        memory = 12288
+        mac = "aa:b2:92:04:00:e1"
+        memory = 16384
       }
-      additional_repos = {
-        server_stack = "http://download.suse.de/ibs/Devel:/Galaxy:/Manager:/TEST:/Ion/images/repo/SLE-Module-SUSE-Manager-Server-4.3-POOL-x86_64-Media1/"
-      }
+      // Your server repo providing all dependencies to run server in K3S
+      // additional_repos = {
+      //   server_repo = "",
+      // }
+      login_timeout = 28800
     }
     proxy = {
       provider_settings = {
-        mac = "aa:b2:93:01:00:42"
-      }
-      additional_repos = {
-        server_stack = "http://download.suse.de/ibs/Devel:/Galaxy:/Manager:/TEST:/Ion/images/repo/SLE-Module-SUSE-Manager-Proxy-4.3-POOL-x86_64-Media1/"
-      }
-      additional_packages = [ "venv-salt-minion" ]
-      install_salt_bundle = true
-    }
-    suse-client = {
-      image = "sles15sp4o"
-      name = "cli-sles15"
-      provider_settings = {
-        mac = "aa:b2:93:01:00:44"
+        mac = "aa:b2:92:04:00:e2"
       }
       additional_packages = [ "venv-salt-minion" ]
       install_salt_bundle = true
@@ -156,7 +151,7 @@ module "cucumber_testsuite" {
       image = "sles15sp4o"
       name = "min-sles15"
       provider_settings = {
-        mac = "aa:b2:93:01:00:46"
+        mac = "aa:b2:92:04:00:e4"
       }
       additional_packages = [ "venv-salt-minion" ]
       install_salt_bundle = true
@@ -165,7 +160,7 @@ module "cucumber_testsuite" {
       image = "sles15sp4o"
       name = "minssh-sles15"
       provider_settings = {
-        mac = "aa:b2:93:01:00:48"
+        mac = "aa:b2:92:04:00:e5"
       }
       additional_packages = [ "venv-salt-minion", "iptables" ]
       install_salt_bundle = true
@@ -174,7 +169,7 @@ module "cucumber_testsuite" {
       image = "rocky8o"
       name = "min-rocky8"
       provider_settings = {
-        mac = "aa:b2:93:01:00:49"
+        mac = "aa:b2:92:04:00:e6"
         // Since start of May we have problems with the instance not booting after a restart if there is only a CPU and only 1024Mb for RAM
         // Also, openscap cannot run with less than 1.25 GB of RAM
         memory = 2048
@@ -183,13 +178,24 @@ module "cucumber_testsuite" {
       additional_packages = [ "venv-salt-minion" ]
       install_salt_bundle = true
     }
+    debian-minion = {
+      name = "min-ubuntu2204"
+      image = "ubuntu2204o"
+      provider_settings = {
+        mac = "aa:b2:92:04:00:e7"
+      }
+      additional_packages = [ "venv-salt-minion" ]
+
+      // FIXME: cloudl-init fails if venv-salt-minion is not avaiable
+      // We can set "install_salt_bundle = true" as soon as venv-salt-minion is available Uyuni:Stable
+      install_salt_bundle = false
+    }
     build-host = {
       image = "sles15sp4o"
       name = "min-build"
       provider_settings = {
-        mac = "aa:b2:93:01:00:4d"
+        mac = " aa:b2:92:04:00:e9"
         memory = 2048
-        vcpu = 2
       }
       additional_packages = [ "venv-salt-minion" ]
       install_salt_bundle = true
@@ -200,20 +206,35 @@ module "cucumber_testsuite" {
       install_salt_bundle = true
     }
     kvm-host = {
-      image = "sles15sp4o"
+      image = "opensuse154o"
       name = "min-kvm"
+      additional_grains = {
+        hvm_disk_image = {
+          leap = {
+            hostname = "leap-salt-migration"
+            image = "http://minima-mirror.mgr.suse.de/distribution/leap/15.4/appliances/openSUSE-Leap-15.4-JeOS.x86_64-OpenStack-Cloud.qcow2"
+            hash = "http://minima-mirror.mgr.suse.de/distribution/leap/15.4/appliances/openSUSE-Leap-15.4-JeOS.x86_64-OpenStack-Cloud.qcow2.sha256"
+          }
+          sles = {
+            hostname = "sles-salt-migration"
+            image = "http://minima-mirror.mgr.suse.de/install/SLE-15-SP4-Minimal-GM/SLES15-SP4-Minimal-VM.x86_64-OpenStack-Cloud-GM.qcow2"
+            hash = "http://minima-mirror.mgr.suse.de/install/SLE-15-SP4-Minimal-GM/SLES15-SP4-Minimal-VM.x86_64-OpenStack-Cloud-GM.qcow2.sha256"
+          }
+        }
+      }
       provider_settings = {
-        mac = "aa:b2:93:01:00:4e"
+        mac = "aa:b2:92:04:00:ea"
       }
       additional_packages = [ "venv-salt-minion" ]
       install_salt_bundle = true
     }
   }
+  nested_vm_hosts = ["leap-salt-migration","sles-salt-migration"]
   provider_settings = {
     pool               = "ssd"
     network_name       = null
     bridge             = "br0"
-    additional_network = "192.168.41.0/24"
+    additional_network = "192.168.113.0/24"
   }
 }
 
