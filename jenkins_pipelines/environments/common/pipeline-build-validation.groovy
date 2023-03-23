@@ -34,6 +34,7 @@ def run(params) {
 
             // Load json matching non MU repositories data
             def json_matching_non_MU_data = readJSON file: params.matching_minion_non_MU_channel_json_file
+            echo "Json data ${json_matching_non_MU_data}"
 
             stage('Deploy') {
                 if (params.must_deploy) {
