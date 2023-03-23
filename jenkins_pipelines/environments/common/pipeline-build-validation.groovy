@@ -37,7 +37,7 @@ def run(params) {
             echo "Json text ${json_text}"
 //            env.json_matching_non_MU_data = new groovy.json.JsonSlurper().parseText(json_text)
 //            echo "Json data ${env.json_matching_non_MU_data}"
-            echo "Data data ${env.json_matching_non_MU_data.liberty9_minion}"
+            echo env.json_matching_non_MU_data.liberty9_minion
 
 
             stage('Deploy') {
