@@ -304,22 +304,25 @@ def clientTestingStages() {
                     }
                 }
             }
-            if (params.must_add_non_MU_repositories && json_matching_non_MU_data.containsKey(minion)) {
+            if (params.must_add_non_MU_repositories) {
                 stage('Add non MU Repositories') {
-                    def build_validation_non_MU_script = json_matching_non_MU_data["${minion}"]
-                    if (params.confirm_before_continue) {
-                        input 'Press any key to start adding common channels'
-                    }
-                    echo 'Add non MU Repositories'
-                    res_non_MU_repositories = sh(script: "./terracumber-cli ${common_params} --logfile ${resultdirbuild}/testsuite.log --runstep cucumber --cucumber-cmd 'unset ${temporaryList.join(' ')}; export BUILD_VALIDATION=true; cd /root/spacewalk/testsuite; rake cucumber:${build_validation_non_MU_script}'", returnStatus: true)
-                    echo "Non MU Repositories status code: ${res_non_MU_repositories}"
-                    if (res_non_MU_repositories != 0) {
-                        error("Add common channels failed with status code: ${res_non_MU_repositories}")
-                    }
-                    res_sync_non_MU_repositories = sh(script: "./terracumber-cli ${common_params} --logfile ${resultdirbuild}/testsuite.log --runstep cucumber --cucumber-cmd 'unset ${temporaryList.join(' ')}; export BUILD_VALIDATION=true; cd /root/spacewalk/testsuite; rake cucumber:build_validation_wait_for_custom_reposync'", returnStatus: true)
-                    echo "Non MU Repositories synchronization status code: ${res_sync_non_MU_repositories}"
-                    if (res_sync_non_MU_repositories != 0) {
-                        error("Non MU Repositories synchronization failed with status code: ${res_sync_non_MU_repositories}")
+                    // We have this condition inside the stage to see in Jenkins side which minion is skipped
+                    if (json_matching_non_MU_data.containsKey(minion)) {
+                        def build_validation_non_MU_script = json_matching_non_MU_data["${minion}"]
+                        if (params.confirm_before_continue) {
+                            input 'Press any key to start adding common channels'
+                        }
+                        echo 'Add non MU Repositories'
+                        res_non_MU_repositories = sh(script: "./terracumber-cli ${common_params} --logfile ${resultdirbuild}/testsuite.log --runstep cucumber --cucumber-cmd 'unset ${temporaryList.join(' ')}; export BUILD_VALIDATION=true; cd /root/spacewalk/testsuite; rake cucumber:${build_validation_non_MU_script}'", returnStatus: true)
+                        echo "Non MU Repositories status code: ${res_non_MU_repositories}"
+                        if (res_non_MU_repositories != 0) {
+                            error("Add common channels failed with status code: ${res_non_MU_repositories}")
+                        }
+                        res_sync_non_MU_repositories = sh(script: "./terracumber-cli ${common_params} --logfile ${resultdirbuild}/testsuite.log --runstep cucumber --cucumber-cmd 'unset ${temporaryList.join(' ')}; export BUILD_VALIDATION=true; cd /root/spacewalk/testsuite; rake cucumber:build_validation_wait_for_custom_reposync'", returnStatus: true)
+                        echo "Non MU Repositories synchronization status code: ${res_sync_non_MU_repositories}"
+                        if (res_sync_non_MU_repositories != 0) {
+                            error("Non MU Repositories synchronization failed with status code: ${res_sync_non_MU_repositories}")
+                        }
                     }
                 }
             }
