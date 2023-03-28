@@ -331,7 +331,7 @@ module "controller" {
   sle15sp4_minion_configuration    = module.sles15sp4-minion.configuration
   sle15sp4_sshminion_configuration = module.sles15sp4-sshminion.configuration
 
-  rocky8-minion_configuration    = module.rocky8-minion.configuration
+  rocky8_minion_configuration    = module.rocky8-minion.configuration
 }
 
 output "configuration" {
