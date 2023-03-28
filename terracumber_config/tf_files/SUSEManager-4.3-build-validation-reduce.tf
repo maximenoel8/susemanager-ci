@@ -102,7 +102,7 @@ module "base_core" {
   name_prefix = "mnoel-bv-43-"
   use_avahi   = true
   domain      = "tf.local"
-  images      = [ "opensuse154o", "sles15sp2o", "sles15sp3o", "sles15sp4o", "libertylinux9o" ]
+  images      = [ "opensuse154o", "sles15sp2o", "sles15sp3o", "sles15sp4o", "rocky8o" ]
 
   mirror = "minima-mirror-bv.mgr.prv.suse.net"
   use_mirror_images = true
@@ -286,20 +286,21 @@ module "sles15sp4-sshminion" {
   ssh_key_path            = "./salt/controller/id_rsa.pub"
 }
 
-module "liberty9-minion" {
+module "rocky8-minion" {
+
   source             = "./modules/minion"
   base_configuration = module.base_core.configuration
   product_version    = "4.3-released"
-  name               = "min-liberty9"
-  image              = "libertylinux9o"
-  auto_connect_to_master  = false
-  use_os_released_updates = false
-  ssh_key_path            = "./salt/controller/id_rsa.pub"
+  name               = "min-rocky8"
+  image              = "rocky8o"
   server_configuration = {
     hostname = "mnoel-bv-43-pxy.tf.local"
   }
+  auto_connect_to_master  = false
+  use_os_released_updates = false
+  ssh_key_path            = "./salt/controller/id_rsa.pub"
 
-  //liberty9-minion_additional_repos
+  //rocky8-minion_additional_repos
 
 }
 
@@ -330,7 +331,7 @@ module "controller" {
   sle15sp4_minion_configuration    = module.sles15sp4-minion.configuration
   sle15sp4_sshminion_configuration = module.sles15sp4-sshminion.configuration
 
-  liberty9_minion_configuration    = module.liberty9-minion.configuration
+  rocky8-minion_configuration    = module.rocky8-minion.configuration
 }
 
 output "configuration" {
