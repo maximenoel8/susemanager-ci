@@ -210,19 +210,19 @@ def run(params) {
             }
 
             stage('Get results') {
-                def error = 0
+                def result_error = 0
                 if (deployed || !params.must_deploy) {
                     try {
                         sh "./terracumber-cli ${common_params} --logfile ${resultdirbuild}/testsuite.log --runstep cucumber --cucumber-cmd 'export BUILD_VALIDATION=true; cd /root/spacewalk/testsuite; rake cucumber:build_validation_finishing'"
                     } catch(Exception ex) {
                         println("ERROR: rake cucumber:build_validation_finishing failed")
-                        error = 1
+                        result_error = 1
                     }
                     try {
                         sh "./terracumber-cli ${common_params} --logfile ${resultdirbuild}/testsuite.log --runstep cucumber --cucumber-cmd 'export BUILD_VALIDATION=true; cd /root/spacewalk/testsuite; rake utils:generate_test_report'"
                     } catch(Exception ex) {
                         println("ERROR: rake utils:generate_test_report failed")
-                        error = 1
+                        result_error = 1
                     }
                     sh "./terracumber-cli ${common_params} --logfile ${resultdirbuild}/testsuite.log --runstep getresults"
                     publishHTML( target: [
@@ -243,7 +243,7 @@ def run(params) {
                 if (env.client_stage_result_fail) {
                     error("Client stage failed")
                 }
-                sh "exit ${error}"
+                sh "exit ${result_error}"
             }
         }
     }
