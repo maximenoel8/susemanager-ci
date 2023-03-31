@@ -396,17 +396,19 @@ def getMinionList() {
             envVar.add(instanceList[1].replaceAll("-", "_").replaceAll("sles", "sle").toUpperCase())
         }
     }
-
-    def declareMinionList = params.minions_to_run.split(", ")
-    println ("Minion list from jenkins : ${declareMinionList}" )
-    def notDeployedMinionList = declareMinionList.findAll { !nodeList.contains(it) }
-    def minionToDisableList = nodeList.findAll { !declareMinionList.contains(it) }
-    def envVariableListToDisable = minionToDisableList.collect { it.replaceAll("ssh_minion", "sshminion").toUpperCase() }
-    def envVariableWithDisableNode = envVar - envVariableListToDisable
-    def nodeListWithDisableNode = nodeList - minionToDisableList
-    println "This minions are declared in jenkins but not deployed ! ${notDeployedMinionList}"
-
-    return [nodeList:nodeListWithDisableNode, envVariableList:envVariableWithDisableNode, envVariableListToDisable:envVariableListToDisable]
+    // Convert jenkins minions list parameter to list
+    def nodesToRun = params.minions_to_run.split(", ")
+    // Create a variable with declared nodes on Jenkins side but not deploy and print it
+    def notDeployedNode = nodesToRun.findAll { !nodeList.contains(it) }
+    println "This minions are declared in jenkins but not deployed ! ${notDeployedNode}"
+    // Check the difference between the nodes deployed and the nodes declared in Jenkins side
+    // This difference will be the nodes to disable
+    def disabledNodes = nodeList.findAll { !nodesToRun.contains(it) }
+    // Convert this list to cucumber compatible environment variable
+    def envVarDisabledNodes = disabledNodes.collect { it.replaceAll("ssh_minion", "sshminion").toUpperCase() }
+    // Create a node list without the disabled nodes. ( use to configure the client stage )
+    def nodeListWithDisabledNodes = nodeList - disabledNodes
+    return [nodeList:nodeListWithDisabledNodes, envVariableList:envVar, envVariableListToDisable:envVarDisabledNodes]
 }
 
 return this
