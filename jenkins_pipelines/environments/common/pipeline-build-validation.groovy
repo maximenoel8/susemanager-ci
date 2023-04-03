@@ -273,9 +273,9 @@ def clientTestingStages() {
             }
             if (params.must_add_MU_repositories) {
                 stage("Add_MUs_${minion}") {
-                    if (minion.contains('ssh')) {
+                    if (minion.contains('ssh_minion')) {
                         println ("SSH minion with dependOn ${minion.replaceAll('ssh_minion', 'minion')}")
-                        dependsOn "add_MUs_${minion.replaceAll('ssh_minion', 'minion')}"
+                        dependsOn "Add_MUs_${minion.replaceAll('ssh_minion', 'minion')}"
                     } else {
                         println ("Create group ${minion}")
                         if (params.confirm_before_continue) {
