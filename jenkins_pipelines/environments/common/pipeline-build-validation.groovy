@@ -291,25 +291,26 @@ def clientTestingStages() {
                     }
                 }
             }
-            if (params.must_add_non_MU_repositories) {
-                stage('Add non MU Repositories') {
-                    // We have this condition inside the stage to see in Jenkins which minion is skipped
-                    if (json_matching_non_MU_data.containsKey(minion)) {
-                        def build_validation_non_MU_script = json_matching_non_MU_data["${minion}"]
+            if (params.must_add_MU_repositories) {
+                stage('Add MUs') {
+                    if (!minion.contains('ssh')) {
+                        group("add_MU_${minion}")
                         if (params.confirm_before_continue) {
-                            input 'Press any key to start adding common channels'
+                            input 'Press any key to start adding Maintenance Update repositories'
                         }
-                        echo 'Add non MU Repositories'
-                        res_non_MU_repositories = sh(script: "./terracumber-cli ${common_params} --logfile ${resultdirbuild}/testsuite.log --runstep cucumber --cucumber-cmd 'unset ${temporaryList.join(' ')}; export BUILD_VALIDATION=true; cd /root/spacewalk/testsuite; rake cucumber:${build_validation_non_MU_script}'", returnStatus: true)
-                        echo "Non MU Repositories status code: ${res_non_MU_repositories}"
-                        if (res_non_MU_repositories != 0) {
-                            error("Add common channels failed with status code: ${res_non_MU_repositories}")
+                        echo 'Add custom channels and MU repositories'
+                        res_mu_repos = sh(script: "./terracumber-cli ${common_params} --logfile ${resultdirbuild}/testsuite.log --runstep cucumber --cucumber-cmd 'unset ${temporaryList.join(' ')}; export BUILD_VALIDATION=true; cd /root/spacewalk/testsuite; rake cucumber:build_validation_add_maintenance_update_repositories_${minion}'", returnStatus: true)
+                        if (res_mu_repos != 0) {
+                            error("Add custom channels and MU repositories failed with status code: ${res_mu_repos}")
                         }
-                        res_sync_non_MU_repositories = sh(script: "./terracumber-cli ${common_params} --logfile ${resultdirbuild}/testsuite.log --runstep cucumber --cucumber-cmd 'unset ${temporaryList.join(' ')}; export BUILD_VALIDATION=true; cd /root/spacewalk/testsuite; rake cucumber:build_validation_wait_for_custom_reposync'", returnStatus: true)
-                        echo "Non MU Repositories synchronization status code: ${res_sync_non_MU_repositories}"
-                        if (res_sync_non_MU_repositories != 0) {
-                            error("Non MU Repositories synchronization failed with status code: ${res_sync_non_MU_repositories}")
+                        echo "Custom channels and MU repositories status code: ${res_mu_repos}"
+                        res_sync_mu_repos = sh(script: "./terracumber-cli ${common_params} --logfile ${resultdirbuild}/testsuite.log --runstep cucumber --cucumber-cmd 'unset ${temporaryList.join(' ')}; export BUILD_VALIDATION=true; cd /root/spacewalk/testsuite; rake cucumber:build_validation_wait_for_custom_reposync'", returnStatus: true)
+                        echo "Custom channels and MU repositories synchronization status code: ${res_sync_mu_repos}"
+                        if (res_sync_mu_repos != 0) {
+                            error("Custom channels and MU repositories synchronization failed with status code: ${res_sync_mu_repos}")
                         }
+                    } else {
+                        dependOn "add_MU_${minion.replaceAll('sshminion', 'minion')}"
                     }
                 }
             }
