@@ -279,10 +279,10 @@ def clientTestingStages() {
                         def minion_name = minion.replaceAll('ssh_minion', 'minion')
                         echo "Print dictionnary ${mu_sync_status}"
                         echo "Print minion replace ${minion.replaceAll('ssh_minion', 'minion')}"
-                        echo "SSH dictio ${mu_sync_status["${minion_name}"]}"
+                        echo "SSH dictio ${mu_sync_status[minion_name]}"
                         waitUntil {
-                            echo "SSH dictio in wait ${mu_sync_status["${minion_name}"]}"
-                            mu_sync_status["${minion_name}"]
+                            echo "SSH dictio in wait ${mu_sync_status[minion_name]}"
+                            mu_sync_status[minion_name]
                         }
                         echo "MU repository created by ${minion}"
                     } else {
@@ -301,7 +301,7 @@ def clientTestingStages() {
                         if (res_sync_mu_repos != 0) {
                             error("Custom channels and MU repositories synchronization failed with status code: ${res_sync_mu_repos}")
                         }
-                        mu_sync_status << ["${minion}" : true]
+                        mu_sync_status[minion] = true
                         echo "Dictionnary ${mu_sync_status}"
                         echo "Dictionnary value ${mu_sync_status[minion]}"
                     }
@@ -426,7 +426,7 @@ def getMinionList() {
     // Create a node list without the disabled nodes. ( use to configure the client stage )
     def nodeListWithDisabledNodes = nodeList - disabledNodes
     for (node in nodeListWithDisabledNodes ) {
-        MUSyncStatus << ["${node}" : false]
+        MUSyncStatus[node] = false
     }
     return [nodeList:nodeListWithDisabledNodes, envVariableList:envVar, envVariableListToDisable:envVarDisabledNodes, MUSyncStatus:MUSyncStatus]
 }
