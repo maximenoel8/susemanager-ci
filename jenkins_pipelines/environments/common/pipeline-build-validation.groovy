@@ -279,10 +279,10 @@ def clientTestingStages() {
                         def minion_name = minion.replaceAll('ssh_minion', 'minion')
                         echo "Print dictionnary ${mu_sync_status}"
                         echo "Print minion replace ${minion.replaceAll('ssh_minion', 'minion')}"
-                        echo "SSH dictio ${mu_sync_status[minion_name]}"
+                        echo "SSH dictio ${mu_sync_status["${minion_name}"]}"
                         waitUntil {
-                            echo "SSH dictio in wait ${mu_sync_status[minion_name]}"
-                            mu_sync_status[minion_name]
+                            echo "SSH dictio in wait ${mu_sync_status["${minion_name}"]}"
+                            mu_sync_status["${minion_name}"]
                         }
                         echo "MU repository created by ${minion}"
                     } else {
