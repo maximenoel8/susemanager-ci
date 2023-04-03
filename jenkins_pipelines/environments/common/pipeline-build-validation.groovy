@@ -276,13 +276,13 @@ def clientTestingStages() {
             if (params.must_add_MU_repositories) {
                 stage("Add_MUs_${minion}") {
                     if (minion.contains('ssh_minion')) {
-                        println("SSH minion with dependOn ${minion.replaceAll('ssh_minion', 'minion')}")
+                        def minion_name = minion.replaceAll('ssh_minion', 'minion')
                         echo "Print dictionnary ${mu_sync_status}"
                         echo "Print minion replace ${minion.replaceAll('ssh_minion', 'minion')}"
-                        echo "SSH dictio ${mu_sync_status[minion.replaceAll('ssh_minion', 'minion')]}"
+                        echo "SSH dictio ${mu_sync_status[minion_name]}"
                         waitUntil {
-                            echo "SSH dictio in wait ${mu_sync_status[minion.replaceAll('ssh_minion', 'minion')]}"
-                            mu_sync_status[minion.replaceAll('ssh_minion', 'minion')]
+                            echo "SSH dictio in wait ${mu_sync_status[minion_name]}"
+                            mu_sync_status[minion_name]
                         }
                         echo "MU repository created by ${minion}"
                     } else {
@@ -414,7 +414,7 @@ def getMinionList() {
         }
     }
     // Convert jenkins minions list parameter to list
-    def nodesToRun = params.minions_to_run.split(", ")
+    Set<String> nodesToRun = params.minions_to_run.split(", ")
     // Create a variable with declared nodes on Jenkins side but not deploy and print it
     def notDeployedNode = nodesToRun.findAll { !nodeList.contains(it) }
     println "This minions are declared in jenkins but not deployed ! ${notDeployedNode}"
@@ -425,6 +425,7 @@ def getMinionList() {
     def envVarDisabledNodes = disabledNodes.collect { it.replaceAll("ssh_minion", "sshminion").toUpperCase() }
     // Create a node list without the disabled nodes. ( use to configure the client stage )
     def nodeListWithDisabledNodes = nodeList - disabledNodes
+    echo "Node list ${nodeListWithDisabledNodes}"
     // Convert nodeListWithDisabledNodes set object to list
     List<String> mainList = new ArrayList<String>()
     mainList.addAll(nodeListWithDisabledNodes)
