@@ -272,13 +272,10 @@ def clientTestingStages() {
                 echo "Testing ${minion}"
             }
             if (params.must_add_MU_repositories) {
-                stage('Add MUs') {
-                    println ("Before group")
-                    group("add_MU_${minion}")
-                    println ("after group")
+                stage("Add_MUs_${minion}") {
                     if (minion.contains('ssh')) {
                         println ("SSH minion with dependOn ${minion.replaceAll('ssh_minion', 'minion')}")
-                        dependsOn "add_MU_${minion.replaceAll('ssh_minion', 'minion')}"
+                        dependsOn "add_MUs_${minion.replaceAll('ssh_minion', 'minion')}"
                     } else {
                         println ("Create group ${minion}")
                         if (params.confirm_before_continue) {
