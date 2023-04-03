@@ -261,8 +261,7 @@ def clientTestingStages() {
 
     //Get minion list from terraform state list command
     def minionList = getMinionList()
-    def mu_sync_status = [:]
-    mu_sync_status << minionList.MUSyncStatus
+    def mu_sync_status = minionList.MUSyncStatus
 
     // Construct a stage list for each node.
     minionList.nodeList.each { minion ->
