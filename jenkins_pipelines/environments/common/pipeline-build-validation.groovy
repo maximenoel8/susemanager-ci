@@ -276,8 +276,10 @@ def clientTestingStages() {
                 stage("Add_MUs_${minion}") {
                     if (minion.contains('ssh_minion')) {
                         println("SSH minion with dependOn ${minion.replaceAll('ssh_minion', 'minion')}")
+                        echo "SSH dictio ${mu_dictionary[minion.replaceAll('ssh_minion', 'minion')]}"
                         waitUntil {
-                            mu_dictionary["${minion.replaceAll('ssh_minion', 'minion')}"]
+                            echo "SSH dictio in wait ${mu_dictionary[minion.replaceAll('ssh_minion', 'minion')]}"
+                            mu_dictionary[minion.replaceAll('ssh_minion', 'minion')]
                         }
                         echo "MU repository created by ${minion}"
                     } else {
@@ -299,6 +301,7 @@ def clientTestingStages() {
                         }
                         mu_dictionary << ["${minion}" : true]
                         echo "Dictionnary ${mu_dictionary}"
+                        echo "Dictionnary value ${mu_dictionary[minion]}"
                     }
                 }
             }
