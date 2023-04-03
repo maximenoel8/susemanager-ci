@@ -427,9 +427,7 @@ def getMinionList() {
     def nodeListWithDisabledNodes = nodeList - disabledNodes
     echo "Node list ${nodeListWithDisabledNodes}"
     // Convert nodeListWithDisabledNodes set object to list
-    List<String> mainList = new ArrayList<String>()
-    mainList.addAll(nodeListWithDisabledNodes)
-    mainList.each { node ->
+    for (node in nodeListWithDisabledNodes ) {
         MUSyncStatus << ["${node}" : false]
     }
     return [nodeList:nodeListWithDisabledNodes, envVariableList:envVar, envVariableListToDisable:envVarDisabledNodes, MUSyncStatus:MUSyncStatus]
