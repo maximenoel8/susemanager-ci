@@ -276,6 +276,8 @@ def clientTestingStages() {
                 stage("Add_MUs_${minion}") {
                     if (minion.contains('ssh_minion')) {
                         println("SSH minion with dependOn ${minion.replaceAll('ssh_minion', 'minion')}")
+                        echo "Print dictionnary ${mu_dictionary}"
+                        echo "Print minion replace ${minion.replaceAll('ssh_minion', 'minion')}"
                         echo "SSH dictio ${mu_dictionary[minion.replaceAll('ssh_minion', 'minion')]}"
                         waitUntil {
                             echo "SSH dictio in wait ${mu_dictionary[minion.replaceAll('ssh_minion', 'minion')]}"
