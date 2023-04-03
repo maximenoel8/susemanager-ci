@@ -281,7 +281,7 @@ def clientTestingStages() {
                         }
                         echo "MU repository created by ${minion}"
                     } else {
-                        mu_dictionary.put("${minion}" : false)
+                        mu_dictionary << ["${minion}" : false]
                         println("Create group ${minion}")
                         if (params.confirm_before_continue) {
                             input 'Press any key to start adding Maintenance Update repositories'
@@ -297,7 +297,8 @@ def clientTestingStages() {
                         if (res_sync_mu_repos != 0) {
                             error("Custom channels and MU repositories synchronization failed with status code: ${res_sync_mu_repos}")
                         }
-                        mu_dictionary.put("${minion}" : true)
+                        mu_dictionary << ["${minion}" : true]
+                        echo "Dictionnary ${mu_dictionary}"
                     }
                 }
             }
