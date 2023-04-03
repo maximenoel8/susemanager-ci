@@ -310,7 +310,7 @@ def clientTestingStages() {
                             error("Custom channels and MU repositories synchronization failed with status code: ${res_sync_mu_repos}")
                         }
                     } else {
-                        dependOn "add_MU_${minion.replaceAll('sshminion', 'minion')}"
+                        dependOn "add_MU_${minion.replaceAll('ssh_minion', 'minion')}"
                     }
                 }
             }
