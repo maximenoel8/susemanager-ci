@@ -426,7 +426,7 @@ def getMinionList() {
     // Create a node list without the disabled nodes. ( use to configure the client stage )
     def nodeListWithDisabledNodes = nodeList - disabledNodes
     nodeListWithDisabledNodes.each { node ->
-        MUSyncStatus << [node : false]
+        MUSyncStatus << ["${node}" : false]
     }
     return [nodeList:nodeListWithDisabledNodes, envVariableList:envVar, envVariableListToDisable:envVarDisabledNodes, MUSyncStatus:MUSyncStatus]
 }
