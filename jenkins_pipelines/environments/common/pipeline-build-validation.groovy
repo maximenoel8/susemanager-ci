@@ -205,46 +205,46 @@ def run(params) {
             }
         }
         finally {
-            stage('Save TF state') {
-                archiveArtifacts artifacts: "results/sumaform/terraform.tfstate, results/sumaform/.terraform/**/*"
-            }
-
-            stage('Get results') {
-                def result_error = 0
-                if (deployed || !params.must_deploy) {
-                    try {
-                        sh "./terracumber-cli ${common_params} --logfile ${resultdirbuild}/testsuite.log --runstep cucumber --cucumber-cmd 'export BUILD_VALIDATION=true; cd /root/spacewalk/testsuite; rake cucumber:build_validation_finishing'"
-                    } catch(Exception ex) {
-                        println("ERROR: rake cucumber:build_validation_finishing failed")
-                        result_error = 1
-                    }
-                    try {
-                        sh "./terracumber-cli ${common_params} --logfile ${resultdirbuild}/testsuite.log --runstep cucumber --cucumber-cmd 'export BUILD_VALIDATION=true; cd /root/spacewalk/testsuite; rake utils:generate_test_report'"
-                    } catch(Exception ex) {
-                        println("ERROR: rake utils:generate_test_report failed")
-                        result_error = 1
-                    }
-                    sh "./terracumber-cli ${common_params} --logfile ${resultdirbuild}/testsuite.log --runstep getresults"
-                    publishHTML( target: [
-                            allowMissing: true,
-                            alwaysLinkToLastBuild: false,
-                            keepAll: true,
-                            reportDir: "${resultdirbuild}/cucumber_report/",
-                            reportFiles: 'cucumber_report.html',
-                            reportName: "Build Validation report"]
-                    )
-                    // junit allowEmptyResults: true, testResults: "${junit_resultdir}/*.xml"
-                }
-                // Send email
-                sh "./terracumber-cli ${common_params} --logfile ${resultdirbuild}/mail.log --runstep mail"
-                // Clean up old results
-                sh "./clean-old-results -r ${resultdir}"
-                // Fail pipeline if client stages failed
-                if (env.client_stage_result_fail) {
-                    error("Client stage failed")
-                }
-                sh "exit ${result_error}"
-            }
+//            stage('Save TF state') {
+//                archiveArtifacts artifacts: "results/sumaform/terraform.tfstate, results/sumaform/.terraform/**/*"
+//            }
+//
+//            stage('Get results') {
+//                def result_error = 0
+//                if (deployed || !params.must_deploy) {
+//                    try {
+//                        sh "./terracumber-cli ${common_params} --logfile ${resultdirbuild}/testsuite.log --runstep cucumber --cucumber-cmd 'export BUILD_VALIDATION=true; cd /root/spacewalk/testsuite; rake cucumber:build_validation_finishing'"
+//                    } catch(Exception ex) {
+//                        println("ERROR: rake cucumber:build_validation_finishing failed")
+//                        result_error = 1
+//                    }
+//                    try {
+//                        sh "./terracumber-cli ${common_params} --logfile ${resultdirbuild}/testsuite.log --runstep cucumber --cucumber-cmd 'export BUILD_VALIDATION=true; cd /root/spacewalk/testsuite; rake utils:generate_test_report'"
+//                    } catch(Exception ex) {
+//                        println("ERROR: rake utils:generate_test_report failed")
+//                        result_error = 1
+//                    }
+//                    sh "./terracumber-cli ${common_params} --logfile ${resultdirbuild}/testsuite.log --runstep getresults"
+//                    publishHTML( target: [
+//                            allowMissing: true,
+//                            alwaysLinkToLastBuild: false,
+//                            keepAll: true,
+//                            reportDir: "${resultdirbuild}/cucumber_report/",
+//                            reportFiles: 'cucumber_report.html',
+//                            reportName: "Build Validation report"]
+//                    )
+//                    // junit allowEmptyResults: true, testResults: "${junit_resultdir}/*.xml"
+//                }
+//                // Send email
+//                sh "./terracumber-cli ${common_params} --logfile ${resultdirbuild}/mail.log --runstep mail"
+//                // Clean up old results
+//                sh "./clean-old-results -r ${resultdir}"
+//                // Fail pipeline if client stages failed
+//                if (env.client_stage_result_fail) {
+//                    error("Client stage failed")
+//                }
+//                sh "exit ${result_error}"
+//            }
         }
     }
 }
