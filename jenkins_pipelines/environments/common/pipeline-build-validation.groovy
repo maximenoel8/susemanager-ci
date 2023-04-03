@@ -261,7 +261,8 @@ def clientTestingStages() {
 
     //Get minion list from terraform state list command
     def minionList = getMinionList()
-    def mu_dictionary = [:]
+    def mu_sync_status = [:]
+    mu_sync_status << minionList.MUSyncStatus
 
     // Construct a stage list for each node.
     minionList.nodeList.each { minion ->
@@ -276,16 +277,15 @@ def clientTestingStages() {
                 stage("Add_MUs_${minion}") {
                     if (minion.contains('ssh_minion')) {
                         println("SSH minion with dependOn ${minion.replaceAll('ssh_minion', 'minion')}")
-                        echo "Print dictionnary ${mu_dictionary}"
+                        echo "Print dictionnary ${mu_sync_status}"
                         echo "Print minion replace ${minion.replaceAll('ssh_minion', 'minion')}"
-                        echo "SSH dictio ${mu_dictionary[minion.replaceAll('ssh_minion', 'minion')]}"
+                        echo "SSH dictio ${mu_sync_status[minion.replaceAll('ssh_minion', 'minion')]}"
                         waitUntil {
-                            echo "SSH dictio in wait ${mu_dictionary[minion.replaceAll('ssh_minion', 'minion')]}"
-                            mu_dictionary[minion.replaceAll('ssh_minion', 'minion')]
+                            echo "SSH dictio in wait ${mu_sync_status[minion.replaceAll('ssh_minion', 'minion')]}"
+                            mu_sync_status[minion.replaceAll('ssh_minion', 'minion')]
                         }
                         echo "MU repository created by ${minion}"
                     } else {
-                        mu_dictionary << ["${minion}" : false]
                         println("Create group ${minion}")
                         if (params.confirm_before_continue) {
                             input 'Press any key to start adding Maintenance Update repositories'
@@ -301,9 +301,9 @@ def clientTestingStages() {
                         if (res_sync_mu_repos != 0) {
                             error("Custom channels and MU repositories synchronization failed with status code: ${res_sync_mu_repos}")
                         }
-                        mu_dictionary << ["${minion}" : true]
-                        echo "Dictionnary ${mu_dictionary}"
-                        echo "Dictionnary value ${mu_dictionary[minion]}"
+                        mu_sync_status << ["${minion}" : true]
+                        echo "Dictionnary ${mu_sync_status}"
+                        echo "Dictionnary value ${mu_sync_status[minion]}"
                     }
                 }
             }
@@ -402,6 +402,7 @@ def getMinionList() {
     // Due to the disparity between the node names in the test suite and those in the environment variables of the controller, two separate lists are maintained.
     Set<String> nodeList = new HashSet<String>()
     Set<String> envVar = new HashSet<String>()
+    def MUSyncStatus = [:]
     modules = sh(script: "cd ${resultdir}/sumaform; terraform state list",
             returnStdout: true)
     String[] moduleList = modules.split("\n")
@@ -424,7 +425,10 @@ def getMinionList() {
     def envVarDisabledNodes = disabledNodes.collect { it.replaceAll("ssh_minion", "sshminion").toUpperCase() }
     // Create a node list without the disabled nodes. ( use to configure the client stage )
     def nodeListWithDisabledNodes = nodeList - disabledNodes
-    return [nodeList:nodeListWithDisabledNodes, envVariableList:envVar, envVariableListToDisable:envVarDisabledNodes]
+    nodeListWithDisabledNodes.each { node ->
+        MUSyncStatus << [node : false]
+    }
+    return [nodeList:nodeListWithDisabledNodes, envVariableList:envVar, envVariableListToDisable:envVarDisabledNodes, MUSyncStatus:MUSyncStatus]
 }
 
 return this
