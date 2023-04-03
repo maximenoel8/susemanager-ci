@@ -276,11 +276,12 @@ def clientTestingStages() {
                 stage("Add_MUs_${minion}") {
                     if (minion.contains('ssh_minion')) {
                         println("SSH minion with dependOn ${minion.replaceAll('ssh_minion', 'minion')}")
-                        waitUntl {
+                        waitUntil {
                             mu_dictionary["${minion.replaceAll('ssh_minion', 'minion')}"]
                         }
                         echo "MU repository created by ${minion}"
                     } else {
+                        mu_dictionary.put("${minion}" : false)
                         println("Create group ${minion}")
                         if (params.confirm_before_continue) {
                             input 'Press any key to start adding Maintenance Update repositories'
