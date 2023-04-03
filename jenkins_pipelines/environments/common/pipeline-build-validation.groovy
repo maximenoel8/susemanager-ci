@@ -425,7 +425,10 @@ def getMinionList() {
     def envVarDisabledNodes = disabledNodes.collect { it.replaceAll("ssh_minion", "sshminion").toUpperCase() }
     // Create a node list without the disabled nodes. ( use to configure the client stage )
     def nodeListWithDisabledNodes = nodeList - disabledNodes
-    nodeListWithDisabledNodes.each { node ->
+    // Convert nodeListWithDisabledNodes set object to list
+    List<String> mainList = new ArrayList<String>()
+    mainList.addAll(nodeListWithDisabledNodes)
+    mainList.each { node ->
         MUSyncStatus << ["${node}" : false]
     }
     return [nodeList:nodeListWithDisabledNodes, envVariableList:envVar, envVariableListToDisable:envVarDisabledNodes, MUSyncStatus:MUSyncStatus]
