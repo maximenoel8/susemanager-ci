@@ -120,7 +120,6 @@ def run(params) {
                 if (params.must_boot_monitoring) {
                     stage('Prepare Monitoring Server') {
                         // Block ready to support maintenance update for monitoring server
-                        /*
                         if (params.must_add_MU_repositories) {
                             echo 'Add Server Monitoring MUs'
                             if (params.confirm_before_continue) {
@@ -134,8 +133,6 @@ def run(params) {
                             echo "Custom channels and MU repositories synchronization status code: ${res_sync_mu_repos}"
                             sh "exit \$(( ${res_mu_repos}|${res_sync_mu_repos} ))"
                         }
-
-                         */
                         if (params.must_add_keys) {
                             echo 'Add server monitoring activation key'
                             if (params.confirm_before_continue) {

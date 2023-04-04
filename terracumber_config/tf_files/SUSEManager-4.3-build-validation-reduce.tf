@@ -304,6 +304,23 @@ module "rocky8-minion" {
 
 }
 
+module "monitoring-server" {
+  source             = "./modules/minion"
+  base_configuration = module.base_core.configuration
+  product_version    = "4.3-released"
+  name               = "monitoring"
+  image              = "sles15sp4o"
+
+  server_configuration = {
+    hostname = "mnoel-bv-43-pxy.tf.local"
+  }
+  auto_connect_to_master  = false
+  use_os_released_updates = false
+  ssh_key_path            = "./salt/controller/id_rsa.pub"
+
+  //monitoring_additional_repos
+}
+
 module "controller" {
   source             = "./modules/controller"
   base_configuration = module.base_core.configuration
@@ -330,6 +347,8 @@ module "controller" {
   sle15sp4_client_configuration    = module.sles15sp4-client.configuration
   sle15sp4_minion_configuration    = module.sles15sp4-minion.configuration
   sle15sp4_sshminion_configuration = module.sles15sp4-sshminion.configuration
+
+  monitoringserver_configuration = module.monitoring-server.configuration
 
   rocky8_minion_configuration    = module.rocky8-minion.configuration
 }
