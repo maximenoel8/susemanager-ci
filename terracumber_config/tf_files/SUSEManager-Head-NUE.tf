@@ -197,7 +197,7 @@ module "cucumber_testsuite" {
       additional_grains = {
         hvm_disk_image = {
           leap = {
-            hostname = "leap"
+            hostname = "suma-head-min-nested"
             image = "http://minima-mirror.mgr.suse.de/distribution/leap/15.4/appliances/openSUSE-Leap-15.4-JeOS.x86_64-OpenStack-Cloud.qcow2"
             hash = "http://minima-mirror.mgr.suse.de/distribution/leap/15.4/appliances/openSUSE-Leap-15.4-JeOS.x86_64-OpenStack-Cloud.qcow2.sha256"
           }
@@ -216,6 +216,7 @@ module "cucumber_testsuite" {
     }
   }
   nested_vm_hosts = ["suma-head-min-nested"]
+  nested_vm_macs =  ["aa:b2:93:01:00:bf"]
   provider_settings = {
     pool = "ssd"
     network_name = null
