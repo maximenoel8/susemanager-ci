@@ -91,8 +91,8 @@ provider "libvirt" {
 module "cucumber_testsuite" {
   source = "./modules/cucumber_testsuite"
 
-  //product_version = "uyuni-master"
-  product_version = "head"
+  product_version = "uyuni-master"
+  //product_version = "head"
 
   // Cucumber repository configuration for the controller
   git_username = var.GIT_USER
@@ -103,7 +103,7 @@ module "cucumber_testsuite" {
   cc_username = var.SCC_USER
   cc_password = var.SCC_PASSWORD
 
-  images = ["centos7o", "opensuse154o", "sles15sp2o", "sles15sp3o", "sles15sp4o"]
+  images = ["rocky8o", "opensuse154o", "sles15sp2o", "sles15sp3o", "sles15sp4o"]
 
   use_avahi    = false
   name_prefix  = "suma-testhexagon-"
@@ -125,22 +125,24 @@ module "cucumber_testsuite" {
         mac = "aa:b2:93:01:00:50"
       }
     }
-    server = {
+    server_containerized = {
       provider_settings = {
         mac = "aa:b2:93:01:00:51"
-        memory = 10240
+        memory = 13312
       }
-      additional_repos = {
-        Test_repo = "http://download.suse.de/ibs/Devel:/Galaxy:/Manager:/TEST:/Hexagon/SLE_15_SP4/"
-      }
+      runtime = "podman"
+      container_repository = "registry.opensuse.org/systemsmanagement/uyuni/master/servercontainer/containers/uyuni"
+      //additional_repos = {
+      //  Test_repo = "http://download.suse.de/ibs/Devel:/Galaxy:/Manager:/TEST:/Hexagon/SLE_15_SP4/"
+      //}
     }
     proxy = {
       provider_settings = {
         mac = "aa:b2:93:01:00:52"
       }
-      additional_repos = {
-        Test_repo = "http://download.suse.de/ibs/Devel:/Galaxy:/Manager:/TEST:/Hexagon/SLE_15_SP4/"
-      }
+      //additional_repos = {
+      //  Test_repo = "http://download.suse.de/ibs/Devel:/Galaxy:/Manager:/TEST:/Hexagon/SLE_15_SP4/"
+      //}
       additional_packages = [ "venv-salt-minion" ]
       install_salt_bundle = true
     }
@@ -149,9 +151,6 @@ module "cucumber_testsuite" {
       name = "cli-sles15"
       provider_settings = {
         mac = "aa:b2:93:01:00:54"
-      }
-      additional_repos = {
-        Test_client_tools_repo = "https://download.opensuse.org/repositories/home:/cbosdonnat:/branches:/systemsmanagement:/Uyuni:/Master:/SLE15-Uyuni-Client-Tools/SLE_15/"
       }
       additional_packages = [ "venv-salt-minion" ]
       install_salt_bundle = true
