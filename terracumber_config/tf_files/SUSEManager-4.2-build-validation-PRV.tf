@@ -1,23 +1,23 @@
 // Mandatory variables for terracumber
 variable "URL_PREFIX" {
   type = string
-  default = "https://ci.suse.de/view/Manager/view/Uyuni/job/uyuni-master-qe-build-validation"
+  default = "https://ci.suse.de/view/Manager/view/Manager-4.2/job/manager-4.2-qe-build-validation"
 }
 
 // Not really used as this is for --runall parameter, and we run cucumber step by step
 variable "CUCUMBER_COMMAND" {
   type = string
-  default = "export PRODUCT='Uyuni' && run-testsuite"
+  default = "export PRODUCT='SUSE-Manager' && run-testsuite"
 }
 
 variable "CUCUMBER_GITREPO" {
   type = string
-  default = "https://github.com/uyuni-project/uyuni.git"
+  default = "https://github.com/SUSE/spacewalk.git"
 }
 
 variable "CUCUMBER_BRANCH" {
   type = string
-  default = "master"
+  default = "Manager-4.2"
 }
 
 variable "CUCUMBER_RESULTS" {
@@ -27,7 +27,7 @@ variable "CUCUMBER_RESULTS" {
 
 variable "MAIL_SUBJECT" {
   type = string
-  default = "Results Uyuni Build Validation $status: $tests scenarios ($failures failed, $errors errors, $skipped skipped, $passed passed)"
+  default = "Results 4.2 Build Validation $status: $tests scenarios ($failures failed, $errors errors, $skipped skipped, $passed passed)"
 }
 
 variable "MAIL_TEMPLATE" {
@@ -37,7 +37,7 @@ variable "MAIL_TEMPLATE" {
 
 variable "MAIL_SUBJECT_ENV_FAIL" {
   type = string
-  default = "Results Uyuni Build Validation: Environment setup failed"
+  default = "Results 4.2 Build Validation: Environment setup failed"
 }
 
 variable "MAIL_TEMPLATE_ENV_FAIL" {
@@ -85,27 +85,27 @@ terraform {
 }
 
 provider "libvirt" {
-  uri = "qemu+tcp://caipirinha.mgr.prv.suse.net/system"
+  uri = "qemu+tcp://caladan.mgr.prv.suse.net/system"
 }
 
 provider "libvirt" {
-  alias = "cosmopolitan"
-  uri = "qemu+tcp://cosmopolitan.mgr.prv.suse.net/system"
+  alias = "tatooine"
+  uri = "qemu+tcp://tatooine.mgr.prv.suse.net/system"
 }
 
 provider "libvirt" {
-  alias = "ginfizz"
-  uri = "qemu+tcp://ginfizz.mgr.prv.suse.net/system"
+  alias = "florina"
+  uri = "qemu+tcp://florina.mgr.prv.suse.net/system"
 }
 
 provider "libvirt" {
-  alias = "hugo"
-  uri = "qemu+tcp://hugo.mgr.prv.suse.net/system"
+  alias = "terminus"
+  uri = "qemu+tcp://terminus.mgr.prv.suse.net/system"
 }
 
 provider "libvirt" {
-  alias = "irishcoffee"
-  uri = "qemu+tcp://irishcoffee.mgr.prv.suse.net/system"
+  alias = "trantor"
+  uri = "qemu+tcp://trantor.mgr.prv.suse.net/system"
 }
 
 provider "libvirt" {
@@ -118,10 +118,10 @@ module "base_core" {
 
   cc_username = var.SCC_USER
   cc_password = var.SCC_PASSWORD
-  name_prefix = "uyuni-bv-"
+  name_prefix = "suma-bv-42-"
   use_avahi   = false
   domain      = "mgr.prv.suse.net"
-  images      = [ "sles15sp4o", "opensuse154o" ]
+  images      = [ "sles15sp3o", "opensuse154o" ]
 
   mirror = "minima-mirror-bv.mgr.prv.suse.net"
   use_mirror_images = true
@@ -131,20 +131,20 @@ module "base_core" {
   provider_settings = {
     pool        = "ssd"
     bridge      = "br1"
-    additional_network = "192.168.43.0/24"
+    additional_network = "192.168.42.0/24"
   }
 }
 
 module "base_old_sle" {
   providers = {
-    libvirt = libvirt.cosmopolitan
+    libvirt = libvirt.tatooine
   }
 
   source = "./modules/base"
 
   cc_username = var.SCC_USER
   cc_password = var.SCC_PASSWORD
-  name_prefix = "uyuni-bv-"
+  name_prefix = "suma-bv-42-"
   use_avahi   = false
   domain      = "mgr.prv.suse.net"
   images      = [ "sles12sp4o", "sles12sp5o" ]
@@ -162,17 +162,17 @@ module "base_old_sle" {
 
 module "base_res" {
   providers = {
-    libvirt = libvirt.cosmopolitan
+    libvirt = libvirt.tatooine
   }
 
   source = "./modules/base"
 
   cc_username = var.SCC_USER
   cc_password = var.SCC_PASSWORD
-  name_prefix = "uyuni-bv-"
+  name_prefix = "suma-bv-42-"
   use_avahi   = false
   domain      = "mgr.prv.suse.net"
-  images      = [ "almalinux9o", "centos7o", "libertylinux9o", "oraclelinux9o", "rocky8o", "rocky9o" ]
+  images      = [ "centos7o", "rocky8o" ]
 
   mirror = "minima-mirror-bv.mgr.prv.suse.net"
   use_mirror_images = true
@@ -187,17 +187,17 @@ module "base_res" {
 
 module "base_new_sle" {
   providers = {
-    libvirt = libvirt.ginfizz
+    libvirt = libvirt.florina
   }
 
   source = "./modules/base"
 
   cc_username = var.SCC_USER
   cc_password = var.SCC_PASSWORD
-  name_prefix = "uyuni-bv-"
+  name_prefix = "suma-bv-42-"
   use_avahi   = false
   domain      = "mgr.prv.suse.net"
-  images      = [ "sles15sp1o", "sles15sp2o", "sles15sp3o", "sles15sp4o", "slemicro51-ign", "slemicro52-ign", "slemicro53-ign" ]
+  images      = [ "sles15sp1o", "sles15sp2o", "sles15sp3o", "sles15sp4o" ]
 
   mirror = "minima-mirror-bv.mgr.prv.suse.net"
   use_mirror_images = true
@@ -212,17 +212,17 @@ module "base_new_sle" {
 
 module "base_retail" {
   providers = {
-    libvirt = libvirt.hugo
+    libvirt = libvirt.terminus
   }
 
   source = "./modules/base"
 
   cc_username = var.SCC_USER
   cc_password = var.SCC_PASSWORD
-  name_prefix = "uyuni-bv-"
+  name_prefix = "suma-bv-42-"
   use_avahi   = false
   domain      = "mgr.prv.suse.net"
-  images      = [ "sles12sp5o", "sles15sp3o", "sles15sp4o"]
+  images      = [ "sles12sp5o", "sles15sp3o" ]
 
   mirror = "minima-mirror-bv.mgr.prv.suse.net"
   use_mirror_images = true
@@ -232,23 +232,23 @@ module "base_retail" {
   provider_settings = {
     pool        = "ssd"
     bridge      = "br1"
-    additional_network = "192.168.43.0/24"
+    additional_network = "192.168.42.0/24"
   }
 }
 
 module "base_debian" {
   providers = {
-    libvirt = libvirt.irishcoffee
+    libvirt = libvirt.trantor
   }
 
   source = "./modules/base"
 
   cc_username = var.SCC_USER
   cc_password = var.SCC_PASSWORD
-  name_prefix = "uyuni-bv-"
+  name_prefix = "suma-bv-42-"
   use_avahi   = false
   domain      = "mgr.prv.suse.net"
-  images      = [ "ubuntu1804o", "ubuntu2004o", "ubuntu2204o", "debian10o", "debian11o" ]
+  images      = [ "ubuntu1804o", "ubuntu2004o", "debian10o", "debian11o" ]
 
   mirror = "minima-mirror-bv.mgr.prv.suse.net"
   use_mirror_images = true
@@ -270,7 +270,7 @@ module "base_arm" {
 
   cc_username = var.SCC_USER
   cc_password = var.SCC_PASSWORD
-  name_prefix = "uyuni-bv-"
+  name_prefix = "suma-bv-42-"
   use_avahi   = false
   domain      = "mgr.prv.suse.net"
   images      = [ "opensuse154armo" ]
@@ -289,17 +289,17 @@ module "base_arm" {
 module "server" {
   source             = "./modules/server"
   base_configuration = module.base_core.configuration
-  product_version    = "uyuni-master"
+  product_version    = "4.2-released"
   name               = "srv"
   provider_settings = {
-    mac                = "aa:b2:93:02:01:6d"
+    mac                = "aa:b2:92:42:00:51"
     memory             = 40960
     vcpu               = 10
     data_pool          = "ssd"
   }
 
   server_mounted_mirror = "minima-mirror-bv.mgr.prv.suse.net"
-  repository_disk_size = 1700
+  repository_disk_size = 1500
 
   auto_accept                    = false
   monitored                      = true
@@ -324,18 +324,18 @@ module "server" {
 
 module "proxy" {
   providers = {
-    libvirt = libvirt.hugo
+    libvirt = libvirt.terminus
   }
   source             = "./modules/proxy"
   base_configuration = module.base_retail.configuration
-  product_version    = "uyuni-master"
+  product_version    = "4.2-released"
   name               = "pxy"
   provider_settings = {
-    mac                = "aa:b2:93:02:01:6e"
+    mac                = "aa:b2:92:42:00:52"
     memory             = 4096
   }
   server_configuration = {
-    hostname = "uyuni-bv-srv.mgr.prv.suse.net"
+    hostname = "suma-bv-42-srv.mgr.prv.suse.net"
     username = "admin"
     password = "admin"
   }
@@ -348,176 +348,153 @@ module "proxy" {
   publish_private_ssl_key   = false
   use_os_released_updates   = true
   ssh_key_path              = "./salt/controller/id_rsa.pub"
-
-  //proxy_additional_repos
-
 }
 
 module "sles12sp4-client" {
   providers = {
-    libvirt = libvirt.cosmopolitan
+    libvirt = libvirt.tatooine
   }
   source             = "./modules/client"
   base_configuration = module.base_old_sle.configuration
-  product_version    = "uyuni-master"
+  product_version    = "4.2-released"
   name               = "cli-sles12sp4"
   image              = "sles12sp4o"
   provider_settings = {
-    mac                = "aa:b2:93:02:01:74"
+    mac                = "aa:b2:92:42:00:58"
     memory             = 4096
   }
   server_configuration = {
-    hostname = "uyuni-bv-pxy.mgr.prv.suse.net"
+    hostname = "suma-bv-42-pxy.mgr.prv.suse.net"
   }
   auto_register           = false
   use_os_released_updates = false
   ssh_key_path            = "./salt/controller/id_rsa.pub"
-
-  //sle12sp4-client_additional_repos
-
 }
 
 module "sles12sp5-client" {
   providers = {
-    libvirt = libvirt.cosmopolitan
+    libvirt = libvirt.tatooine
   }
   source             = "./modules/client"
   base_configuration = module.base_old_sle.configuration
-  product_version    = "uyuni-master"
+  product_version    = "4.2-released"
   name               = "cli-sles12sp5"
   image              = "sles12sp5o"
   provider_settings = {
-    mac                = "aa:b2:93:02:01:75"
+    mac                = "aa:b2:92:42:00:59"
     memory             = 4096
   }
   server_configuration = {
-    hostname = "uyuni-bv-pxy.mgr.prv.suse.net"
+    hostname = "suma-bv-42-pxy.mgr.prv.suse.net"
   }
   auto_register           = false
   use_os_released_updates = false
   ssh_key_path            = "./salt/controller/id_rsa.pub"
-
-  //sle12sp5-client_additional_repos
-
 }
 
 module "sles15sp1-client" {
   providers = {
-    libvirt = libvirt.ginfizz
+    libvirt = libvirt.florina
   }
   source             = "./modules/client"
   base_configuration = module.base_new_sle.configuration
-  product_version    = "uyuni-master"
+  product_version    = "4.2-released"
   name               = "cli-sles15sp1"
   image              = "sles15sp1o"
   provider_settings = {
-    mac                = "aa:b2:93:02:01:77"
+    mac                = "aa:b2:92:42:00:5b"
     memory             = 4096
   }
   server_configuration = {
-    hostname = "uyuni-bv-pxy.mgr.prv.suse.net"
+    hostname = "suma-bv-42-pxy.mgr.prv.suse.net"
   }
   auto_register           = false
   use_os_released_updates = false
   ssh_key_path            = "./salt/controller/id_rsa.pub"
-
-  //sle15sp1-client_additional_repos
-
 }
 
 module "sles15sp2-client" {
   providers = {
-    libvirt = libvirt.ginfizz
+    libvirt = libvirt.florina
   }
   source             = "./modules/client"
   base_configuration = module.base_new_sle.configuration
-  product_version    = "uyuni-master"
+  product_version    = "4.2-released"
   name               = "cli-sles15sp2"
   image              = "sles15sp2o"
   provider_settings = {
-    mac                = "aa:b2:93:02:01:78"
+    mac                = "aa:b2:92:42:00:5c"
     memory             = 4096
   }
   server_configuration = {
-    hostname = "uyuni-bv-pxy.mgr.prv.suse.net"
+    hostname = "suma-bv-42-pxy.mgr.prv.suse.net"
   }
   auto_register           = false
   use_os_released_updates = false
   ssh_key_path            = "./salt/controller/id_rsa.pub"
-
-  //sle15sp2-client_additional_repos
-
 }
 
 module "sles15sp3-client" {
   providers = {
-    libvirt = libvirt.ginfizz
+    libvirt = libvirt.florina
   }
   source             = "./modules/client"
   base_configuration = module.base_new_sle.configuration
-  product_version    = "uyuni-master"
+  product_version    = "4.2-released"
   name               = "cli-sles15sp3"
   image              = "sles15sp3o"
   provider_settings = {
-    mac                = "aa:b2:93:02:01:79"
+    mac                = "aa:b2:92:42:00:5d"
     memory             = 4096
   }
   server_configuration = {
-    hostname = "uyuni-bv-pxy.mgr.prv.suse.net"
+    hostname = "suma-bv-42-pxy.mgr.prv.suse.net"
   }
   auto_register           = false
   use_os_released_updates = false
   ssh_key_path            = "./salt/controller/id_rsa.pub"
-
-  //sle15sp3-client_additional_repos
-
 }
 
 module "sles15sp4-client" {
   providers = {
-    libvirt = libvirt.ginfizz
+    libvirt = libvirt.florina
   }
   source             = "./modules/client"
   base_configuration = module.base_new_sle.configuration
-  product_version    = "uyuni-master"
+  product_version    = "4.2-released"
   name               = "cli-sles15sp4"
   image              = "sles15sp4o"
   provider_settings = {
-    mac                = "aa:b2:93:02:01:7a"
+    mac                = "aa:b2:92:42:00:5e"
     memory             = 4096
   }
   server_configuration = {
-    hostname = "uyuni-bv-pxy.mgr.prv.suse.net"
+    hostname = "suma-bv-42-pxy.mgr.prv.suse.net"
   }
   auto_register           = false
   use_os_released_updates = false
   ssh_key_path            = "./salt/controller/id_rsa.pub"
-
-  //sle15sp4-client_additional_repos
-
 }
 
 module "centos7-client" {
   providers = {
-    libvirt = libvirt.cosmopolitan
+    libvirt = libvirt.tatooine
   }
   source             = "./modules/client"
   base_configuration = module.base_res.configuration
-  product_version    = "uyuni-master"
+  product_version    = "4.2-released"
   name               = "cli-centos7"
   image              = "centos7o"
   provider_settings = {
-    mac                = "aa:b2:93:02:01:7b"
+    mac                = "aa:b2:92:42:00:5f"
     memory             = 4096
   }
   server_configuration = {
-    hostname = "uyuni-bv-pxy.mgr.prv.suse.net"
+    hostname = "suma-bv-42-pxy.mgr.prv.suse.net"
   }
   auto_register           = false
   use_os_released_updates = false
   ssh_key_path            = "./salt/controller/id_rsa.pub"
-
-  //ceos7-client_additional_repos
 
   additional_packages = [ "venv-salt-minion" ]
   install_salt_bundle = true
@@ -525,417 +502,265 @@ module "centos7-client" {
 
 module "sles12sp4-minion" {
   providers = {
-    libvirt = libvirt.cosmopolitan
+    libvirt = libvirt.tatooine
   }
   source             = "./modules/minion"
   base_configuration = module.base_old_sle.configuration
-  product_version    = "uyuni-master"
+  product_version    = "4.2-released"
   name               = "min-sles12sp4"
   image              = "sles12sp4o"
   provider_settings = {
-    mac                = "aa:b2:93:02:01:7c"
+    mac                = "aa:b2:92:42:00:60"
     memory             = 4096
   }
   server_configuration = {
-    hostname = "uyuni-bv-pxy.mgr.prv.suse.net"
+    hostname = "suma-bv-42-pxy.mgr.prv.suse.net"
   }
   auto_connect_to_master  = false
   use_os_released_updates = false
   ssh_key_path            = "./salt/controller/id_rsa.pub"
-
-  //sle12sp4-minion_additional_repos
-
 }
 
 module "sles12sp5-minion" {
   providers = {
-    libvirt = libvirt.cosmopolitan
+    libvirt = libvirt.tatooine
   }
   source             = "./modules/minion"
   base_configuration = module.base_old_sle.configuration
-  product_version    = "uyuni-master"
+  product_version    = "4.2-released"
   name               = "min-sles12sp5"
   image              = "sles12sp5o"
   provider_settings = {
-    mac                = "aa:b2:93:02:01:7d"
+    mac                = "aa:b2:92:42:00:61"
     memory             = 4096
   }
   server_configuration = {
-    hostname = "uyuni-bv-pxy.mgr.prv.suse.net"
+    hostname = "suma-bv-42-pxy.mgr.prv.suse.net"
   }
   auto_connect_to_master  = false
   use_os_released_updates = false
   ssh_key_path            = "./salt/controller/id_rsa.pub"
-
-  //sle12sp5-minion_additional_repos
-
 }
 
 module "sles15sp1-minion" {
   providers = {
-    libvirt = libvirt.ginfizz
+    libvirt = libvirt.florina
   }
   source             = "./modules/minion"
   base_configuration = module.base_new_sle.configuration
-  product_version    = "uyuni-master"
+  product_version    = "4.2-released"
   name               = "min-sles15sp1"
   image              = "sles15sp1o"
   provider_settings = {
-    mac                = "aa:b2:93:02:01:7f"
+    mac                = "aa:b2:92:42:00:63"
     memory             = 4096
   }
 
   server_configuration = {
-    hostname = "uyuni-bv-pxy.mgr.prv.suse.net"
+    hostname = "suma-bv-42-pxy.mgr.prv.suse.net"
   }
   auto_connect_to_master  = false
   use_os_released_updates = false
   ssh_key_path            = "./salt/controller/id_rsa.pub"
-
-  //sle15sp1-minion_additional_repos
-
 }
 
 module "sles15sp2-minion" {
   providers = {
-    libvirt = libvirt.ginfizz
+    libvirt = libvirt.florina
   }
   source             = "./modules/minion"
   base_configuration = module.base_new_sle.configuration
-  product_version    = "uyuni-master"
+  product_version    = "4.2-released"
   name               = "min-sles15sp2"
   image              = "sles15sp2o"
   provider_settings = {
-    mac                = "aa:b2:93:02:01:80"
+    mac                = "aa:b2:92:42:00:64"
     memory             = 4096
   }
 
   server_configuration = {
-    hostname = "uyuni-bv-pxy.mgr.prv.suse.net"
+    hostname = "suma-bv-42-pxy.mgr.prv.suse.net"
   }
   auto_connect_to_master  = false
   use_os_released_updates = false
   ssh_key_path            = "./salt/controller/id_rsa.pub"
-
-  //sle15sp2-minion_additional_repos
-
 }
 
 module "sles15sp3-minion" {
   providers = {
-    libvirt = libvirt.ginfizz
+    libvirt = libvirt.florina
   }
   source             = "./modules/minion"
   base_configuration = module.base_new_sle.configuration
-  product_version    = "uyuni-master"
+  product_version    = "4.2-released"
   name               = "min-sles15sp3"
   image              = "sles15sp3o"
   provider_settings = {
-    mac                = "aa:b2:93:02:01:81"
+    mac                = "aa:b2:92:42:00:65"
     memory             = 4096
   }
 
   server_configuration = {
-    hostname = "uyuni-bv-pxy.mgr.prv.suse.net"
+    hostname = "suma-bv-42-pxy.mgr.prv.suse.net"
   }
   auto_connect_to_master  = false
   use_os_released_updates = false
   ssh_key_path            = "./salt/controller/id_rsa.pub"
-
-  //sle15sp3-minion_additional_repos
-
 }
 
 module "sles15sp4-minion" {
   providers = {
-    libvirt = libvirt.ginfizz
+    libvirt = libvirt.florina
   }
   source             = "./modules/minion"
   base_configuration = module.base_new_sle.configuration
-  product_version    = "uyuni-master"
+  product_version    = "4.2-released"
   name               = "min-sles15sp4"
   image              = "sles15sp4o"
   provider_settings = {
-    mac                = "aa:b2:93:02:01:82"
+    mac                = "aa:b2:92:42:00:66"
     memory             = 4096
   }
 
   server_configuration = {
-    hostname = "uyuni-bv-pxy.mgr.prv.suse.net"
+    hostname = "suma-bv-42-pxy.mgr.prv.suse.net"
   }
   auto_connect_to_master  = false
   use_os_released_updates = false
   ssh_key_path            = "./salt/controller/id_rsa.pub"
-
-  //sle15sp4-minion_additional_repos
-
-}
-
-module "alma9-minion" {
-  providers = {
-    libvirt = libvirt.cosmopolitan
-  }
-  source             = "./modules/minion"
-  base_configuration = module.base_res.configuration
-  product_version    = "uyuni-master"
-  name               = "min-alma9"
-  image              = "almalinux9o"
-  provider_settings = {
-    mac                = "aa:b2:93:02:01:8e"
-    memory             = 4096
-  }
-  server_configuration = {
-    hostname = "uyuni-bv-pxy.mgr.prv.suse.net"
-  }
-  auto_connect_to_master  = false
-  use_os_released_updates = false
-  ssh_key_path            = "./salt/controller/id_rsa.pub"
-
-  //alma9-minion_additional_repos
-
 }
 
 module "centos7-minion" {
   providers = {
-    libvirt = libvirt.cosmopolitan
+    libvirt = libvirt.tatooine
   }
   source             = "./modules/minion"
   base_configuration = module.base_res.configuration
-  product_version    = "uyuni-master"
+  product_version    = "4.2-released"
   name               = "min-centos7"
   image              = "centos7o"
   provider_settings = {
-    mac                = "aa:b2:93:02:01:83"
+    mac                = "aa:b2:92:42:00:67"
     memory             = 4096
   }
   server_configuration = {
-    hostname = "uyuni-bv-pxy.mgr.prv.suse.net"
+    hostname = "suma-bv-42-pxy.mgr.prv.suse.net"
   }
   auto_connect_to_master  = false
   use_os_released_updates = false
   ssh_key_path            = "./salt/controller/id_rsa.pub"
-
-  //ceos7-minion_additional_repos
 
   additional_packages = [ "venv-salt-minion" ]
   install_salt_bundle = true
 }
 
-module "liberty9-minion" {
-  providers = {
-    libvirt = libvirt.cosmopolitan
-  }
-  source             = "./modules/minion"
-  base_configuration = module.base_res.configuration
-  product_version    = "uyuni-master"
-  name               = "min-liberty9"
-  image              = "libertylinux9o"
-  provider_settings = {
-    mac                = "aa:b2:93:02:01:91"
-    memory             = 4096
-  }
-  server_configuration = {
-    hostname = "uyuni-bv-pxy.mgr.prv.suse.net"
-  }
-  auto_connect_to_master  = false
-  use_os_released_updates = false
-  ssh_key_path            = "./salt/controller/id_rsa.pub"
-
-  //liberty9-minion_additional_repos
-
-}
-
-module "oracle9-minion" {
-  providers = {
-    libvirt = libvirt.cosmopolitan
-  }
-  source             = "./modules/minion"
-  base_configuration = module.base_res.configuration
-  product_version    = "uyuni-master"
-  name               = "min-oracle9"
-  image              = "oraclelinux9o"
-  provider_settings = {
-    mac                = "aa:b2:93:02:01:8f"
-    memory             = 4096
-  }
-  server_configuration = {
-    hostname = "uyuni-bv-pxy.mgr.prv.suse.net"
-  }
-  auto_connect_to_master  = false
-  use_os_released_updates = false
-  ssh_key_path            = "./salt/controller/id_rsa.pub"
-
-  //oracle9-minion_additional_repos
-
-}
-
 module "rocky8-minion" {
   providers = {
-    libvirt = libvirt.cosmopolitan
+    libvirt = libvirt.tatooine
   }
   source             = "./modules/minion"
   base_configuration = module.base_res.configuration
-  product_version    = "uyuni-master"
+  product_version    = "4.2-released"
   name               = "min-rocky8"
   image              = "rocky8o"
   provider_settings = {
-    mac                = "aa:b2:93:02:01:84"
+    mac                = "aa:b2:92:42:00:68"
     memory             = 4096
   }
   server_configuration = {
-    hostname = "uyuni-bv-pxy.mgr.prv.suse.net"
+    hostname = "suma-bv-42-pxy.mgr.prv.suse.net"
   }
   auto_connect_to_master  = false
   use_os_released_updates = false
   ssh_key_path            = "./salt/controller/id_rsa.pub"
-
-  //rocky8-minion_additional_repos
-
-}
-
-module "rocky9-minion" {
-  providers = {
-    libvirt = libvirt.cosmopolitan
-  }
-  source             = "./modules/minion"
-  base_configuration = module.base_res.configuration
-  product_version    = "uyuni-master"
-  name               = "min-rocky9"
-  image              = "rocky9o"
-  provider_settings = {
-    mac                = "aa:b2:93:02:01:8d"
-    memory             = 4096
-  }
-  server_configuration = {
-    hostname = "uyuni-bv-pxy.mgr.prv.suse.net"
-  }
-  auto_connect_to_master  = false
-  use_os_released_updates = false
-  ssh_key_path            = "./salt/controller/id_rsa.pub"
-
-  //rocky9-minion_additional_repos
-
 }
 
 module "ubuntu1804-minion" {
   providers = {
-    libvirt = libvirt.irishcoffee
+    libvirt = libvirt.trantor
   }
   source             = "./modules/minion"
   base_configuration = module.base_debian.configuration
-  product_version    = "uyuni-master"
+  product_version    = "4.2-released"
   name               = "min-ubuntu1804"
   image              = "ubuntu1804o"
   provider_settings = {
-    mac                = "aa:b2:93:02:01:85"
+    mac                = "aa:b2:92:42:00:69"
     memory             = 4096
   }
   server_configuration = {
-    hostname = "uyuni-bv-pxy.mgr.prv.suse.net"
+    hostname = "suma-bv-42-pxy.mgr.prv.suse.net"
   }
   auto_connect_to_master  = false
   use_os_released_updates = false
   ssh_key_path            = "./salt/controller/id_rsa.pub"
-
-  //ubuntu1804-minion_additional_repos
-
 }
 
 module "ubuntu2004-minion" {
   providers = {
-    libvirt = libvirt.irishcoffee
+    libvirt = libvirt.trantor
   }
   source             = "./modules/minion"
   base_configuration = module.base_debian.configuration
-  product_version    = "uyuni-master"
+  product_version    = "4.2-released"
   name               = "min-ubuntu2004"
   image              = "ubuntu2004o"
   provider_settings = {
-    mac                = "aa:b2:93:02:01:86"
+    mac                = "aa:b2:92:42:00:6a"
     memory             = 4096
   }
   server_configuration = {
-    hostname = "uyuni-bv-pxy.mgr.prv.suse.net"
-  }
-  auto_connect_to_master  = false
-  use_os_released_updates = false
-  ssh_key_path            = "./salt/controller/id_rsa.pub"
-
-  //ubuntu2004-minion_additional_repos
-
-}
-
-module "ubuntu2204-minion" {
-  providers = {
-    libvirt = libvirt.irishcoffee
-  }
-  source             = "./modules/minion"
-  base_configuration = module.base_debian.configuration
-  product_version    = "uyuni-master"
-  name               = "min-ubuntu2204"
-  image              = "ubuntu2204o"
-  provider_settings = {
-    mac                = "aa:b2:93:02:01:87"
-    memory             = 4096
-  }
-  server_configuration = {
-    hostname = "uyuni-bv-pxy.mgr.prv.suse.net"
+    hostname = "suma-bv-42-pxy.mgr.prv.suse.net"
   }
   auto_connect_to_master  = false
   use_os_released_updates = false
   ssh_key_path            = "./salt/controller/id_rsa.pub"
 }
 
-// Debian 9 is not supported by 4.3
+// Ubuntu 22.04 is not supported by SUSE Manager 4.2
 
 module "debian10-minion" {
   providers = {
-    libvirt = libvirt.irishcoffee
+    libvirt = libvirt.trantor
   }
   source             = "./modules/minion"
   base_configuration = module.base_debian.configuration
-  product_version    = "uyuni-master"
+  product_version    = "4.2-released"
   name               = "min-debian10"
   image              = "debian10o"
   provider_settings = {
-    mac                = "aa:b2:93:02:01:89"
+    mac                = "aa:b2:92:42:00:6d"
     memory             = 4096
   }
 
   server_configuration = {
-    hostname = "uyuni-bv-pxy.mgr.prv.suse.net"
+    hostname = "suma-bv-42-pxy.mgr.prv.suse.net"
   }
   auto_connect_to_master  = false
   use_os_released_updates = false
   ssh_key_path            = "./salt/controller/id_rsa.pub"
-
-  //debian10-minion_additional_repos
-
 }
 
 module "debian11-minion" {
   providers = {
-    libvirt = libvirt.irishcoffee
+    libvirt = libvirt.trantor
   }
   source             = "./modules/minion"
   base_configuration = module.base_debian.configuration
-  product_version    = "uyuni-master"
+  product_version    = "4.2-released"
   name               = "min-debian11"
   image              = "debian11o"
   provider_settings = {
-    mac                = "aa:b2:93:02:01:8a"
+    mac                = "aa:b2:92:42:00:6e"
     memory             = 4096
   }
 
   server_configuration = {
-    hostname = "uyuni-bv-pxy.mgr.prv.suse.net"
+    hostname = "suma-bv-42-pxy.mgr.prv.suse.net"
   }
   auto_connect_to_master  = false
   use_os_released_updates = false
   ssh_key_path            = "./salt/controller/id_rsa.pub"
-
-  //debian11-minion_additional_repos
-
 }
 
 module "opensuse154arm-minion" {
@@ -944,112 +769,34 @@ module "opensuse154arm-minion" {
   }
   source             = "./modules/minion"
   base_configuration = module.base_arm.configuration
-  product_version    = "uyuni-master"
+  product_version    = "4.2-released"
   name               = "min-opensuse154arm"
   image              = "opensuse154armo"
   provider_settings = {
-    mac                = "aa:b2:93:01:00:f8"
+    mac                = "aa:b2:93:01:00:f2"
     memory             = 2048
     vcpu               = 2
     xslt               = file("../../susemanager-ci/terracumber_config/tf_files/common/tune-aarch64.xslt")
   }
   server_configuration = {
-    hostname = "uyuni-bv-pxy.mgr.prv.suse.net"
+    hostname = "suma-bv-42-pxy.mgr.prv.suse.net"
   }
   auto_connect_to_master  = false
   use_os_released_updates = false
   ssh_key_path            = "./salt/controller/id_rsa.pub"
-
-  //opensuse154arm-minion_additional_repos
-
-}
-
-module "slemicro51-minion" {
-  providers = {
-    libvirt = libvirt.ginfizz
-  }
-  source             = "./modules/minion"
-  base_configuration = module.base_new_sle.configuration
-  product_version    = "uyuni-master"
-  name               = "min-slemicro51"
-  image              = "slemicro51-ign"
-  provider_settings = {
-    mac                = "aa:b2:93:02:01:92"
-   memory             = 2048
-  }
-
-  server_configuration = {
-    hostname = "uyuni-bv-pxy.mgr.prv.suse.net"
-  }
-  auto_connect_to_master  = false
-  use_os_released_updates = false
-  ssh_key_path            = "./salt/controller/id_rsa.pub"
-
-  //slemicro51-minion_additional_repos
-
-}
-
-module "slemicro52-minion" {
-  providers = {
-    libvirt = libvirt.ginfizz
-  }
-  source             = "./modules/minion"
-  base_configuration = module.base_new_sle.configuration
-  product_version    = "uyuni-master"
-  name               = "min-slemicro52"
-  image              = "slemicro52-ign"
-  provider_settings = {
-    mac                = "aa:b2:93:02:01:8c"
-   memory             = 2048
-  }
-
-  server_configuration = {
-    hostname = "uyuni-bv-pxy.mgr.prv.suse.net"
-  }
-  auto_connect_to_master  = false
-  use_os_released_updates = false
-  ssh_key_path            = "./salt/controller/id_rsa.pub"
-
-  //slemicro52-minion_additional_repos
-
-}
-
-module "slemicro53-minion" {
-  providers = {
-    libvirt = libvirt.ginfizz
-  }
-  source             = "./modules/minion"
-  base_configuration = module.base_new_sle.configuration
-  product_version    = "uyuni-master"
-  name               = "min-slemicro53"
-  image              = "slemicro53-ign"
-  provider_settings = {
-    mac                = "aa:b2:93:02:01:90"
-   memory             = 2048
-  }
-
-  server_configuration = {
-    hostname = "uyuni-bv-pxy.mgr.prv.suse.net"
-  }
-  auto_connect_to_master  = false
-  use_os_released_updates = false
-  ssh_key_path            = "./salt/controller/id_rsa.pub"
-
-  //slemicro52-minion_additional_repos
-
 }
 
 module "sles12sp4-sshminion" {
   providers = {
-    libvirt = libvirt.cosmopolitan
+    libvirt = libvirt.tatooine
   }
   source             = "./modules/sshminion"
   base_configuration = module.base_old_sle.configuration
-  product_version    = "uyuni-master"
+  product_version    = "4.2-released"
   name               = "minssh-sles12sp4"
   image              = "sles12sp4o"
   provider_settings = {
-    mac                = "aa:b2:93:02:01:9c"
+    mac                = "aa:b2:92:42:00:80"
     memory             = 4096
   }
 
@@ -1060,15 +807,15 @@ module "sles12sp4-sshminion" {
 
 module "sles12sp5-sshminion" {
   providers = {
-    libvirt = libvirt.cosmopolitan
+    libvirt = libvirt.tatooine
   }
   source             = "./modules/sshminion"
   base_configuration = module.base_old_sle.configuration
-  product_version    = "uyuni-master"
+  product_version    = "4.2-released"
   name               = "minssh-sles12sp5"
   image              = "sles12sp5o"
   provider_settings = {
-    mac                = "aa:b2:93:02:01:9d"
+    mac                = "aa:b2:92:42:00:81"
     memory             = 4096
   }
 
@@ -1079,15 +826,15 @@ module "sles12sp5-sshminion" {
 
 module "sles15sp1-sshminion" {
   providers = {
-    libvirt = libvirt.ginfizz
+    libvirt = libvirt.florina
   }
   source             = "./modules/sshminion"
   base_configuration = module.base_new_sle.configuration
-  product_version    = "uyuni-master"
+  product_version    = "4.2-released"
   name               = "minssh-sles15sp1"
   image              = "sles15sp1o"
   provider_settings = {
-    mac                = "aa:b2:93:02:01:9f"
+    mac                = "aa:b2:92:42:00:83"
     memory             = 4096
   }
   use_os_released_updates = false
@@ -1097,15 +844,15 @@ module "sles15sp1-sshminion" {
 
 module "sles15sp2-sshminion" {
   providers = {
-    libvirt = libvirt.ginfizz
+    libvirt = libvirt.florina
   }
   source             = "./modules/sshminion"
   base_configuration = module.base_new_sle.configuration
-  product_version    = "uyuni-master"
+  product_version    = "4.2-released"
   name               = "minssh-sles15sp2"
   image              = "sles15sp2o"
   provider_settings = {
-    mac                = "aa:b2:93:02:01:a0"
+    mac                = "aa:b2:92:42:00:84"
     memory             = 4096
   }
   use_os_released_updates = false
@@ -1114,15 +861,15 @@ module "sles15sp2-sshminion" {
 
 module "sles15sp3-sshminion" {
   providers = {
-    libvirt = libvirt.ginfizz
+    libvirt = libvirt.florina
   }
   source             = "./modules/sshminion"
   base_configuration = module.base_new_sle.configuration
-  product_version    = "uyuni-master"
+  product_version    = "4.2-released"
   name               = "minssh-sles15sp3"
   image              = "sles15sp3o"
   provider_settings = {
-    mac                = "aa:b2:93:02:01:a1"
+    mac                = "aa:b2:92:42:00:85"
     memory             = 4096
   }
   use_os_released_updates = false
@@ -1131,55 +878,32 @@ module "sles15sp3-sshminion" {
 
 module "sles15sp4-sshminion" {
   providers = {
-    libvirt = libvirt.ginfizz
+    libvirt = libvirt.florina
   }
   source             = "./modules/sshminion"
   base_configuration = module.base_new_sle.configuration
-  product_version    = "uyuni-master"
+  product_version    = "4.2-released"
   name               = "minssh-sles15sp4"
   image              = "sles15sp4o"
   provider_settings = {
-    mac                = "aa:b2:93:02:01:a2"
+    mac                = "aa:b2:92:42:00:86"
     memory             = 4096
   }
   use_os_released_updates = false
   ssh_key_path            = "./salt/controller/id_rsa.pub"
-}
-
-module "alma9-sshminion" {
-  providers = {
-    libvirt = libvirt.cosmopolitan
-  }
-  source             = "./modules/minion"
-  base_configuration = module.base_res.configuration
-  product_version    = "uyuni-master"
-  name               = "minssh-alma9"
-  image              = "almalinux9o"
-  provider_settings = {
-    mac                = "aa:b2:93:02:01:ae"
-    memory             = 4096
-  }
-  server_configuration = {
-    hostname = "uyuni-bv-pxy.mgr.prv.suse.net"
-  }
-  use_os_released_updates = false
-  ssh_key_path            = "./salt/controller/id_rsa.pub"
-
-  //alma9-sshminion_additional_repos
-
 }
 
 module "centos7-sshminion" {
   providers = {
-    libvirt = libvirt.cosmopolitan
+    libvirt = libvirt.tatooine
   }
   source             = "./modules/sshminion"
   base_configuration = module.base_res.configuration
-  product_version    = "uyuni-master"
+  product_version    = "4.2-released"
   name               = "minssh-centos7"
   image              = "centos7o"
   provider_settings = {
-    mac                = "aa:b2:93:02:01:a3"
+    mac                = "aa:b2:92:42:00:87"
     memory             = 4096
   }
   use_os_released_updates = false
@@ -1189,80 +913,17 @@ module "centos7-sshminion" {
   install_salt_bundle = true
 }
 
-module "liberty9-sshminion" {
-  providers = {
-    libvirt = libvirt.cosmopolitan
-  }
-  source             = "./modules/minion"
-  base_configuration = module.base_res.configuration
-  product_version    = "uyuni-master"
-  name               = "minssh-liberty9"
-  image              = "libertylinux9o"
-  provider_settings = {
-    mac                = "aa:b2:93:02:01:b1"
-    memory             = 4096
-  }
-  server_configuration = {
-    hostname = "uyuni-bv-pxy.mgr.prv.suse.net"
-  }
-  use_os_released_updates = false
-  ssh_key_path            = "./salt/controller/id_rsa.pub"
-
-  //liberty9-sshminion_additional_repos
-
-}
-
-module "oracle9-sshminion" {
-  providers = {
-    libvirt = libvirt.cosmopolitan
-  }
-  source             = "./modules/minion"
-  base_configuration = module.base_res.configuration
-  product_version    = "uyuni-master"
-  name               = "minssh-oracle9"
-  image              = "oraclelinux9o"
-  provider_settings = {
-    mac                = "aa:b2:93:02:01:af"
-    memory             = 4096
-  }
-  server_configuration = {
-    hostname = "uyuni-bv-pxy.mgr.prv.suse.net"
-  }
-  use_os_released_updates = false
-  ssh_key_path            = "./salt/controller/id_rsa.pub"
-
-  //oracle9-sshminion_additional_repos
-
-}
-
 module "rocky8-sshminion" {
   providers = {
-    libvirt = libvirt.cosmopolitan
+    libvirt = libvirt.tatooine
   }
   source             = "./modules/sshminion"
   base_configuration = module.base_res.configuration
-  product_version    = "uyuni-master"
+  product_version    = "4.2-released"
   name               = "minssh-rocky8"
   image              = "rocky8o"
   provider_settings = {
-    mac                = "aa:b2:93:02:01:a4"
-    memory             = 4096
-  }
-  use_os_released_updates = false
-  ssh_key_path            = "./salt/controller/id_rsa.pub"
-}
-
-module "rocky9-sshminion" {
-  providers = {
-    libvirt = libvirt.cosmopolitan
-  }
-  source             = "./modules/sshminion"
-  base_configuration = module.base_res.configuration
-  product_version    = "uyuni-master"
-  name               = "minssh-rocky9"
-  image              = "rocky9o"
-  provider_settings = {
-    mac                = "aa:b2:93:02:01:ad"
+    mac                = "aa:b2:92:42:00:88"
     memory             = 4096
   }
   use_os_released_updates = false
@@ -1271,15 +932,15 @@ module "rocky9-sshminion" {
 
 module "ubuntu1804-sshminion" {
   providers = {
-    libvirt = libvirt.irishcoffee
+    libvirt = libvirt.trantor
   }
   source             = "./modules/sshminion"
   base_configuration = module.base_debian.configuration
-  product_version    = "uyuni-master"
+  product_version    = "4.2-released"
   name               = "minssh-ubuntu1804"
   image              = "ubuntu1804o"
   provider_settings = {
-    mac                = "aa:b2:93:02:01:a5"
+    mac                = "aa:b2:92:42:00:89"
     memory             = 4096
   }
   use_os_released_updates = false
@@ -1288,51 +949,34 @@ module "ubuntu1804-sshminion" {
 
 module "ubuntu2004-sshminion" {
   providers = {
-    libvirt = libvirt.irishcoffee
+    libvirt = libvirt.trantor
   }
   source             = "./modules/sshminion"
   base_configuration = module.base_debian.configuration
-  product_version    = "uyuni-master"
+  product_version    = "4.2-released"
   name               = "minssh-ubuntu2004"
   image              = "ubuntu2004o"
   provider_settings = {
-    mac                = "aa:b2:93:02:01:a6"
+    mac                = "aa:b2:92:42:00:8a"
     memory             = 4096
   }
   use_os_released_updates = false
   ssh_key_path            = "./salt/controller/id_rsa.pub"
 }
 
-module "ubuntu2204-sshminion" {
-  providers = {
-    libvirt = libvirt.irishcoffee
-  }
-  source             = "./modules/sshminion"
-  base_configuration = module.base_debian.configuration
-  product_version    = "uyuni-master"
-  name               = "minssh-ubuntu2204"
-  image              = "ubuntu2204o"
-  provider_settings = {
-    mac                = "aa:b2:93:02:01:a57"
-    memory             = 4096
-  }
-  use_os_released_updates = false
-  ssh_key_path            = "./salt/controller/id_rsa.pub"
-}
-
-// Debian 9 is not supported by 4.3
+// Ubuntu 22.04 is not supported by SUSE Manager 4.2
 
 module "debian10-sshminion" {
   providers = {
-    libvirt = libvirt.irishcoffee
+    libvirt = libvirt.trantor
   }
   source             = "./modules/sshminion"
   base_configuration = module.base_debian.configuration
-  product_version    = "uyuni-master"
+  product_version    = "4.2-released"
   name               = "minssh-debian10"
   image              = "debian10o"
   provider_settings = {
-    mac                = "aa:b2:93:02:01:a9"
+    mac                = "aa:b2:92:42:00:8d"
     memory             = 4096
   }
   use_os_released_updates = false
@@ -1341,15 +985,15 @@ module "debian10-sshminion" {
 
 module "debian11-sshminion" {
   providers = {
-    libvirt = libvirt.irishcoffee
+    libvirt = libvirt.trantor
   }
   source             = "./modules/sshminion"
   base_configuration = module.base_debian.configuration
-  product_version    = "uyuni-master"
+  product_version    = "4.2-released"
   name               = "minssh-debian11"
   image              = "debian11o"
   provider_settings = {
-    mac                = "aa:b2:93:02:01:aa"
+    mac                = "aa:b2:92:42:00:8e"
     memory             = 4096
   }
   use_os_released_updates = false
@@ -1362,11 +1006,11 @@ module "opensuse154arm-sshminion" {
   }
   source             = "./modules/sshminion"
   base_configuration = module.base_arm.configuration
-  product_version    = "uyuni-master"
+  product_version    = "4.2-released"
   name               = "minssh-opensuse154arm"
   image              = "opensuse154armo"
   provider_settings = {
-    mac                = "aa:b2:93:01:00:f9"
+    mac                = "aa:b2:93:01:00:f3"
     memory             = 2048
     vcpu               = 2
     xslt               = file("../../susemanager-ci/terracumber_config/tf_files/common/tune-aarch64.xslt")
@@ -1375,73 +1019,22 @@ module "opensuse154arm-sshminion" {
   ssh_key_path            = "./salt/controller/id_rsa.pub"
 }
 
-module "slemicro51-sshminion" {
- providers = {
-    libvirt = libvirt.ginfizz
-  }
-  source             = "./modules/sshminion"
-  base_configuration = module.base_new_sle.configuration
-  product_version    = "uyuni-master"
-  name               = "minssh-slemicro51"
-  image              = "slemicro51-ign"
-  provider_settings = {
-    mac                = "aa:b2:93:02:01:b2"
-    memory             = 2048
-  }
-  use_os_released_updates = false
-  ssh_key_path            = "./salt/controller/id_rsa.pub"
-}
-
-module "slemicro52-sshminion" {
- providers = {
-    libvirt = libvirt.ginfizz
-  }
-  source             = "./modules/sshminion"
-  base_configuration = module.base_new_sle.configuration
-  product_version    = "uyuni-master"
-  name               = "minssh-slemicro52"
-  image              = "slemicro52-ign"
-  provider_settings = {
-    mac                = "aa:b2:93:02:01:ac"
-    memory             = 2048
-  }
-  use_os_released_updates = false
-  ssh_key_path            = "./salt/controller/id_rsa.pub"
-}
-
-module "slemicro53-sshminion" {
- providers = {
-    libvirt = libvirt.ginfizz
-  }
-  source             = "./modules/sshminion"
-  base_configuration = module.base_new_sle.configuration
-  product_version    = "uyuni-master"
-  name               = "minssh-slemicro53"
-  image              = "slemicro53-ign"
-  provider_settings = {
-    mac                = "aa:b2:93:02:01:b0"
-    memory             = 2048
-  }
-  use_os_released_updates = false
-  ssh_key_path            = "./salt/controller/id_rsa.pub"
-}
-
 module "sles12sp5-buildhost" {
   providers = {
-    libvirt = libvirt.hugo
+    libvirt = libvirt.terminus
   }
   source             = "./modules/build_host"
   base_configuration = module.base_retail.configuration
-  product_version    = "uyuni-master"
+  product_version    = "4.2-released"
   name               = "build-sles12sp5"
   image              = "sles12sp5o"
   provider_settings = {
-    mac                = "aa:b2:93:02:01:70"
+    mac                = "aa:b2:92:42:00:54"
     memory             = 2048
     vcpu               = 2
   }
   server_configuration = {
-    hostname = "uyuni-bv-pxy.mgr.prv.suse.net"
+    hostname = "suma-bv-42-pxy.mgr.prv.suse.net"
   }
   auto_connect_to_master  = false
   use_os_released_updates = false
@@ -1450,7 +1043,7 @@ module "sles12sp5-buildhost" {
 
 module "sles12sp5-terminal" {
   providers = {
-    libvirt = libvirt.hugo
+    libvirt = libvirt.terminus
   }
   source             = "./modules/pxe_boot"
   base_configuration = module.base_retail.configuration
@@ -1464,36 +1057,36 @@ module "sles12sp5-terminal" {
   }
 }
 
-module "sles15sp4-buildhost" {
+module "sles15sp3-buildhost" {
   providers = {
-    libvirt = libvirt.hugo
+    libvirt = libvirt.terminus
   }
   source             = "./modules/build_host"
   base_configuration = module.base_retail.configuration
-  product_version    = "uyuni-master"
-  name               = "build-sles15sp4"
-  image              = "sles15sp4o"
+  product_version    = "4.2-released"
+  name               = "build-sles15sp3"
+  image              = "sles15sp3o"
   provider_settings = {
-    mac                = "aa:b2:93:02:01:71"
+    mac                = "aa:b2:92:42:00:55"
     memory             = 2048
     vcpu               = 2
   }
   server_configuration = {
-    hostname = "uyuni-bv-pxy.mgr.prv.suse.net"
+    hostname = "suma-bv-42-pxy.mgr.prv.suse.net"
   }
   auto_connect_to_master  = false
   use_os_released_updates = false
   ssh_key_path            = "./salt/controller/id_rsa.pub"
 }
 
-module "sles15sp4-terminal" {
+module "sles15sp3-terminal" {
   providers = {
-    libvirt = libvirt.hugo
+    libvirt = libvirt.terminus
   }
   source             = "./modules/pxe_boot"
   base_configuration = module.base_retail.configuration
-  name               = "terminal-sles15sp4"
-  image              = "sles15sp4o"
+  name               = "terminal-sles15sp3"
+  image              = "sles15sp3o"
   provider_settings = {
     memory             = 2048
     vcpu               = 2
@@ -1504,26 +1097,24 @@ module "sles15sp4-terminal" {
 
 module "monitoring-server" {
   providers = {
-    libvirt = libvirt.hugo
+    libvirt = libvirt.terminus
   }
   source             = "./modules/minion"
   base_configuration = module.base_retail.configuration
-  product_version    = "uyuni-master"
+  product_version    = "4.2-released"
   name               = "monitoring"
-  image              = "sles15sp4o"
+  image              = "sles15sp3o"
   provider_settings = {
-    mac                = "aa:b2:93:02:01:6f"
+    mac                = "aa:b2:92:42:00:53"
     memory             = 2048
   }
 
   server_configuration = {
-    hostname = "uyuni-bv-pxy.mgr.prv.suse.net"
+    hostname = "suma-bv-42-pxy.mgr.prv.suse.net"
   }
   auto_connect_to_master  = false
   use_os_released_updates = false
   ssh_key_path            = "./salt/controller/id_rsa.pub"
-
-  //monitoring_additional_repos
 }
 
 module "controller" {
@@ -1531,7 +1122,7 @@ module "controller" {
   base_configuration = module.base_core.configuration
   name               = "ctl"
   provider_settings = {
-    mac                = "aa:b2:93:02:01:6c"
+    mac                = "aa:b2:92:42:00:50"
     memory             = 16384
     vcpu               = 8
   }
@@ -1545,6 +1136,13 @@ module "controller" {
 
   server_configuration = module.server.configuration
   proxy_configuration  = module.proxy.configuration
+
+  centos7_client_configuration    = module.centos7-client.configuration
+  centos7_minion_configuration    = module.centos7-minion.configuration
+  centos7_sshminion_configuration = module.centos7-sshminion.configuration
+
+  rocky8_minion_configuration    = module.rocky8-minion.configuration
+  rocky8_sshminion_configuration = module.rocky8-sshminion.configuration
 
   sle12sp4_client_configuration    = module.sles12sp4-client.configuration
   sle12sp4_minion_configuration    = module.sles12sp4-minion.configuration
@@ -1570,33 +1168,13 @@ module "controller" {
   sle15sp4_minion_configuration    = module.sles15sp4-minion.configuration
   sle15sp4_sshminion_configuration = module.sles15sp4-sshminion.configuration
 
-  alma9_minion_configuration    = module.alma9-minion.configuration
-  alma9_sshminion_configuration = module.alma9-sshminion.configuration
-
-  centos7_client_configuration    = module.centos7-client.configuration
-  centos7_minion_configuration    = module.centos7-minion.configuration
-  centos7_sshminion_configuration = module.centos7-sshminion.configuration
-
-  liberty9_minion_configuration    = module.liberty9-minion.configuration
-  liberty9_sshminion_configuration = module.liberty9-sshminion.configuration
-
-  oracle9_minion_configuration    = module.oracle9-minion.configuration
-  oracle9_sshminion_configuration = module.oracle9-sshminion.configuration
-
-  rocky8_minion_configuration    = module.rocky8-minion.configuration
-  rocky8_sshminion_configuration = module.rocky8-sshminion.configuration
-
-  rocky9_minion_configuration    = module.rocky9-minion.configuration
-  rocky9_sshminion_configuration = module.rocky9-sshminion.configuration
-
   ubuntu1804_minion_configuration    = module.ubuntu1804-minion.configuration
   ubuntu1804_sshminion_configuration = module.ubuntu1804-sshminion.configuration
 
   ubuntu2004_minion_configuration    = module.ubuntu2004-minion.configuration
   ubuntu2004_sshminion_configuration = module.ubuntu2004-sshminion.configuration
 
-  ubuntu2204_minion_configuration    = module.ubuntu2204-minion.configuration
-  ubuntu2204_sshminion_configuration = module.ubuntu2204-sshminion.configuration
+  // Ubuntu 22.04 is not supported by SUSE Manager 4.2
 
   debian10_minion_configuration    = module.debian10-minion.configuration
   debian10_sshminion_configuration = module.debian10-sshminion.configuration
@@ -1604,23 +1182,14 @@ module "controller" {
   debian11_minion_configuration    = module.debian11-minion.configuration
   debian11_sshminion_configuration = module.debian11-sshminion.configuration
 
-  opensuse154arm_minion_configuration    = module.opensuse154arm-minion.configuration
+  opensuse154arm_minion_configuration = module.opensuse154arm-minion.configuration
   opensuse154arm_sshminion_configuration = module.opensuse154arm-sshminion.configuration
 
-  slemicro51_minion_configuration    = module.slemicro51-minion.configuration
-  slemicro51_sshminion_configuration = module.slemicro51-sshminion.configuration
-
-  slemicro52_minion_configuration    = module.slemicro52-minion.configuration
-  slemicro52_sshminion_configuration = module.slemicro52-sshminion.configuration
-
-  slemicro53_minion_configuration    = module.slemicro53-minion.configuration
-  slemicro53_sshminion_configuration = module.slemicro53-sshminion.configuration
-
   sle12sp5_buildhost_configuration = module.sles12sp5-buildhost.configuration
-  sle15sp4_buildhost_configuration = module.sles15sp4-buildhost.configuration
+  sle15sp3_buildhost_configuration = module.sles15sp3-buildhost.configuration
 
   sle12sp5_terminal_configuration = module.sles12sp5-terminal.configuration
-  sle15sp4_terminal_configuration = module.sles15sp4-terminal.configuration
+  sle15sp3_terminal_configuration = module.sles15sp3-terminal.configuration
 
   monitoringserver_configuration = module.monitoring-server.configuration
 }

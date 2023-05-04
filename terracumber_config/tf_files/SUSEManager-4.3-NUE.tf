@@ -85,7 +85,7 @@ terraform {
 }
 
 provider "libvirt" {
-  uri = "qemu+tcp://salzbreze.mgr.suse.de/system"
+  uri = "qemu+tcp://suma-01.mgr.suse.de/system"
 }
 
 module "cucumber_testsuite" {
@@ -109,13 +109,13 @@ module "cucumber_testsuite" {
   domain       = "mgr.suse.de"
   from_email   = "root@suse.de"
 
-  no_auth_registry = "registry.mgr.suse.de"
-  auth_registry = "registry.mgr.suse.de:5000/cucutest"
+  no_auth_registry       = "registry.mgr.suse.de"
+  auth_registry          = "registry.mgr.suse.de:5000/cucutest"
   auth_registry_username = "cucutest"
   auth_registry_password = "cucusecret"
-  git_profiles_repo = "https://github.com/uyuni-project/uyuni.git#:testsuite/features/profiles/internal_nue"
+  git_profiles_repo      = "https://github.com/uyuni-project/uyuni.git#:testsuite/features/profiles/internal_nue"
 
-  server_http_proxy = "http-proxy.mgr.suse.de:3128"
+  server_http_proxy        = "http-proxy.mgr.suse.de:3128"
   custom_download_endpoint = "ftp://minima-mirror.mgr.suse.de:445"
 
   # when changing images, please also keep in mind to adjust the image matrix at the end of the README.
@@ -123,16 +123,22 @@ module "cucumber_testsuite" {
     controller = {
       provider_settings = {
         mac = "aa:b2:93:01:00:90"
+        vcpu = 2
+        memory = 2048
       }
     }
     server = {
       provider_settings = {
         mac = "aa:b2:93:01:00:91"
+        vcpu = 8
+        memory = 32768
       }
     }
     proxy = {
       provider_settings = {
         mac = "aa:b2:93:01:00:92"
+        vcpu = 2
+        memory = 2048
       }
       additional_packages = [ "venv-salt-minion" ]
       install_salt_bundle = true
@@ -142,6 +148,8 @@ module "cucumber_testsuite" {
       name = "cli-sles15"
       provider_settings = {
         mac = "aa:b2:93:01:00:94"
+        vcpu = 2
+        memory = 2048
       }
       additional_packages = [ "venv-salt-minion" ]
       install_salt_bundle = true
@@ -151,6 +159,8 @@ module "cucumber_testsuite" {
       name = "min-sles15"
       provider_settings = {
         mac = "aa:b2:93:01:00:96"
+        vcpu = 2
+        memory = 2048
       }
       additional_packages = [ "venv-salt-minion" ]
       install_salt_bundle = true
@@ -160,6 +170,8 @@ module "cucumber_testsuite" {
       name = "minssh-sles15"
       provider_settings = {
         mac = "aa:b2:93:01:00:98"
+        vcpu = 2
+        memory = 2048
       }
       additional_packages = [ "venv-salt-minion", "iptables" ]
       install_salt_bundle = true
@@ -171,8 +183,8 @@ module "cucumber_testsuite" {
         mac = "aa:b2:93:01:00:99"
         // Since start of May we have problems with the instance not booting after a restart if there is only a CPU and only 1024Mb for RAM
         // Also, openscap cannot run with less than 1.25 GB of RAM
-        memory = 2048
         vcpu = 2
+        memory = 2048
       }
       additional_packages = [ "venv-salt-minion" ]
       install_salt_bundle = true
@@ -182,33 +194,42 @@ module "cucumber_testsuite" {
       name = "min-ubuntu2204"
       provider_settings = {
         mac = "aa:b2:93:01:00:9b"
+        vcpu = 2
+        memory = 2048
       }
       additional_packages = [ "venv-salt-minion" ]
       install_salt_bundle = true
     }
     build-host = {
       image = "sles15sp4o"
-      name = "min-build"
       provider_settings = {
         mac = "aa:b2:93:01:00:9d"
-        memory = 2048
+        vcpu = 4
+        memory = 8192
       }
       additional_packages = [ "venv-salt-minion" ]
       install_salt_bundle = true
     }
     pxeboot-minion = {
       image = "sles15sp4o"
+      provider_settings = {
+        vcpu = 2
+        memory = 2048
+      }
     }
     kvm-host = {
       image = "sles15sp4o"
       name = "min-kvm"
       provider_settings = {
         mac = "aa:b2:93:01:00:9e"
+        vcpu = 4
+        memory = 8192
       }
       additional_packages = [ "venv-salt-minion" ]
       install_salt_bundle = true
     }
   }
+  nested_vm_host = "min-nested"
   provider_settings = {
     pool = "ssd"
     network_name = null

@@ -79,7 +79,7 @@ terraform {
 }
 
 provider "libvirt" {
-  uri = "qemu+tcp://cokerunner.mgr.suse.de/system"
+  uri = "qemu+tcp://suma-02.mgr.suse.de/system"
 }
 
 module "base" {
@@ -91,11 +91,11 @@ module "base" {
   name_prefix = "suma-refhead-"
   use_avahi   = false
   domain      = "mgr.suse.de"
-  images      = ["rocky8o", "sles15sp1o", "sles15sp2o", "sles15sp3o", "sles15sp4o", "ubuntu2204o"]
+  images      = ["rocky8o", "sles15sp3o", "sles15sp4o", "ubuntu2204o"]
   provider_settings = {
     pool         = "ssd"
     network_name = null
-    bridge       = "br2"
+    bridge       = "br0"
   }
 }
 
@@ -113,7 +113,8 @@ module "server" {
 
   provider_settings = {
     mac = "aa:b2:93:01:00:c1"
-    memory = 8192
+    vcpu = 4
+    memory = 16384
   }
 }
 
@@ -129,6 +130,8 @@ module "suse-minion" {
 
   provider_settings = {
     mac = "aa:b2:93:01:00:c6"
+    vcpu = 2
+    memory = 2048
   }
   additional_packages = [ "venv-salt-minion" ]
   install_salt_bundle = true
@@ -146,8 +149,8 @@ module "redhat-minion" {
     mac = "aa:b2:93:01:00:c9"
     // Since start of May we have problems with the instance not booting after a restart if there is only a CPU and only 1024Mb for RAM
     // Also, openscap cannot run with less than 1.25 GB of RAM
-    memory = 2048
     vcpu = 2
+    memory = 2048
   }
   additional_packages = [ "venv-salt-minion" ]
   install_salt_bundle = true
@@ -163,6 +166,8 @@ module "debian-minion" {
 
   provider_settings = {
     mac = "aa:b2:93:01:00:cb"
+    vcpu = 2
+    memory = 2048
   }
   additional_packages = [ "venv-salt-minion" ]
   install_salt_bundle = true
@@ -178,6 +183,8 @@ module "build-host" {
 
   provider_settings = {
     mac = "aa:b2:93:01:00:cd"
+    vcpu = 2
+    memory = 2048
   }
   additional_packages = [ "venv-salt-minion" ]
   install_salt_bundle = true
@@ -193,6 +200,8 @@ module "kvm-minion" {
 
   provider_settings = {
     mac = "aa:b2:93:01:00:ce"
+    vcpu = 2
+    memory = 2048
   }
   additional_packages = [ "venv-salt-minion" ]
   install_salt_bundle = true
