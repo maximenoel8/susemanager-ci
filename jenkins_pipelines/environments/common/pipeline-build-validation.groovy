@@ -181,7 +181,7 @@ def run(params) {
                 // Call the minion testing.
                 try {
                     stage('Clients stages') {
-                        clientTestingStages()
+                        clientTestingStages(capybara_timeout, default_timeout)
                     }
 
                 } catch (Exception ex) {
@@ -265,7 +265,7 @@ def run(params) {
 
 // Develop a function that outlines the various stages of a minion.
 // These stages will be executed concurrently.
-def clientTestingStages() {
+def clientTestingStages(capybara_timeout, default_timeout) {
 
     // Implement a hash map to store the various stages of nodes.
     def tests = [:]
