@@ -225,7 +225,7 @@ module "proxy-host1" {
   source             = "./modules/proxy"
   base_configuration = module.base_core.configuration
   product_version    = "4.3-released"
-  name               = "pxy"
+  name               = "pxy-host1"
   provider_settings = {
     memory             = 4096
   }
@@ -252,7 +252,7 @@ module "proxy-host2" {
   source             = "./modules/proxy"
   base_configuration = module.base_core.configuration
   product_version    = "4.3-released"
-  name               = "pxy"
+  name               = "pxy-host2"
   provider_settings = {
     memory             = 4096
   }
