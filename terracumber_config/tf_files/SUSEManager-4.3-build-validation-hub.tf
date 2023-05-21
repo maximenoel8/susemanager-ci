@@ -357,9 +357,3 @@ module "sles15sp4-minion" {
 
 }
 
-
-output "configuration" {
-  value = {
-    controller = module.controller.configuration
-  }
-}
