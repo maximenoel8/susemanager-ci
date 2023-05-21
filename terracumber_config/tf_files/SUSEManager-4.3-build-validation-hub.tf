@@ -147,7 +147,7 @@ module "server-hub" {
   from_email                     = "root@suse.de"
   accept_all_ssl_protocols       = true
 
-  //server_additional_repos_hub
+  //server-hub_additional_repos
 
 }
 
@@ -182,7 +182,7 @@ module "server-host1" {
   from_email                     = "root@suse.de"
   accept_all_ssl_protocols       = true
 
-  //server_additional_repos_host1
+  //server-host1_additional_repos
 
 }
 
@@ -217,7 +217,7 @@ module "server-host2" {
   from_email                     = "root@suse.de"
   accept_all_ssl_protocols       = true
 
-  //server_additional_repos_host2
+  //server-host2_additional_repos
 
 }
 
@@ -244,7 +244,7 @@ module "proxy-host1" {
   use_os_released_updates   = true
   ssh_key_path              = "./salt/controller/id_rsa.pub"
 
-  //proxy_additional_repos_host1
+  //proxy-host1_additional_repos
 
 }
 
@@ -271,7 +271,7 @@ module "proxy-host2" {
   use_os_released_updates   = true
   ssh_key_path              = "./salt/controller/id_rsa.pub"
 
-  //proxy_additional_repos_host2
+  //proxy-host2_additional_repos
 
 }
 
