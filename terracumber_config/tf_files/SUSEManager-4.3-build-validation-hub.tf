@@ -357,32 +357,6 @@ module "sles15sp4-minion" {
 
 }
 
-module "controller" {
-  source             = "./modules/controller"
-  base_configuration = module.base_core.configuration
-  name               = "ctl"
-  provider_settings = {
-    memory             = 16384
-    vcpu               = 8
-  }
-  swap_file_size = null
-
-  // Cucumber repository configuration for the controller
-  git_username = var.GIT_USER
-  git_password = var.GIT_PASSWORD
-  git_repo     = var.CUCUMBER_GITREPO
-  branch       = var.CUCUMBER_BRANCH
-
-  server_configuration = module.server-hub.configuration
-  proxy_configuration  = module.proxy-host1.configuration
-
-  sle15sp3_client_configuration    = module.sles15sp3-client.configuration
-  sle15sp3_minion_configuration    = module.sles15sp3-minion.configuration
-
-  sle15sp4_client_configuration    = module.sles15sp4-client.configuration
-  sle15sp4_minion_configuration    = module.sles15sp4-minion.configuration
-
-}
 
 output "configuration" {
   value = {
