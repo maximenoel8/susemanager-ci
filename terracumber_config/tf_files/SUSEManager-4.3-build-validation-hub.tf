@@ -123,7 +123,7 @@ module "server-hub" {
   name               = "srv-hub"
   provider_settings = {
     memory             = 40960
-    vcpu               = 10
+    vcpu               = 4
     data_pool          = "ssd"
   }
 
@@ -158,7 +158,7 @@ module "server-host1" {
   name               = "srv-host1"
   provider_settings = {
     memory             = 40960
-    vcpu               = 10
+    vcpu               = 4
     data_pool          = "ssd"
   }
 
@@ -193,7 +193,7 @@ module "server-host2" {
   name               = "srv-host2"
   provider_settings = {
     memory             = 40960
-    vcpu               = 10
+    vcpu               = 4
     data_pool          = "ssd"
   }
 
@@ -363,7 +363,7 @@ module "controller" {
   name               = "ctl"
   provider_settings = {
     memory             = 16384
-    vcpu               = 8
+    vcpu               = 6
   }
   swap_file_size = null
 
