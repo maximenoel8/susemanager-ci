@@ -383,3 +383,9 @@ module "controller" {
   sle15sp4_minion_configuration    = module.sles15sp4-minion.configuration
 
 }
+
+output "configuration" {
+  value = {
+    controller = module.controller.configuration
+  }
+}
