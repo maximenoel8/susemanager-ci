@@ -122,7 +122,7 @@ module "server-hub" {
   product_version    = "4.3-released"
   name               = "srv-hub"
   provider_settings = {
-    memory             = 40960
+    memory             = 8192
     vcpu               = 4
     data_pool          = "ssd"
   }
@@ -157,7 +157,7 @@ module "server-host1" {
   product_version    = "4.3-released"
   name               = "srv-host1"
   provider_settings = {
-    memory             = 40960
+    memory             = 8192
     vcpu               = 4
     data_pool          = "ssd"
   }
@@ -192,7 +192,7 @@ module "server-host2" {
   product_version    = "4.3-released"
   name               = "srv-host2"
   provider_settings = {
-    memory             = 40960
+    memory             = 8192
     vcpu               = 4
     data_pool          = "ssd"
   }
@@ -218,33 +218,6 @@ module "server-host2" {
   accept_all_ssl_protocols       = true
 
   //server-host2_additional_repos
-
-}
-
-module "proxy-host1" {
-  source             = "./modules/proxy"
-  base_configuration = module.base_core.configuration
-  product_version    = "4.3-released"
-  name               = "pxy-host1"
-  provider_settings = {
-    memory             = 4096
-  }
-  server_configuration = {
-    hostname = "mnoel-bv-43-srv-host1.tf.local"
-    username = "admin"
-    password = "admin"
-  }
-  auto_register             = false
-  auto_connect_to_master    = false
-  download_private_ssl_key  = false
-  install_proxy_pattern     = false
-  auto_configure            = false
-  generate_bootstrap_script = false
-  publish_private_ssl_key   = false
-  use_os_released_updates   = true
-  ssh_key_path              = "./salt/controller/id_rsa.pub"
-
-  //proxy-host1_additional_repos
 
 }
 
@@ -283,6 +256,7 @@ module "sles15sp3-client" {
   image              = "sles15sp3o"
   provider_settings = {
     memory             = 4096
+    vcpu               = 1
   }
   server_configuration = {
     hostname = "mnoel-bv-43-pxy-host1.tf.local"
@@ -303,6 +277,7 @@ module "sles15sp4-client" {
   image              = "sles15sp4o"
   provider_settings = {
     memory             = 4096
+    vcpu               = 1
   }
   server_configuration = {
     hostname = "mnoel-bv-43-pxy-host2.tf.local"
@@ -363,7 +338,7 @@ module "controller" {
   name               = "ctl"
   provider_settings = {
     memory             = 16384
-    vcpu               = 6
+    vcpu               = 4
   }
   swap_file_size = null
 
@@ -374,7 +349,7 @@ module "controller" {
   branch       = var.CUCUMBER_BRANCH
 
   server_configuration = module.server-host1.configuration
-  proxy_configuration  = module.proxy-host1.configuration
+//  proxy_configuration  = module.proxy-host1.configuration
 
   sle15sp3_client_configuration    = module.sles15sp3-client.configuration
   sle15sp3_minion_configuration    = module.sles15sp3-minion.configuration
