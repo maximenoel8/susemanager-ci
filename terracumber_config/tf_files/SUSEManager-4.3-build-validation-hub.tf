@@ -290,6 +290,23 @@ module "sles15sp4-client" {
 
 }
 
+
+module "sles15sp5-sshminion" {
+  source             = "./modules/sshminion"
+  base_configuration = module.base_core.configuration
+  product_version    = "4.3-released"
+  name               = "ssh-sles15sp5"
+  image              = "sles15sp5o"
+  provider_settings = {
+    memory             = 4096
+    vcpu               = 1
+  }
+  use_os_released_updates = false
+  ssh_key_path            = "./salt/controller/id_rsa.pub"
+
+}
+
+
 module "sles15sp3-minion" {
   source             = "./modules/minion"
   base_configuration = module.base_core.configuration
@@ -332,6 +349,27 @@ module "sles15sp4-minion" {
 
 }
 
+module "sles15sp5-minion" {
+  source             = "./modules/minion"
+  base_configuration = module.base_core.configuration
+  product_version    = "4.3-released"
+  name               = "min-sles15sp5"
+  image              = "sles15sp5o"
+  provider_settings = {
+    memory             = 4096
+  }
+
+  server_configuration = {
+    hostname = "mnoel-bv-43-pxy-host2.tf.local"
+  }
+  auto_connect_to_master  = false
+  use_os_released_updates = false
+  ssh_key_path            = "./salt/controller/id_rsa.pub"
+
+  //sle15sp5-minion_additional_repos
+
+}
+
 module "controller" {
   source             = "./modules/controller"
   base_configuration = module.base_core.configuration
@@ -348,11 +386,12 @@ module "controller" {
   git_repo     = var.CUCUMBER_GITREPO
   branch       = var.CUCUMBER_BRANCH
 
-  server_configuration = module.server-host1.configuration
-//  proxy_configuration  = module.proxy-host1.configuration
+  server_configuration = module.server-host2.configuration
+  proxy_configuration  = module.proxy-host2.configuration
 
   sle15sp3_client_configuration    = module.sles15sp3-client.configuration
   sle15sp3_minion_configuration    = module.sles15sp3-minion.configuration
+  sle15sp5_sshminion_configuration    = module.sles15sp5-sshminion.configuration
 
   sle15sp4_client_configuration    = module.sles15sp4-client.configuration
   sle15sp4_minion_configuration    = module.sles15sp4-minion.configuration
