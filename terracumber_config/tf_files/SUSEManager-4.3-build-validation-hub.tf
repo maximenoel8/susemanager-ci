@@ -248,47 +248,47 @@ module "proxy-host2" {
 
 }
 
-module "sles15sp3-client" {
-  source             = "./modules/client"
-  base_configuration = module.base_core.configuration
-  product_version    = "4.3-released"
-  name               = "cli-sles15sp3"
-  image              = "sles15sp3o"
-  provider_settings = {
-    memory             = 4096
-    vcpu               = 1
-  }
-  server_configuration = {
-    hostname = "mnoel-bv-43-pxy-host1.tf.local"
-  }
-  auto_register           = false
-  use_os_released_updates = false
-  ssh_key_path            = "./salt/controller/id_rsa.pub"
-
-  //sle15sp3-client_additional_repos
-
-}
-
-module "sles15sp4-client" {
-  source             = "./modules/client"
-  base_configuration = module.base_core.configuration
-  product_version    = "4.3-released"
-  name               = "cli-sles15sp4"
-  image              = "sles15sp4o"
-  provider_settings = {
-    memory             = 4096
-    vcpu               = 1
-  }
-  server_configuration = {
-    hostname = "mnoel-bv-43-pxy-host2.tf.local"
-  }
-  auto_register           = false
-  use_os_released_updates = false
-  ssh_key_path            = "./salt/controller/id_rsa.pub"
-
-  //sle15sp4-client_additional_repos
-
-}
+//module "sles15sp3-client" {
+//  source             = "./modules/client"
+//  base_configuration = module.base_core.configuration
+//  product_version    = "4.3-released"
+//  name               = "cli-sles15sp3"
+//  image              = "sles15sp3o"
+//  provider_settings = {
+//    memory             = 4096
+//    vcpu               = 1
+//  }
+//  server_configuration = {
+//    hostname = "mnoel-bv-43-pxy-host1.tf.local"
+//  }
+//  auto_register           = false
+//  use_os_released_updates = false
+//  ssh_key_path            = "./salt/controller/id_rsa.pub"
+//
+//  //sle15sp3-client_additional_repos
+//
+//}
+//
+//module "sles15sp4-client" {
+//  source             = "./modules/client"
+//  base_configuration = module.base_core.configuration
+//  product_version    = "4.3-released"
+//  name               = "cli-sles15sp4"
+//  image              = "sles15sp4o"
+//  provider_settings = {
+//    memory             = 4096
+//    vcpu               = 1
+//  }
+//  server_configuration = {
+//    hostname = "mnoel-bv-43-pxy-host2.tf.local"
+//  }
+//  auto_register           = false
+//  use_os_released_updates = false
+//  ssh_key_path            = "./salt/controller/id_rsa.pub"
+//
+//  //sle15sp4-client_additional_repos
+//
+//}
 
 
 module "sles15sp5-sshminion" {
@@ -389,11 +389,11 @@ module "controller" {
   server_configuration = module.server-host2.configuration
   proxy_configuration  = module.proxy-host2.configuration
 
-  sle15sp3_client_configuration    = module.sles15sp3-client.configuration
+//  sle15sp3_client_configuration    = module.sles15sp3-client.configuration
   sle15sp3_minion_configuration    = module.sles15sp3-minion.configuration
   sle15sp5_sshminion_configuration    = module.sles15sp5-sshminion.configuration
 
-  sle15sp4_client_configuration    = module.sles15sp4-client.configuration
+//  sle15sp4_client_configuration    = module.sles15sp4-client.configuration
   sle15sp4_minion_configuration    = module.sles15sp4-minion.configuration
 
 }
