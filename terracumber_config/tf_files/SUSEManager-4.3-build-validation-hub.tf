@@ -391,7 +391,8 @@ module "controller" {
 
 //  sle15sp3_client_configuration    = module.sles15sp3-client.configuration
   sle15sp3_minion_configuration    = module.sles15sp3-minion.configuration
-  sle15sp5_sshminion_configuration    = module.sles15sp5-sshminion.configuration
+  sle15sp5_sshminion_configuration = module.sles15sp5-sshminion.configuration
+  sle15sp5_minion_configuration    = module.sles15sp5-minion.configuration
 
 //  sle15sp4_client_configuration    = module.sles15sp4-client.configuration
   sle15sp4_minion_configuration    = module.sles15sp4-minion.configuration
