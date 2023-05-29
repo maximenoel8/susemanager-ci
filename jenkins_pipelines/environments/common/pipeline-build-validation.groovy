@@ -484,7 +484,7 @@ def getNodesHandler() {
     // Create a map storing mu synchronization state for each minion.
     // This map is to be sure ssh minions have the MU channel ready.
     for (node in nodeListWithDisabledNodes ) {
-        MUSyncStatus[node] = 'UNSYNC'
+        MUSyncStatus[node] = 'NONE'
     }
     return [nodeList:nodeListWithDisabledNodes, envVariableList:envVar, envVariableListToDisable:envVarDisabledNodes, MUSyncStatus:MUSyncStatus]
 }
