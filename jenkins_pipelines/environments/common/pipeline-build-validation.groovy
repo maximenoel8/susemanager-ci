@@ -330,6 +330,8 @@ def clientTestingStages(capybara_timeout, default_timeout) {
                         waitUntil {
                             if (mu_sync_status[minion_name_without_ssh] == 'SYNC' || mu_sync_status[minion_name_without_ssh] == 'FAIL') {
                                 return true
+                            } else {
+                                return false
                             }
                         }
                         if (mu_sync_status[minion_name_without_ssh] == 'FAIL') {
