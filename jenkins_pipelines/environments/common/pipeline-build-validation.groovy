@@ -198,13 +198,12 @@ def run(params) {
                     client_stage_result_fail = true
                 }
             }
-
-            stage('Prepare and run Retail') {
-                if (params.must_prepare_retail) {
-                    if (params.confirm_before_continue) {
-                        input 'Press any key to start running the retail tests'
-                    }
-                    try {
+            try {
+                stage('Prepare and run Retail') {
+                    if (params.must_prepare_retail) {
+                        if (params.confirm_before_continue) {
+                            input 'Press any key to start running the retail tests'
+                        }
                         // temporary
                         error("test fail retail ")
                         // temporary
@@ -220,19 +219,19 @@ def run(params) {
                         if (res_retail_sle15 != 0 || res_retail_proxy != 0 || res_retail_sle12 != 0) {
                             error("Run retail failed")
                         }
-                    } catch (Exception ex) {
-                        println('ERROR: Retail testing fail')
-                        retail_stage_result_fail = true
                     }
                 }
+            } catch (Exception ex) {
+                println('ERROR: Retail testing fail')
+                retail_stage_result_fail = true
             }
 
-            stage('Containerization') {
-                if (params.must_run_containerization_tests) {
-                    if (params.confirm_before_continue) {
-                        input 'Press any key to start running the containerization tests'
-                    }
-                    try {
+            try {
+                stage('Containerization') {
+                    if (params.must_run_containerization_tests) {
+                        if (params.confirm_before_continue) {
+                            input 'Press any key to start running the containerization tests'
+                        }
                         // temporary
                         error("test fail contai ")
                         // temporary
@@ -242,12 +241,11 @@ def run(params) {
                         if (res_container_proxy != 0) {
                             error("Containerization test failed with status code: ${res_non_MU_repositories}")
                         }
-
-                    } catch (Exception ex) {
-                        println('ERROR: Containerization failed')
-                        containerization_stage_result_fail = true
                     }
                 }
+            } catch (Exception ex) {
+                println('ERROR: Containerization failed')
+                containerization_stage_result_fail = true
             }
         }
         finally {
