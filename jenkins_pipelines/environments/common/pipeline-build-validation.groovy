@@ -133,6 +133,9 @@ def run(params) {
             if (params.enable_monitoring_stages) {
                 try {
                     stage('Add MUs Monitoring') {
+                        // temporary
+                        error("test fail monitoring ")
+                        // temporary
                         if (params.must_add_MU_repositories && params.enable_monitoring_stages) {
                             if (params.confirm_before_continue) {
                                 input 'Press any key to start adding Maintenance Update repositories'
@@ -202,6 +205,9 @@ def run(params) {
                         input 'Press any key to start running the retail tests'
                     }
                     try {
+                        // temporary
+                        error("test fail retail ")
+                        // temporary
                         echo 'Prepare Proxy for Retail'
                         res_retail_proxy = sh(script: "./terracumber-cli ${common_params} --logfile ${resultdirbuild}/testsuite.log --runstep cucumber --cucumber-cmd 'export CAPYBARA_TIMEOUT=${capybara_timeout}; export DEFAULT_TIMEOUT=${default_timeout}; ${env.exports} cd /root/spacewalk/testsuite; rake cucumber:build_validation_retail_proxy'", returnStatus: true)
                         echo "Retail proxy status code: ${res_retail_proxy}"
@@ -227,6 +233,9 @@ def run(params) {
                         input 'Press any key to start running the containerization tests'
                     }
                     try {
+                        // temporary
+                        error("test fail contai ")
+                        // temporary
                         echo 'Prepare Proxy as Pod and run basic tests'
                         res_container_proxy = sh(script: "./terracumber-cli ${common_params} --logfile ${resultdirbuild}/testsuite.log --runstep cucumber --cucumber-cmd 'export CAPYBARA_TIMEOUT=${capybara_timeout}; export DEFAULT_TIMEOUT=${default_timeout}; ${env.exports} cd /root/spacewalk/testsuite; rake cucumber:build_validation_containerization'", returnStatus: true)
                         echo "Container proxy status code: ${res_container_proxy}"
