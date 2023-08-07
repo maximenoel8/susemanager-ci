@@ -183,6 +183,7 @@ module "server" {
   publish_private_ssl_key        = false
   use_os_released_updates        = true
   disable_download_tokens        = false
+  disable_auto_bootstrap         = true
   accept_all_ssl_protocols       = true
   additional_packages = [ "venv-salt-minion" ]
   install_salt_bundle = true

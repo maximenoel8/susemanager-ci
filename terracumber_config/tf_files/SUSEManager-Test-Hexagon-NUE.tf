@@ -103,7 +103,7 @@ module "cucumber_testsuite" {
   cc_username = var.SCC_USER
   cc_password = var.SCC_PASSWORD
 
-  images = ["rocky8o", "opensuse154o", "sles15sp4o"]
+  images = ["rocky8o", "opensuse154o"]
 
   use_avahi    = false
   name_prefix  = "suma-testhexagon-"
@@ -115,6 +115,8 @@ module "cucumber_testsuite" {
   auth_registry_username = "cucutest"
   auth_registry_password = "cucusecret"
   git_profiles_repo = "https://github.com/uyuni-project/uyuni.git#:testsuite/features/profiles/internal_nue"
+  
+  container_server = true
 
   server_http_proxy = "http-proxy.mgr.suse.de:3128"
   custom_download_endpoint = "ftp://minima-mirror.mgr.suse.de:445"
@@ -128,8 +130,9 @@ module "cucumber_testsuite" {
     server_containerized = {
       provider_settings = {
         mac = "aa:b2:93:01:00:51"
-        memory = 13312
+        memory = 16384
       }
+      login_timeout = 28800
       runtime = "podman"
       container_repository = "registry.opensuse.org/systemsmanagement/uyuni/master/servercontainer/containers/uyuni"
       //additional_repos = {
@@ -146,18 +149,10 @@ module "cucumber_testsuite" {
       additional_packages = [ "venv-salt-minion" ]
       install_salt_bundle = true
     }
-    suse-client = {
-      image = "sles15sp4o"
-      name = "cli-sles15"
-      provider_settings = {
-        mac = "aa:b2:93:01:00:54"
-      }
-      additional_packages = [ "venv-salt-minion" ]
-      install_salt_bundle = true
-    }
+
     suse-minion = {
-      image = "sles15sp4o"
-      name = "min-sles15"
+      image = "opensuse154o"
+      name = "min-suse"
       provider_settings = {
         mac = "aa:b2:93:01:00:56"
       }
@@ -165,8 +160,8 @@ module "cucumber_testsuite" {
       install_salt_bundle = true
     }
     suse-sshminion = {
-      image = "sles15sp4o"
-      name = "minssh-sles15"
+      image = "opensuse154o"
+      name = "minssh-suse"
       provider_settings = {
         mac = "aa:b2:93:01:00:58"
       }
@@ -174,6 +169,8 @@ module "cucumber_testsuite" {
       install_salt_bundle = true
     }
     redhat-minion = {
+      image = "rocky8o"
+      name = "min-rocky8"
       provider_settings = {
         mac = "aa:b2:93:01:00:5a"
         // Since start of May we have problems with the instance not booting after a restart if there is only a CPU and only 1024Mb for RAM
@@ -185,10 +182,13 @@ module "cucumber_testsuite" {
       install_salt_bundle = true
     }
     pxeboot-minion = {
-      image = "sles15sp4o"
+      image = "opensuse154o"
+      additional_packages = [ "venv-salt-minion" ]
+      install_salt_bundle = true
     }
     build-host = {
-      image = "sles15sp4o"
+      image = "opensuse154o"
+      name = "min-build"
       provider_settings = {
         mac = "aa:b2:93:01:00:5d"
         memory = 2048

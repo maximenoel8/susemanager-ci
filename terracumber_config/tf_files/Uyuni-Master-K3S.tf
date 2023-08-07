@@ -102,7 +102,7 @@ module "cucumber_testsuite" {
   cc_username = var.SCC_USER
   cc_password = var.SCC_PASSWORD
 
-  images = ["rocky8o", "opensuse154o", "sles15sp4o", "ubuntu2204o"]
+  images = ["rocky8o", "opensuse154o", "ubuntu2204o"]
 
   use_avahi    = false
   name_prefix  = "uyuni-master-k3s-"
@@ -114,6 +114,8 @@ module "cucumber_testsuite" {
   auth_registry_username = "cucutest"
   auth_registry_password = "cucusecret"
   git_profiles_repo = "https://github.com/uyuni-project/uyuni.git#:testsuite/features/profiles/internal_nue"
+  
+  container_server = true
 
   # mirror      = "minima-mirror.mgr.suse.de"
   # use_mirror_images = true
@@ -146,8 +148,8 @@ module "cucumber_testsuite" {
       install_salt_bundle = true
     }
     suse-minion = {
-      image = "sles15sp4o"
-      name = "min-sles15"
+      image = "opensuse154o"
+      name = "min-suse"
       provider_settings = {
         mac = "aa:b2:93:01:00:36"
       }
@@ -155,8 +157,8 @@ module "cucumber_testsuite" {
       install_salt_bundle = true
     }
     suse-sshminion = {
-      image = "sles15sp4o"
-      name = "minssh-sles15"
+      image = "opensuse154o"
+      name = "minssh-suse"
       provider_settings = {
         mac = "aa:b2:93:01:00:38"
       }
@@ -189,7 +191,7 @@ module "cucumber_testsuite" {
       install_salt_bundle = false
     }
     build-host = {
-      image = "sles15sp4o"
+      image = "opensuse154o"
       name = "min-build"
       provider_settings = {
         mac = "aa:b2:93:01:00:3d"
@@ -199,7 +201,7 @@ module "cucumber_testsuite" {
       install_salt_bundle = true
     }
     pxeboot-minion = {
-      image = "sles15sp4o"
+      image = "opensuse154o"
       additional_packages = [ "venv-salt-minion" ]
       install_salt_bundle = true
     }
@@ -209,12 +211,12 @@ module "cucumber_testsuite" {
       additional_grains = {
         hvm_disk_image = {
           leap = {
-            hostname = "leap-salt-migration"
+            hostname = "uyuni-master-min-nested"
             image = "http://minima-mirror.mgr.suse.de/distribution/leap/15.4/appliances/openSUSE-Leap-15.4-JeOS.x86_64-OpenStack-Cloud.qcow2"
             hash = "http://minima-mirror.mgr.suse.de/distribution/leap/15.4/appliances/openSUSE-Leap-15.4-JeOS.x86_64-OpenStack-Cloud.qcow2.sha256"
           }
           sles = {
-            hostname = "sles-salt-migration"
+            hostname = "uyuni-master-min-nested"
             image = "http://minima-mirror.mgr.suse.de/install/SLE-15-SP4-Minimal-GM/SLES15-SP4-Minimal-VM.x86_64-OpenStack-Cloud-GM.qcow2"
             hash = "http://minima-mirror.mgr.suse.de/install/SLE-15-SP4-Minimal-GM/SLES15-SP4-Minimal-VM.x86_64-OpenStack-Cloud-GM.qcow2.sha256"
           }
