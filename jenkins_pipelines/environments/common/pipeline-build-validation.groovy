@@ -18,8 +18,6 @@ def run(params) {
         def client_stage_result_fail = false
         def retail_stage_result_fail = false
         def containerization_stage_result_fail = false
-        def nodesHandler = getNodesHandler()
-        def clientsList = nodesHandler.envVariableList.toList()
 
         env.common_params = "--outputdir ${resultdir} --tf ${params.tf_file} --gitfolder ${resultdir}/sumaform"
 
@@ -59,6 +57,8 @@ def run(params) {
                     deployed = true
                 }
             }
+            def nodesHandler = getNodesHandler()
+            def clientsList = nodesHandler.envVariableList.toList()
 
             stage('Sanity check') {
                 sh "./terracumber-cli ${common_params} --logfile ${resultdirbuild}/testsuite.log --runstep cucumber --cucumber-cmd 'cd /root/spacewalk/testsuite; ${env.exports} rake cucumber:build_validation_sanity_check'"
@@ -73,6 +73,7 @@ def run(params) {
             stage('Sync. products and channels') {
                 if (params.must_sync && (deployed || !params.must_deploy)) {
                     // Get minion list from terraform state list command
+                    def nodesHandler = getNodesHandler()
                     res_products = sh(script: "./terracumber-cli ${common_params} --logfile ${resultdirbuild}/testsuite.log --runstep cucumber --cucumber-cmd 'unset ${nodesHandler.envVariableListToDisable.join(' ')}; ${env.exports} cd /root/spacewalk/testsuite; rake cucumber:build_validation_reposync'", returnStatus: true)
                     echo "Custom channels and MU repositories status code: ${res_products}"
                     res_sync_products = sh(script: "./terracumber-cli ${common_params} --logfile ${resultdirbuild}/testsuite.log --runstep cucumber --cucumber-cmd '${env.exports} cd /root/spacewalk/testsuite; rake cucumber:build_validation_wait_for_product_reposync'", returnStatus: true)
@@ -347,6 +348,7 @@ def clientTestingStages() {
                         }
                     }
                 }
+                // Don't update required_custom_channel_status for minion who needs non MU repositories
                 if (!json_matching_non_MU_data.containsKey(node)) {
                     required_custom_channel_status[node] = 'CREATED'
                 }
@@ -376,7 +378,10 @@ def clientTestingStages() {
                         }
                     }
                 }
-                required_custom_channel_status[node] = 'CREATED'
+                // Don't overwrite required_custom_channel_status variable for minions who don't need non MU repositories ( protect overwrite of add MU fails )
+                if (json_matching_non_MU_data.containsKey(node)) {
+                    required_custom_channel_status[node] = 'CREATED'
+                }
             }
             stage("Add Activation Keys ${node}") {
                 if (params.must_add_keys) {
