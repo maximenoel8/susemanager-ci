@@ -416,6 +416,7 @@ def clientTestingStages() {
                         println "Waiting for bootstrap repository creation by ${minion_name_without_ssh} for ${node}."
                         waitUntil {
                             bootstrap_repository_status[minion_name_without_ssh] != 'NOT_CREATED'
+                            println "Bootstrap repository status for ${minion_name_without_ssh} is ${bootstrap_repository_status[minion_name_without_ssh]}"
                         }
                         if (bootstrap_repository_status[minion_name_without_ssh] == 'FAIL') {
                             error("${minion_name_without_ssh} creates bootstrap repository failed")
