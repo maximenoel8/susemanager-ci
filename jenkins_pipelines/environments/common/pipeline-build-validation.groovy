@@ -2,7 +2,7 @@ def run(params) {
     timestamps {
         //Capybara configuration
         def capybara_timeout = 60
-        def default_timeout = 500
+        def default_timeout = 800
 
         deployed = false
         env.resultdir = "${WORKSPACE}/results"
@@ -516,7 +516,7 @@ def getNodesHandler() {
 }
 
 def randomWait() {
-    def randomWait = new Random().nextInt(180)
+    def randomWait = new Random().nextInt(360)
     println "Waiting for ${randomWait} seconds"
     sleep randomWait
 }
