@@ -448,7 +448,7 @@ def clientTestingStages() {
                     if (params.confirm_before_continue) {
                         input 'Press any key to start bootstraping the clients'
                     }
-                    randomWait()
+//                    randomWait()
                     echo 'Bootstrap clients'
                     res_init_clients = sh(script: "./terracumber-cli ${common_params} --logfile ${resultdirbuild}/testsuite.log --runstep cucumber --cucumber-cmd 'unset ${temporaryList.join(' ')}; ${env.exports} cd /root/spacewalk/testsuite; rake cucumber:build_validation_init_client_${node}'", returnStatus: true)
                     echo "Init clients status code: ${res_init_clients}"
@@ -462,7 +462,7 @@ def clientTestingStages() {
                     if (params.confirm_before_continue) {
                         input 'Press any key to start running the smoke tests'
                     }
-                    randomWait()
+//                    randomWait()
                     echo 'Run Smoke tests'
                     res_smoke_tests = sh(script: "./terracumber-cli ${common_params} --logfile ${resultdirbuild}/testsuite.log --runstep cucumber --cucumber-cmd 'unset ${temporaryList.join(' ')}; ${env.exports} cd /root/spacewalk/testsuite; rake cucumber:build_validation_smoke_tests_${node}'", returnStatus: true)
                     echo "Smoke tests status code: ${res_smoke_tests}"
