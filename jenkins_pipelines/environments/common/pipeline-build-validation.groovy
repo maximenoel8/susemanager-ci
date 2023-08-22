@@ -324,7 +324,7 @@ def clientTestingStages() {
             }
             stage("Add MUs ${node}") {
                 if (params.must_add_MU_repositories) {
-                      if (!node.contains('ssh')) {
+                    if (!node.contains('ssh')) {
                         if (params.confirm_before_continue) {
                             input 'Press any key to start adding Maintenance Update repositories'
                         }
