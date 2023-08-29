@@ -117,8 +117,8 @@ module "cucumber_testsuite" {
   
   container_server = true
 
-  # mirror      = "minima-mirror-ci-bv.mgr.suse.de"
-  # use_mirror_images = true
+  mirror                   = "minima-mirror-ci-bv.mgr.suse.de"
+  use_mirror_images        = true
 
   server_http_proxy = "http-proxy.mgr.suse.de:3128"
   custom_download_endpoint = "ftp://minima-mirror-ci-bv.mgr.suse.de:445"
