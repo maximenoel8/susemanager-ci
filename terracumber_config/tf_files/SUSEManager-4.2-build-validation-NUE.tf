@@ -101,10 +101,10 @@ module "base_core" {
   name_prefix = "suma-bv-42-"
   use_avahi   = false
   domain      = "mgr.suse.de"
-  images      = [ "sles12sp4o", "sles12sp5o", "sles15sp1o", "sles15sp2o", "sles15sp3o", "sles15sp4o", "sles15sp5o", "centos7o", "rocky8o", "ubuntu1804o", "ubuntu2004o", "debian10o", "opensuse154o" ]
+  images      = [ "sles12sp4o", "sles12sp5o", "sles15sp1o", "sles15sp2o", "sles15sp3o", "sles15sp4o", "sles15sp5o", "centos7o", "rocky8o",  "ubuntu2004o", "debian10o", "opensuse154o" ]
 
-  # mirror = "minima-mirror-bv.mgr.suse.de"
-  # use_mirror_images = true
+  mirror = "minima-mirror-ci-bv.mgr.suse.de"
+  use_mirror_images = true
 
   testsuite          = true
 
@@ -115,6 +115,7 @@ module "base_core" {
   }
 }
 
+// WORKAROUND: overdrive3 has been disconnected by mistake
 //module "base_arm" {
 //  providers = {
 //    libvirt = libvirt.overdrive3
@@ -129,8 +130,8 @@ module "base_core" {
 //  domain      = "mgr.suse.de"
 //  images      = [ "opensuse154armo", "opensuse155armo" ]
 //
-//  # mirror = "minima-mirror-bv.mgr.suse.de"
-//  # use_mirror_images = true
+//  mirror = "minima-mirror-ci-bv.mgr.suse.de"
+//  use_mirror_images = true
 //
 //  testsuite = true
 //
@@ -152,7 +153,7 @@ module "server" {
     data_pool          = "ssd"
   }
 
-  # server_mounted_mirror = "minima-mirror-bv.mgr.suse.de"
+  server_mounted_mirror = "minima-mirror-ci-bv.mgr.suse.de"
   repository_disk_size = 2048
 
   auto_accept                    = false
@@ -524,24 +525,6 @@ module "rocky8-minion" {
 
 // Rocky 9 is not supported by SUSE Manager 4.2
 
-module "ubuntu1804-minion" {
-  source             = "./modules/minion"
-  base_configuration = module.base_core.configuration
-  product_version    = "4.2-released"
-  name               = "min-ubuntu1804"
-  image              = "ubuntu1804o"
-  provider_settings = {
-    mac                = "aa:b2:92:42:00:69"
-    memory             = 4096
-  }
-  server_configuration = {
-    hostname = "suma-bv-42-pxy.mgr.suse.de"
-  }
-  auto_connect_to_master  = false
-  use_os_released_updates = false
-  ssh_key_path            = "./salt/controller/id_rsa.pub"
-}
-
 module "ubuntu2004-minion" {
   source             = "./modules/minion"
   base_configuration = module.base_core.configuration
@@ -585,6 +568,7 @@ module "debian10-minion" {
 
 // Debian 12 is not supported by SUSE Manager 4.2
 
+// WORKAROUND: overdrive3 has been disconnected by mistake
 //module "opensuse154arm-minion" {
 //  providers = {
 //    libvirt = libvirt.overdrive3
@@ -607,7 +591,8 @@ module "debian10-minion" {
 //  use_os_released_updates = false
 //  ssh_key_path            = "./salt/controller/id_rsa.pub"
 //}
-//
+
+// WORKAROUND: overdrive3 has been disconnected by mistake
 //module "opensuse155arm-minion" {
 //  providers = {
 //    libvirt = libvirt.overdrive3
@@ -770,20 +755,6 @@ module "rocky8-sshminion" {
 
 // Rocky 9 is not supported by SUSE Manager 4.2
 
-module "ubuntu1804-sshminion" {
-  source             = "./modules/sshminion"
-  base_configuration = module.base_core.configuration
-  product_version    = "4.2-released"
-  name               = "minssh-ubuntu1804"
-  image              = "ubuntu1804o"
-  provider_settings = {
-    mac                = "aa:b2:92:42:00:89"
-    memory             = 4096
-  }
-  use_os_released_updates = false
-  ssh_key_path            = "./salt/controller/id_rsa.pub"
-}
-
 module "ubuntu2004-sshminion" {
   source             = "./modules/sshminion"
   base_configuration = module.base_core.configuration
@@ -818,6 +789,7 @@ module "debian10-sshminion" {
 
 // Debian 12 is not supported by SUSE Manager 4.2
 
+// WORKAROUND: overdrive3 has been disconnected by mistake
 //module "opensuse154arm-sshminion" {
 //  providers = {
 //    libvirt = libvirt.overdrive3
@@ -836,7 +808,8 @@ module "debian10-sshminion" {
 //  use_os_released_updates = false
 //  ssh_key_path            = "./salt/controller/id_rsa.pub"
 //}
-//
+
+// WORKAROUND: overdrive3 has been disconnected by mistake
 //module "opensuse155arm-sshminion" {
 //  providers = {
 //    libvirt = libvirt.overdrive3
@@ -996,9 +969,6 @@ module "controller" {
   sle15sp5_minion_configuration    = module.sles15sp5-minion.configuration
   sle15sp5_sshminion_configuration = module.sles15sp5-sshminion.configuration
 
-  ubuntu1804_minion_configuration    = module.ubuntu1804-minion.configuration
-  ubuntu1804_sshminion_configuration = module.ubuntu1804-sshminion.configuration
-
   ubuntu2004_minion_configuration    = module.ubuntu2004-minion.configuration
   ubuntu2004_sshminion_configuration = module.ubuntu2004-sshminion.configuration
 
@@ -1010,6 +980,7 @@ module "controller" {
   // Debian 11 is not supported by SUSE Manager 4.2
   // Debian 12 is not supported by SUSE Manager 4.2
 
+// WORKAROUND: overdrive3 has been disconnected by mistake
 //  opensuse154arm_minion_configuration = module.opensuse154arm-minion.configuration
 //  opensuse154arm_sshminion_configuration = module.opensuse154arm-sshminion.configuration
 //

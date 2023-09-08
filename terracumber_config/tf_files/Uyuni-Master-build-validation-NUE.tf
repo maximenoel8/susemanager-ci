@@ -101,10 +101,10 @@ module "base_core" {
   name_prefix = "uyuni-bv-master-"
   use_avahi   = false
   domain      = "mgr.suse.de"
-  images      = [ "sles12sp4o", "sles12sp5o", "sles15sp1o", "sles15sp2o", "sles15sp3o", "sles15sp4o", "sles15sp5o", "slemicro51-ign", "slemicro52-ign", "slemicro53-ign", "slemicro54-ign", "almalinux9o", "centos7o", "libertylinux9o", "oraclelinux9o", "rocky8o", "rocky9o", "ubuntu1804o", "ubuntu2004o", "ubuntu2204o", "debian10o", "debian11o", "opensuse154o" ]
+  images      = [ "sles12sp4o", "sles12sp5o", "sles15sp1o", "sles15sp2o", "sles15sp3o", "sles15sp4o", "sles15sp5o", "slemicro51-ign", "slemicro52-ign", "slemicro53-ign", "slemicro54-ign", "almalinux9o", "centos7o", "oraclelinux9o", "rocky8o", "rocky9o", "ubuntu2004o", "ubuntu2204o", "debian10o", "debian11o", "opensuse154o" ]
 
-  # mirror = "minima-mirror-bv.mgr.suse.de"
-  # use_mirror_images = true
+  mirror = "minima-mirror-ci-bv.mgr.suse.de"
+  use_mirror_images = true
 
   testsuite          = true
 
@@ -115,6 +115,7 @@ module "base_core" {
   }
 }
 
+// WORKAROUND: overdrive3 has been disconnected by mistake
 //module "base_arm" {
 //  providers = {
 //    libvirt = libvirt.overdrive3
@@ -129,8 +130,8 @@ module "base_core" {
 //  domain      = "mgr.suse.de"
 //  images      = [ "opensuse154armo", "opensuse155armo" ]
 //
-//  # mirror = "minima-mirror-bv.mgr.suse.de"
-//  # use_mirror_images = true
+//  mirror = "minima-mirror-ci-bv.mgr.suse.de"
+//  use_mirror_images = true
 //
 //  testsuite = true
 //
@@ -143,7 +144,7 @@ module "base_core" {
 module "server" {
   source             = "./modules/server"
   base_configuration = module.base_core.configuration
-  product_version    = "uyuni-released"
+  product_version    = "uyuni-master"
   name               = "srv"
   provider_settings = {
     mac                = "aa:b2:93:02:01:a1"
@@ -152,7 +153,7 @@ module "server" {
     data_pool          = "ssd"
   }
 
-  # server_mounted_mirror = "minima-mirror-bv.mgr.suse.de"
+  server_mounted_mirror = "minima-mirror-ci-bv.mgr.suse.de"
   repository_disk_size = 2048
 
   auto_accept                    = false
@@ -180,7 +181,7 @@ module "server" {
 module "proxy" {
   source             = "./modules/proxy"
   base_configuration = module.base_core.configuration
-  product_version    = "uyuni-released"
+  product_version    = "uyuni-master"
   name               = "pxy"
   provider_settings = {
     mac                = "aa:b2:93:02:01:a2"
@@ -207,7 +208,7 @@ module "proxy" {
 module "sles12sp4-minion" {
   source             = "./modules/minion"
   base_configuration = module.base_core.configuration
-  product_version    = "uyuni-released"
+  product_version    = "uyuni-master"
   name               = "min-sles12sp4"
   image              = "sles12sp4o"
   provider_settings = {
@@ -225,7 +226,7 @@ module "sles12sp4-minion" {
 module "sles12sp5-minion" {
   source             = "./modules/minion"
   base_configuration = module.base_core.configuration
-  product_version    = "uyuni-released"
+  product_version    = "uyuni-master"
   name               = "min-sles12sp5"
   image              = "sles12sp5o"
   provider_settings = {
@@ -243,7 +244,7 @@ module "sles12sp5-minion" {
 module "sles15sp1-minion" {
   source             = "./modules/minion"
   base_configuration = module.base_core.configuration
-  product_version    = "uyuni-released"
+  product_version    = "uyuni-master"
   name               = "min-sles15sp1"
   image              = "sles15sp1o"
   provider_settings = {
@@ -262,7 +263,7 @@ module "sles15sp1-minion" {
 module "sles15sp2-minion" {
   source             = "./modules/minion"
   base_configuration = module.base_core.configuration
-  product_version    = "uyuni-released"
+  product_version    = "uyuni-master"
   name               = "min-sles15sp2"
   image              = "sles15sp2o"
   provider_settings = {
@@ -281,7 +282,7 @@ module "sles15sp2-minion" {
 module "sles15sp3-minion" {
   source             = "./modules/minion"
   base_configuration = module.base_core.configuration
-  product_version    = "uyuni-released"
+  product_version    = "uyuni-master"
   name               = "min-sles15sp3"
   image              = "sles15sp3o"
   provider_settings = {
@@ -300,7 +301,7 @@ module "sles15sp3-minion" {
 module "sles15sp4-minion" {
   source             = "./modules/minion"
   base_configuration = module.base_core.configuration
-  product_version    = "uyuni-released"
+  product_version    = "uyuni-master"
   name               = "min-sles15sp4"
   image              = "sles15sp4o"
   provider_settings = {
@@ -319,7 +320,7 @@ module "sles15sp4-minion" {
 module "sles15sp5-minion" {
   source             = "./modules/minion"
   base_configuration = module.base_core.configuration
-  product_version    = "uyuni-released"
+  product_version    = "uyuni-master"
   name               = "min-sles15sp5"
   image              = "sles15sp5o"
   provider_settings = {
@@ -338,7 +339,7 @@ module "sles15sp5-minion" {
 module "alma9-minion" {
   source             = "./modules/minion"
   base_configuration = module.base_core.configuration
-  product_version    = "uyuni-released"
+  product_version    = "uyuni-master"
   name               = "min-alma9"
   image              = "almalinux9o"
   provider_settings = {
@@ -359,7 +360,7 @@ module "alma9-minion" {
 module "centos7-minion" {
   source             = "./modules/minion"
   base_configuration = module.base_core.configuration
-  product_version    = "uyuni-released"
+  product_version    = "uyuni-master"
   name               = "min-centos7"
   image              = "centos7o"
   provider_settings = {
@@ -377,31 +378,10 @@ module "centos7-minion" {
   install_salt_bundle = true
 }
 
-module "liberty9-minion" {
-  source             = "./modules/minion"
-  base_configuration = module.base_core.configuration
-  product_version    = "uyuni-released"
-  name               = "min-liberty9"
-  image              = "libertylinux9o"
-  provider_settings = {
-    mac                = "aa:b2:93:02:01:c5"
-    memory             = 4096
-  }
-  server_configuration = {
-    hostname = "uyuni-bv-master-pxy.mgr.suse.de"
-  }
-  auto_connect_to_master  = false
-  use_os_released_updates = false
-  ssh_key_path            = "./salt/controller/id_rsa.pub"
-
-  additional_packages = [ "venv-salt-minion" ]
-  install_salt_bundle = true
-}
-
 module "oracle9-minion" {
   source             = "./modules/minion"
   base_configuration = module.base_core.configuration
-  product_version    = "uyuni-released"
+  product_version    = "uyuni-master"
   name               = "min-oracle9"
   image              = "oraclelinux9o"
   provider_settings = {
@@ -422,7 +402,7 @@ module "oracle9-minion" {
 module "rocky8-minion" {
   source             = "./modules/minion"
   base_configuration = module.base_core.configuration
-  product_version    = "uyuni-released"
+  product_version    = "uyuni-master"
   name               = "min-rocky8"
   image              = "rocky8o"
   provider_settings = {
@@ -444,7 +424,7 @@ module "rocky8-minion" {
 module "rocky9-minion" {
   source             = "./modules/minion"
   base_configuration = module.base_core.configuration
-  product_version    = "uyuni-released"
+  product_version    = "uyuni-master"
   name               = "min-rocky9"
   image              = "rocky9o"
   provider_settings = {
@@ -462,28 +442,10 @@ module "rocky9-minion" {
   install_salt_bundle = true
 }
 
-module "ubuntu1804-minion" {
-  source             = "./modules/minion"
-  base_configuration = module.base_core.configuration
-  product_version    = "uyuni-released"
-  name               = "min-ubuntu1804"
-  image              = "ubuntu1804o"
-  provider_settings = {
-    mac                = "aa:b2:93:02:01:b9"
-    memory             = 4096
-  }
-  server_configuration = {
-    hostname = "uyuni-bv-master-pxy.mgr.suse.de"
-  }
-  auto_connect_to_master  = false
-  use_os_released_updates = false
-  ssh_key_path            = "./salt/controller/id_rsa.pub"
-}
-
 module "ubuntu2004-minion" {
   source             = "./modules/minion"
   base_configuration = module.base_core.configuration
-  product_version    = "uyuni-released"
+  product_version    = "uyuni-master"
   name               = "min-ubuntu2004"
   image              = "ubuntu2004o"
   provider_settings = {
@@ -501,7 +463,7 @@ module "ubuntu2004-minion" {
 module "ubuntu2204-minion" {
   source             = "./modules/minion"
   base_configuration = module.base_core.configuration
-  product_version    = "uyuni-released"
+  product_version    = "uyuni-master"
   name               = "min-ubuntu2204"
   image              = "ubuntu2204o"
   provider_settings = {
@@ -521,7 +483,7 @@ module "ubuntu2204-minion" {
 module "debian10-minion" {
   source             = "./modules/minion"
   base_configuration = module.base_core.configuration
-  product_version    = "uyuni-released"
+  product_version    = "uyuni-master"
   name               = "min-debian10"
   image              = "debian10o"
   provider_settings = {
@@ -540,7 +502,7 @@ module "debian10-minion" {
 module "debian11-minion" {
   source             = "./modules/minion"
   base_configuration = module.base_core.configuration
-  product_version    = "uyuni-released"
+  product_version    = "uyuni-master"
   name               = "min-debian11"
   image              = "debian11o"
   provider_settings = {
@@ -556,13 +518,14 @@ module "debian11-minion" {
   ssh_key_path            = "./salt/controller/id_rsa.pub"
 }
 
+// WORKAROUND: overdrive3 has been disconnected by mistake
 //module "opensuse154arm-minion" {
 //  providers = {
 //    libvirt = libvirt.overdrive3
 //  }
 //  source             = "./modules/minion"
 //  base_configuration = module.base_arm.configuration
-//  product_version    = "uyuni-released"
+//  product_version    = "uyuni-master"
 //  name               = "min-opensuse154arm"
 //  image              = "opensuse154armo"
 //  provider_settings = {
@@ -578,14 +541,15 @@ module "debian11-minion" {
 //  use_os_released_updates = false
 //  ssh_key_path            = "./salt/controller/id_rsa.pub"
 //}
-//
+
+// WORKAROUND: overdrive3 has been disconnected by mistake
 //module "opensuse155arm-minion" {
 //  providers = {
 //    libvirt = libvirt.overdrive3
 //  }
 //  source             = "./modules/minion"
 //  base_configuration = module.base_arm.configuration
-//  product_version    = "uyuni-released"
+//  product_version    = "uyuni-master"
 //  name               = "min-opensuse155arm"
 //  image              = "opensuse155armo"
 //  provider_settings = {
@@ -605,7 +569,7 @@ module "debian11-minion" {
 module "slemicro51-minion" {
   source             = "./modules/minion"
   base_configuration = module.base_core.configuration
-  product_version    = "uyuni-released"
+  product_version    = "uyuni-master"
   name               = "min-slemicro51"
   image              = "slemicro51-ign"
   provider_settings = {
@@ -624,7 +588,7 @@ module "slemicro51-minion" {
 module "slemicro52-minion" {
   source             = "./modules/minion"
   base_configuration = module.base_core.configuration
-  product_version    = "uyuni-released"
+  product_version    = "uyuni-master"
   name               = "min-slemicro52"
   image              = "slemicro52-ign"
   provider_settings = {
@@ -643,7 +607,7 @@ module "slemicro52-minion" {
 module "slemicro53-minion" {
   source             = "./modules/minion"
   base_configuration = module.base_core.configuration
-  product_version    = "uyuni-released"
+  product_version    = "uyuni-master"
   name               = "min-slemicro53"
   image              = "slemicro53-ign"
   provider_settings = {
@@ -662,7 +626,7 @@ module "slemicro53-minion" {
 module "slemicro54-minion" {
   source             = "./modules/minion"
   base_configuration = module.base_core.configuration
-  product_version    = "uyuni-released"
+  product_version    = "uyuni-master"
   name               = "min-slemicro54"
   image              = "slemicro54-ign"
   provider_settings = {
@@ -681,7 +645,7 @@ module "slemicro54-minion" {
 module "sles12sp4-sshminion" {
   source             = "./modules/sshminion"
   base_configuration = module.base_core.configuration
-  product_version    = "uyuni-released"
+  product_version    = "uyuni-master"
   name               = "minssh-sles12sp4"
   image              = "sles12sp4o"
   provider_settings = {
@@ -697,7 +661,7 @@ module "sles12sp4-sshminion" {
 module "sles12sp5-sshminion" {
   source             = "./modules/sshminion"
   base_configuration = module.base_core.configuration
-  product_version    = "uyuni-released"
+  product_version    = "uyuni-master"
   name               = "minssh-sles12sp5"
   image              = "sles12sp5o"
   provider_settings = {
@@ -713,7 +677,7 @@ module "sles12sp5-sshminion" {
 module "sles15sp1-sshminion" {
   source             = "./modules/sshminion"
   base_configuration = module.base_core.configuration
-  product_version    = "uyuni-released"
+  product_version    = "uyuni-master"
   name               = "minssh-sles15sp1"
   image              = "sles15sp1o"
   provider_settings = {
@@ -728,7 +692,7 @@ module "sles15sp1-sshminion" {
 module "sles15sp2-sshminion" {
   source             = "./modules/sshminion"
   base_configuration = module.base_core.configuration
-  product_version    = "uyuni-released"
+  product_version    = "uyuni-master"
   name               = "minssh-sles15sp2"
   image              = "sles15sp2o"
   provider_settings = {
@@ -742,7 +706,7 @@ module "sles15sp2-sshminion" {
 module "sles15sp3-sshminion" {
   source             = "./modules/sshminion"
   base_configuration = module.base_core.configuration
-  product_version    = "uyuni-released"
+  product_version    = "uyuni-master"
   name               = "minssh-sles15sp3"
   image              = "sles15sp3o"
   provider_settings = {
@@ -756,7 +720,7 @@ module "sles15sp3-sshminion" {
 module "sles15sp4-sshminion" {
   source             = "./modules/sshminion"
   base_configuration = module.base_core.configuration
-  product_version    = "uyuni-released"
+  product_version    = "uyuni-master"
   name               = "minssh-sles15sp4"
   image              = "sles15sp4o"
   provider_settings = {
@@ -770,7 +734,7 @@ module "sles15sp4-sshminion" {
 module "sles15sp5-sshminion" {
   source             = "./modules/sshminion"
   base_configuration = module.base_core.configuration
-  product_version    = "uyuni-released"
+  product_version    = "uyuni-master"
   name               = "minssh-sles15sp5"
   image              = "sles15sp5o"
   provider_settings = {
@@ -784,7 +748,7 @@ module "sles15sp5-sshminion" {
 module "alma9-sshminion" {
   source             = "./modules/sshminion"
   base_configuration = module.base_core.configuration
-  product_version    = "uyuni-released"
+  product_version    = "uyuni-master"
   name               = "minssh-alma9"
   image              = "almalinux9o"
   provider_settings = {
@@ -801,7 +765,7 @@ module "alma9-sshminion" {
 module "centos7-sshminion" {
   source             = "./modules/sshminion"
   base_configuration = module.base_core.configuration
-  product_version    = "uyuni-released"
+  product_version    = "uyuni-master"
   name               = "minssh-centos7"
   image              = "centos7o"
   provider_settings = {
@@ -815,27 +779,10 @@ module "centos7-sshminion" {
   install_salt_bundle = true
 }
 
-module "liberty9-sshminion" {
-  source             = "./modules/sshminion"
-  base_configuration = module.base_core.configuration
-  product_version    = "uyuni-released"
-  name               = "minssh-liberty9"
-  image              = "libertylinux9o"
-  provider_settings = {
-    mac                = "aa:b2:93:02:01:e5"
-    memory             = 4096
-  }
-  use_os_released_updates = false
-  ssh_key_path            = "./salt/controller/id_rsa.pub"
-
-  additional_packages = [ "venv-salt-minion" ]
-  install_salt_bundle = true
-}
-
 module "oracle9-sshminion" {
   source             = "./modules/sshminion"
   base_configuration = module.base_core.configuration
-  product_version    = "uyuni-released"
+  product_version    = "uyuni-master"
   name               = "minssh-oracle9"
   image              = "oraclelinux9o"
   provider_settings = {
@@ -852,7 +799,7 @@ module "oracle9-sshminion" {
 module "rocky8-sshminion" {
   source             = "./modules/sshminion"
   base_configuration = module.base_core.configuration
-  product_version    = "uyuni-released"
+  product_version    = "uyuni-master"
   name               = "minssh-rocky8"
   image              = "rocky8o"
   provider_settings = {
@@ -869,7 +816,7 @@ module "rocky8-sshminion" {
 module "rocky9-sshminion" {
   source             = "./modules/sshminion"
   base_configuration = module.base_core.configuration
-  product_version    = "uyuni-released"
+  product_version    = "uyuni-master"
   name               = "minssh-rocky9"
   image              = "rocky9o"
   provider_settings = {
@@ -883,24 +830,10 @@ module "rocky9-sshminion" {
   install_salt_bundle = true
 }
 
-module "ubuntu1804-sshminion" {
-  source             = "./modules/sshminion"
-  base_configuration = module.base_core.configuration
-  product_version    = "uyuni-released"
-  name               = "minssh-ubuntu1804"
-  image              = "ubuntu1804o"
-  provider_settings = {
-    mac                = "aa:b2:93:02:01:d9"
-    memory             = 4096
-  }
-  use_os_released_updates = false
-  ssh_key_path            = "./salt/controller/id_rsa.pub"
-}
-
 module "ubuntu2004-sshminion" {
   source             = "./modules/sshminion"
   base_configuration = module.base_core.configuration
-  product_version    = "uyuni-released"
+  product_version    = "uyuni-master"
   name               = "minssh-ubuntu2004"
   image              = "ubuntu2004o"
   provider_settings = {
@@ -914,7 +847,7 @@ module "ubuntu2004-sshminion" {
 module "ubuntu2204-sshminion" {
   source             = "./modules/sshminion"
   base_configuration = module.base_core.configuration
-  product_version    = "uyuni-released"
+  product_version    = "uyuni-master"
   name               = "minssh-ubuntu2204"
   image              = "ubuntu2204o"
   provider_settings = {
@@ -930,7 +863,7 @@ module "ubuntu2204-sshminion" {
 module "debian10-sshminion" {
   source             = "./modules/sshminion"
   base_configuration = module.base_core.configuration
-  product_version    = "uyuni-released"
+  product_version    = "uyuni-master"
   name               = "minssh-debian10"
   image              = "debian10o"
   provider_settings = {
@@ -944,7 +877,7 @@ module "debian10-sshminion" {
 module "debian11-sshminion" {
   source             = "./modules/sshminion"
   base_configuration = module.base_core.configuration
-  product_version    = "uyuni-released"
+  product_version    = "uyuni-master"
   name               = "minssh-debian11"
   image              = "debian11o"
   provider_settings = {
@@ -955,13 +888,14 @@ module "debian11-sshminion" {
   ssh_key_path            = "./salt/controller/id_rsa.pub"
 }
 
+// WORKAROUND: overdrive3 has been disconnected by mistake
 //module "opensuse154arm-sshminion" {
 //  providers = {
 //    libvirt = libvirt.overdrive3
 //  }
 //  source             = "./modules/sshminion"
 //  base_configuration = module.base_arm.configuration
-//  product_version    = "uyuni-released"
+//  product_version    = "uyuni-master"
 //  name               = "minssh-opensuse154arm"
 //  image              = "opensuse154armo"
 //  provider_settings = {
@@ -973,14 +907,15 @@ module "debian11-sshminion" {
 //  use_os_released_updates = false
 //  ssh_key_path            = "./salt/controller/id_rsa.pub"
 //}
-//
+
+// WORKAROUND: overdrive3 has been disconnected by mistake
 //module "opensuse155arm-sshminion" {
 //  providers = {
 //    libvirt = libvirt.overdrive3
 //  }
 //  source             = "./modules/sshminion"
 //  base_configuration = module.base_arm.configuration
-//  product_version    = "uyuni-released"
+//  product_version    = "uyuni-master"
 //  name               = "minssh-opensuse155arm"
 //  image              = "opensuse155armo"
 //  provider_settings = {
@@ -996,7 +931,7 @@ module "debian11-sshminion" {
 module "slemicro51-sshminion" {
   source             = "./modules/sshminion"
   base_configuration = module.base_core.configuration
-  product_version    = "uyuni-released"
+  product_version    = "uyuni-master"
   name               = "minssh-slemicro51"
   image              = "slemicro51-ign"
   provider_settings = {
@@ -1010,7 +945,7 @@ module "slemicro51-sshminion" {
 module "slemicro52-sshminion" {
   source             = "./modules/sshminion"
   base_configuration = module.base_core.configuration
-  product_version    = "uyuni-released"
+  product_version    = "uyuni-master"
   name               = "minssh-slemicro52"
   image              = "slemicro52-ign"
   provider_settings = {
@@ -1024,7 +959,7 @@ module "slemicro52-sshminion" {
 module "slemicro53-sshminion" {
   source             = "./modules/sshminion"
   base_configuration = module.base_core.configuration
-  product_version    = "uyuni-released"
+  product_version    = "uyuni-master"
   name               = "minssh-slemicro53"
   image              = "slemicro53-ign"
   provider_settings = {
@@ -1038,7 +973,7 @@ module "slemicro53-sshminion" {
 module "slemicro54-sshminion" {
   source             = "./modules/sshminion"
   base_configuration = module.base_core.configuration
-  product_version    = "uyuni-released"
+  product_version    = "uyuni-master"
   name               = "minssh-slemicro54"
   image              = "slemicro54-ign"
   provider_settings = {
@@ -1052,7 +987,7 @@ module "slemicro54-sshminion" {
 module "sles12sp5-buildhost" {
   source             = "./modules/build_host"
   base_configuration = module.base_core.configuration
-  product_version    = "uyuni-released"
+  product_version    = "uyuni-master"
   name               = "build-sles12sp5"
   image              = "sles12sp5o"
   provider_settings = {
@@ -1084,7 +1019,7 @@ module "sles12sp5-terminal" {
 module "sles15sp4-buildhost" {
   source             = "./modules/build_host"
   base_configuration = module.base_core.configuration
-  product_version    = "uyuni-released"
+  product_version    = "uyuni-master"
   name               = "build-sles15sp4"
   image              = "sles15sp4o"
   provider_settings = {
@@ -1116,9 +1051,9 @@ module "sles15sp4-terminal" {
 module "monitoring-server" {
   source             = "./modules/minion"
   base_configuration = module.base_core.configuration
-  product_version    = "uyuni-released"
+  product_version    = "uyuni-master"
   name               = "monitoring"
-  image              = "sles15sp4o"
+  image              = "opensuse154o"
   provider_settings = {
     mac                = "aa:b2:93:02:01:a3"
     memory             = 2048
@@ -1179,9 +1114,6 @@ module "controller" {
   centos7_minion_configuration    = module.centos7-minion.configuration
   centos7_sshminion_configuration = module.centos7-sshminion.configuration
 
-  liberty9_minion_configuration    = module.liberty9-minion.configuration
-  liberty9_sshminion_configuration = module.liberty9-sshminion.configuration
-
   oracle9_minion_configuration    = module.oracle9-minion.configuration
   oracle9_sshminion_configuration = module.oracle9-sshminion.configuration
 
@@ -1190,9 +1122,6 @@ module "controller" {
 
   rocky9_minion_configuration    = module.rocky9-minion.configuration
   rocky9_sshminion_configuration = module.rocky9-sshminion.configuration
-
-  ubuntu1804_minion_configuration    = module.ubuntu1804-minion.configuration
-  ubuntu1804_sshminion_configuration = module.ubuntu1804-sshminion.configuration
 
   ubuntu2004_minion_configuration    = module.ubuntu2004-minion.configuration
   ubuntu2004_sshminion_configuration = module.ubuntu2004-sshminion.configuration
@@ -1206,6 +1135,7 @@ module "controller" {
   debian11_minion_configuration    = module.debian11-minion.configuration
   debian11_sshminion_configuration = module.debian11-sshminion.configuration
 
+// WORKAROUND: overdrive3 has been disconnected by mistake
 //  opensuse154arm_minion_configuration    = module.opensuse154arm-minion.configuration
 //  opensuse154arm_sshminion_configuration = module.opensuse154arm-sshminion.configuration
 //

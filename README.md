@@ -47,18 +47,18 @@ For Pull Requests we have these alternative URLs:
 that are needed for testing a particular Pull Request. This includes the master repo, the pull request repo, the client
 repos and some other repos that are also needed. All those repos are synced using the Build Service API, instead of from
 download.opensuse.org.
-- http://minima-mirror.mgr.prv.suse.net/jordi/dummy/: This is an empty repo used instead of the update repos. This way,
+- http://minima-mirror-ci-bv.mgr.prv.suse.net/jordi/dummy/: This is an empty repo used instead of the update repos. This way,
 the build is reproducible.
-- http://minima-mirror.mgr.prv.suse.net/repositories/systemsmanagement:/sumaform:/images:/libvirt/images/. openSUSE
+- http://minima-mirror-ci-bv.mgr.prv.suse.net/repositories/systemsmanagement:/sumaform:/images:/libvirt/images/. openSUSE
 image for testing Pull Requests built with the open build service. This needs to be copied manually.
-- http://minima-mirror.mgr.prv.suse.net/distribution/leap/: oss and non-oss repositories.
+- http://minima-mirror-ci-bv.mgr.prv.suse.net/distribution/leap/: oss and non-oss repositories.
 
 ## Used image versions in the CI test suite
 
 | Version | Minion      | SSH minion  | Client      | RH-like  | Deb-like     | Virthosts   | Buildhost   | Terminal    | Controller | Server      | Proxy       |
 | ------- | ----------- | ----------- | ----------- | -------- | ------------ | ----------- | ----------- | ----------- | ---------- | ----------- | ----------- |
-|  PR test| Leap 15.4   | Leap 15.4   | -           | Rocky 8  | Ubuntu 22.04 | Leap 15.4   | Leap 15.4   | Leap 15.4   | Leap 15.4  | Leap 15.4   | Leap 15.4   |
-|  Uyuni  | Leap 15.4   | Leap 15.4   | -           | Rocky 8  | Ubuntu 22.04 | Leap 15.4   | Leap 15.4   | Leap 15.4   | Leap 15.4  | Leap 15.4   | Leap 15.4   |
+|  PR test| Leap 15.4   | Leap 15.4   | -           | Rocky 8  | Ubuntu 22.04 | Leap 15.4   | SLES 15 SP4 | Leap 15.4   | Leap 15.4  | Leap 15.4   | Leap 15.4   |
+|  Uyuni  | Leap 15.4   | Leap 15.4   | -           | Rocky 8  | Ubuntu 22.04 | Leap 15.4   | SLES 15 SP4 | Leap 15.4   | Leap 15.4  | Leap 15.4   | Leap 15.4   |
 |  HEAD   | SLES 15 SP4 | SLES 15 SP4 | -           | Rocky 8  | Ubuntu 22.04 | SLES 15 SP4 | SLES 15 SP4 | SLES 15 SP4 | Leap 15.4  | SLES 15 SP4 | SLES 15 SP4 |
 |  4.3    | SLES 15 SP4 | SLES 15 SP4 | SLES 15 SP4 | CentOS 7 | Ubuntu 22.04 | SLES 15 SP4 | SLES 15 SP4 | SLES 15 SP4 | Leap 15.4  | SLES 15 SP4 | SLES 15 SP4 |
 |  4.2    | SLES 15 SP3 | SLES 15 SP3 | SLES 15 SP3 | CentOS 7 | Ubuntu 20.04 | SLES 15 SP3 | SLES 15 SP3 | SLES 15 SP3 | Leap 15.4  | SLES 15 SP3 | SLES 15 SP3 |
