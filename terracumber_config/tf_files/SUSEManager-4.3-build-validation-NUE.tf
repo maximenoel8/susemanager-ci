@@ -88,10 +88,10 @@ provider "libvirt" {
   uri = "qemu+tcp://suma-07.mgr.suse.de/system"
 }
 
-provider "libvirt" {
-  alias = "overdrive3"
-  uri = "qemu+tcp://overdrive3.mgr.suse.de/system"
-}
+//provider "libvirt" {
+//  alias = "overdrive3"
+//  uri = "qemu+tcp://overdrive3.mgr.suse.de/system"
+//}
 
 module "base_core" {
   source = "./modules/base"
@@ -101,11 +101,10 @@ module "base_core" {
   name_prefix = "suma-bv-43-"
   use_avahi   = false
   domain      = "mgr.suse.de"
-  images      = [ "sles12sp4o", "sles12sp5o", "sles15sp1o", "sles15sp2o", "sles15sp3o", "sles15sp4o", "slemicro51-ign", "slemicro52-ign", "slemicro53-ign", "slemicro54-ign", "almalinux9o", "centos7o", "oraclelinux9o", "rocky8o", "rocky9o", "ubuntu1804o", "ubuntu2004o", "ubuntu2204o", "debian10o", "debian11o", "opensuse154o" ]
-  // images      = [ "sles12sp4o", "sles12sp5o", "sles15sp1o", "sles15sp2o", "sles15sp3o", "sles15sp4o", "slemicro51-ign", "slemicro52-ign", "slemicro53-ign", "slemicro54-ign", "almalinux9o", "centos7o", "libertylinux9o", "oraclelinux9o", "rocky8o", "rocky9o", "ubuntu1804o", "ubuntu2004o", "ubuntu2204o", "debian10o", "debian11o", "opensuse154o" ]
+  images      = [ "sles12sp4o", "sles12sp5o", "sles15sp1o", "sles15sp2o", "sles15sp3o", "sles15sp4o", "sles15sp5o", "slemicro51-ign", "slemicro52-ign", "slemicro53-ign", "slemicro54-ign", "almalinux9o", "centos7o", "libertylinux9o", "oraclelinux9o", "rocky8o", "rocky9o", "ubuntu2004o", "ubuntu2204o", "debian10o", "debian11o", "debian12o", "opensuse154o" ]
 
-  # mirror = "minima-mirror-bv.mgr.suse.de"
-  # use_mirror_images = true
+  mirror = "minima-mirror-ci-bv.mgr.suse.de"
+  use_mirror_images = true
 
   testsuite          = true
 
@@ -116,30 +115,31 @@ module "base_core" {
   }
 }
 
-module "base_arm" {
-  providers = {
-    libvirt = libvirt.overdrive3
-  }
-
-  source = "./modules/base"
-
-  cc_username = var.SCC_USER
-  cc_password = var.SCC_PASSWORD
-  name_prefix = "suma-bv-43-"
-  use_avahi   = false
-  domain      = "mgr.suse.de"
-  images      = [ "opensuse154armo" ]
-
-  # mirror = "minima-mirror-bv.mgr.suse.de"
-  # use_mirror_images = true
-
-  testsuite = true
-
-  provider_settings = {
-    pool        = "ssd"
-    bridge      = "br1"
-  }
-}
+// WORKAROUND: overdrive3 has been disconnected by mistake
+//module "base_arm" {
+//  providers = {
+//    libvirt = libvirt.overdrive3
+//  }
+//
+//  source = "./modules/base"
+//
+//  cc_username = var.SCC_USER
+//  cc_password = var.SCC_PASSWORD
+//  name_prefix = "suma-bv-43-"
+//  use_avahi   = false
+//  domain      = "mgr.suse.de"
+//  images      = [ "opensuse154armo", "opensuse155armo" ]
+//
+//  mirror = "minima-mirror-ci-bv.mgr.suse.de"
+//  use_mirror_images = true
+//
+//  testsuite = true
+//
+//  provider_settings = {
+//    pool        = "ssd"
+//    bridge      = "br1"
+//  }
+//}
 
 module "server" {
   source             = "./modules/server"
@@ -153,9 +153,10 @@ module "server" {
     data_pool          = "ssd"
   }
 
-  # server_mounted_mirror = "minima-mirror-bv.mgr.suse.de"
+  server_mounted_mirror = "minima-mirror-ci-bv.mgr.suse.de"
   repository_disk_size = 2048
 
+  java_debugging                 = false
   auto_accept                    = false
   monitored                      = true
   disable_firewall               = false
@@ -169,6 +170,7 @@ module "server" {
   publish_private_ssl_key        = false
   use_os_released_updates        = true
   disable_download_tokens        = false
+  disable_auto_bootstrap         = true
   ssh_key_path                   = "./salt/controller/id_rsa.pub"
   from_email                     = "root@suse.de"
   accept_all_ssl_protocols       = true
@@ -300,6 +302,24 @@ module "sles15sp4-client" {
   image              = "sles15sp4o"
   provider_settings = {
     mac                = "aa:b2:92:42:00:ae"
+    memory             = 4096
+  }
+  server_configuration = {
+    hostname = "suma-bv-43-pxy.mgr.suse.de"
+  }
+  auto_register           = false
+  use_os_released_updates = false
+  ssh_key_path            = "./salt/controller/id_rsa.pub"
+}
+
+module "sles15sp5-client" {
+  source             = "./modules/client"
+  base_configuration = module.base_core.configuration
+  product_version    = "4.3-released"
+  name               = "cli-sles15sp5"
+  image              = "sles15sp5o"
+  provider_settings = {
+    mac                = "aa:b2:92:42:00:aa"
     memory             = 4096
   }
   server_configuration = {
@@ -443,6 +463,25 @@ module "sles15sp4-minion" {
   ssh_key_path            = "./salt/controller/id_rsa.pub"
 }
 
+module "sles15sp5-minion" {
+  source             = "./modules/minion"
+  base_configuration = module.base_core.configuration
+  product_version    = "4.3-released"
+  name               = "min-sles15sp5"
+  image              = "sles15sp5o"
+  provider_settings = {
+    mac                = "aa:b2:92:42:00:b2"
+    memory             = 4096
+  }
+
+  server_configuration = {
+    hostname = "suma-bv-43-pxy.mgr.suse.de"
+  }
+  auto_connect_to_master  = false
+  use_os_released_updates = false
+  ssh_key_path            = "./salt/controller/id_rsa.pub"
+}
+
 module "alma9-minion" {
   source             = "./modules/minion"
   base_configuration = module.base_core.configuration
@@ -485,26 +524,26 @@ module "centos7-minion" {
   install_salt_bundle = true
 }
 
-// module "liberty9-minion" {
-//   source             = "./modules/minion"
-//   base_configuration = module.base_core.configuration
-//   product_version    = "4.3-released"
-//   name               = "min-liberty9"
-//   image              = "libertylinux9o"
-//   provider_settings = {
-//     mac                = "aa:b2:92:42:00:c5"
-//     memory             = 4096
-//   }
-//   server_configuration = {
-//     hostname = "suma-bv-43-pxy.mgr.suse.de"
-//   }
-//   auto_connect_to_master  = false
-//   use_os_released_updates = false
-//   ssh_key_path            = "./salt/controller/id_rsa.pub"
-//
-//   additional_packages = [ "venv-salt-minion" ]
-//   install_salt_bundle = true
-// }
+module "liberty9-minion" {
+  source             = "./modules/minion"
+  base_configuration = module.base_core.configuration
+  product_version    = "4.3-released"
+  name               = "min-liberty9"
+  image              = "libertylinux9o"
+  provider_settings = {
+    mac                = "aa:b2:92:42:00:c5"
+    memory             = 4096
+  }
+  server_configuration = {
+    hostname = "suma-bv-43-pxy.mgr.suse.de"
+  }
+  auto_connect_to_master  = false
+  use_os_released_updates = false
+  ssh_key_path            = "./salt/controller/id_rsa.pub"
+
+  additional_packages = [ "venv-salt-minion" ]
+  install_salt_bundle = true
+}
 
 module "oracle9-minion" {
   source             = "./modules/minion"
@@ -569,24 +608,6 @@ module "rocky9-minion" {
   install_salt_bundle = true
 }
 
-module "ubuntu1804-minion" {
-  source             = "./modules/minion"
-  base_configuration = module.base_core.configuration
-  product_version    = "4.3-released"
-  name               = "min-ubuntu1804"
-  image              = "ubuntu1804o"
-  provider_settings = {
-    mac                = "aa:b2:92:42:00:b9"
-    memory             = 4096
-  }
-  server_configuration = {
-    hostname = "suma-bv-43-pxy.mgr.suse.de"
-  }
-  auto_connect_to_master  = false
-  use_os_released_updates = false
-  ssh_key_path            = "./salt/controller/id_rsa.pub"
-}
-
 module "ubuntu2004-minion" {
   source             = "./modules/minion"
   base_configuration = module.base_core.configuration
@@ -603,6 +624,10 @@ module "ubuntu2004-minion" {
   auto_connect_to_master  = false
   use_os_released_updates = false
   ssh_key_path            = "./salt/controller/id_rsa.pub"
+
+  # WORKAROUND https://github.com/uyuni-project/uyuni/issues/7637
+  additional_packages = [ "venv-salt-minion" ]
+  install_salt_bundle = true
 }
 
 module "ubuntu2204-minion" {
@@ -642,6 +667,10 @@ module "debian10-minion" {
   auto_connect_to_master  = false
   use_os_released_updates = false
   ssh_key_path            = "./salt/controller/id_rsa.pub"
+
+  # WORKAROUND https://github.com/uyuni-project/uyuni/issues/7637
+  additional_packages = [ "venv-salt-minion" ]
+  install_salt_bundle = true
 }
 
 module "debian11-minion" {
@@ -663,28 +692,75 @@ module "debian11-minion" {
   ssh_key_path            = "./salt/controller/id_rsa.pub"
 }
 
-module "opensuse154arm-minion" {
-  providers = {
-    libvirt = libvirt.overdrive3
-  }
+module "debian12-minion" {
   source             = "./modules/minion"
-  base_configuration = module.base_arm.configuration
+  base_configuration = module.base_core.configuration
   product_version    = "4.3-released"
-  name               = "min-opensuse154arm"
-  image              = "opensuse154armo"
+  name               = "min-debian12"
+  image              = "debian12o"
   provider_settings = {
-    mac                = "aa:b2:92:42:00:bf"
-    memory             = 2048
-    vcpu               = 2
-    xslt               = file("../../susemanager-ci/terracumber_config/tf_files/common/tune-aarch64.xslt")
+    mac                = "aa:b2:92:42:00:bc"
+    memory             = 4096
   }
+
   server_configuration = {
     hostname = "suma-bv-43-pxy.mgr.suse.de"
   }
   auto_connect_to_master  = false
   use_os_released_updates = false
   ssh_key_path            = "./salt/controller/id_rsa.pub"
+
+  additional_packages = [ "venv-salt-minion" ]
+  install_salt_bundle = true
 }
+
+// WORKAROUND: overdrive3 has been disconnected by mistake
+//module "opensuse154arm-minion" {
+//  providers = {
+//    libvirt = libvirt.overdrive3
+//  }
+//  source             = "./modules/minion"
+//  base_configuration = module.base_arm.configuration
+//  product_version    = "4.3-released"
+//  name               = "min-opensuse154arm"
+//  image              = "opensuse154armo"
+//  provider_settings = {
+//    mac                = "aa:b2:92:42:00:bf"
+//    memory             = 2048
+//    vcpu               = 2
+//    xslt               = file("../../susemanager-ci/terracumber_config/tf_files/common/tune-aarch64.xslt")
+//  }
+//  server_configuration = {
+//    hostname = "suma-bv-43-pxy.mgr.suse.de"
+//  }
+//  auto_connect_to_master  = false
+//  use_os_released_updates = false
+//  ssh_key_path            = "./salt/controller/id_rsa.pub"
+//}
+
+// WORKAROUND: overdrive3 has been disconnected by mistake
+//module "opensuse155arm-minion" {
+//  providers = {
+//    libvirt = libvirt.overdrive3
+//  }
+//  source             = "./modules/minion"
+//  base_configuration = module.base_arm.configuration
+//  product_version    = "4.3-released"
+//  name               = "min-opensuse155arm"
+//  image              = "opensuse155armo"
+//  provider_settings = {
+//    mac                = "aa:b2:92:42:00:c0"
+//    memory             = 2048
+//    vcpu               = 2
+//    xslt               = file("../../susemanager-ci/terracumber_config/tf_files/common/tune-aarch64.xslt")
+//  }
+//  server_configuration = {
+//    hostname = "suma-bv-43-pxy.mgr.suse.de"
+//  }
+//  auto_connect_to_master  = false
+//  use_os_released_updates = false
+//  ssh_key_path            = "./salt/controller/id_rsa.pub"
+//}
 
 module "slemicro51-minion" {
   source             = "./modules/minion"
@@ -694,7 +770,7 @@ module "slemicro51-minion" {
   image              = "slemicro51-ign"
   provider_settings = {
     mac                = "aa:b2:92:42:00:c6"
-   memory             = 2048
+    memory             = 2048
   }
 
   server_configuration = {
@@ -712,8 +788,8 @@ module "slemicro52-minion" {
   name               = "min-slemicro52"
   image              = "slemicro52-ign"
   provider_settings = {
-    mac                = "aa:b2:92:42:00:c0"
-   memory             = 2048
+    mac                = "aa:b2:92:42:00:c7"
+    memory             = 2048
   }
 
   server_configuration = {
@@ -731,8 +807,8 @@ module "slemicro53-minion" {
   name               = "min-slemicro53"
   image              = "slemicro53-ign"
   provider_settings = {
-    mac                = "aa:b2:92:42:00:c4"
-   memory             = 2048
+    mac                = "aa:b2:92:42:00:c8"
+    memory             = 2048
   }
 
   server_configuration = {
@@ -750,8 +826,8 @@ module "slemicro54-minion" {
   name               = "min-slemicro54"
   image              = "slemicro54-ign"
   provider_settings = {
-    mac                = "aa:b2:92:42:00:b2"
-   memory             = 2048
+    mac                = "aa:b2:92:42:00:c9"
+    memory             = 2048
   }
 
   server_configuration = {
@@ -851,6 +927,20 @@ module "sles15sp4-sshminion" {
   ssh_key_path            = "./salt/controller/id_rsa.pub"
 }
 
+module "sles15sp5-sshminion" {
+  source             = "./modules/sshminion"
+  base_configuration = module.base_core.configuration
+  product_version    = "4.3-released"
+  name               = "minssh-sles15sp5"
+  image              = "sles15sp5o"
+  provider_settings = {
+    mac                = "aa:b2:92:42:00:d2"
+    memory             = 4096
+  }
+  use_os_released_updates = false
+  ssh_key_path            = "./salt/controller/id_rsa.pub"
+}
+
 module "alma9-sshminion" {
   source             = "./modules/sshminion"
   base_configuration = module.base_core.configuration
@@ -885,22 +975,22 @@ module "centos7-sshminion" {
   install_salt_bundle = true
 }
 
-// module "liberty9-sshminion" {
-//   source             = "./modules/sshminion"
-//   base_configuration = module.base_core.configuration
-//   product_version    = "4.3-released"
-//   name               = "minssh-liberty9"
-//   image              = "libertylinux9o"
-//   provider_settings = {
-//     mac                = "aa:b2:92:42:00:e5"
-//     memory             = 4096
-//   }
-//   use_os_released_updates = false
-//   ssh_key_path            = "./salt/controller/id_rsa.pub"
-//
-//   additional_packages = [ "venv-salt-minion" ]
-//   install_salt_bundle = true
-// }
+module "liberty9-sshminion" {
+  source             = "./modules/sshminion"
+  base_configuration = module.base_core.configuration
+  product_version    = "4.3-released"
+  name               = "minssh-liberty9"
+  image              = "libertylinux9o"
+  provider_settings = {
+    mac                = "aa:b2:92:42:00:e5"
+    memory             = 4096
+  }
+  use_os_released_updates = false
+  ssh_key_path            = "./salt/controller/id_rsa.pub"
+
+  additional_packages = [ "venv-salt-minion" ]
+  install_salt_bundle = true
+}
 
 module "oracle9-sshminion" {
   source             = "./modules/sshminion"
@@ -953,20 +1043,6 @@ module "rocky9-sshminion" {
   install_salt_bundle = true
 }
 
-module "ubuntu1804-sshminion" {
-  source             = "./modules/sshminion"
-  base_configuration = module.base_core.configuration
-  product_version    = "4.3-released"
-  name               = "minssh-ubuntu1804"
-  image              = "ubuntu1804o"
-  provider_settings = {
-    mac                = "aa:b2:92:42:00:d9"
-    memory             = 4096
-  }
-  use_os_released_updates = false
-  ssh_key_path            = "./salt/controller/id_rsa.pub"
-}
-
 module "ubuntu2004-sshminion" {
   source             = "./modules/sshminion"
   base_configuration = module.base_core.configuration
@@ -979,6 +1055,10 @@ module "ubuntu2004-sshminion" {
   }
   use_os_released_updates = false
   ssh_key_path            = "./salt/controller/id_rsa.pub"
+
+  # WORKAROUND https://github.com/uyuni-project/uyuni/issues/7637
+  additional_packages = [ "venv-salt-minion" ]
+  install_salt_bundle = true
 }
 
 module "ubuntu2204-sshminion" {
@@ -1009,6 +1089,10 @@ module "debian10-sshminion" {
   }
   use_os_released_updates = false
   ssh_key_path            = "./salt/controller/id_rsa.pub"
+
+  # WORKAROUND https://github.com/uyuni-project/uyuni/issues/7637
+  additional_packages = [ "venv-salt-minion" ]
+  install_salt_bundle = true
 }
 
 module "debian11-sshminion" {
@@ -1025,24 +1109,62 @@ module "debian11-sshminion" {
   ssh_key_path            = "./salt/controller/id_rsa.pub"
 }
 
-module "opensuse154arm-sshminion" {
-  providers = {
-    libvirt = libvirt.overdrive3
-  }
+module "debian12-sshminion" {
   source             = "./modules/sshminion"
-  base_configuration = module.base_arm.configuration
+  base_configuration = module.base_core.configuration
   product_version    = "4.3-released"
-  name               = "minssh-opensuse154arm"
-  image              = "opensuse154armo"
+  name               = "minssh-debian12"
+  image              = "debian12o"
   provider_settings = {
-    mac                = "aa:b2:92:42:00:df"
-    memory             = 2048
-    vcpu               = 2
-    xslt               = file("../../susemanager-ci/terracumber_config/tf_files/common/tune-aarch64.xslt")
+    mac                = "aa:b2:92:42:00:dc"
+    memory             = 4096
   }
   use_os_released_updates = false
   ssh_key_path            = "./salt/controller/id_rsa.pub"
+
+  additional_packages = [ "venv-salt-minion" ]
+  install_salt_bundle = true
 }
+
+// WORKAROUND: overdrive3 has been disconnected by mistake
+//module "opensuse154arm-sshminion" {
+//  providers = {
+//    libvirt = libvirt.overdrive3
+//  }
+//  source             = "./modules/sshminion"
+//  base_configuration = module.base_arm.configuration
+//  product_version    = "4.3-released"
+//  name               = "minssh-opensuse154arm"
+//  image              = "opensuse154armo"
+//  provider_settings = {
+//    mac                = "aa:b2:92:42:00:df"
+//    memory             = 2048
+//    vcpu               = 2
+//    xslt               = file("../../susemanager-ci/terracumber_config/tf_files/common/tune-aarch64.xslt")
+//  }
+//  use_os_released_updates = false
+//  ssh_key_path            = "./salt/controller/id_rsa.pub"
+//}
+
+// WORKAROUND: overdrive3 has been disconnected by mistake
+//module "opensuse155arm-sshminion" {
+//  providers = {
+//    libvirt = libvirt.overdrive3
+//  }
+//  source             = "./modules/sshminion"
+//  base_configuration = module.base_arm.configuration
+//  product_version    = "4.3-released"
+//  name               = "minssh-opensuse155arm"
+//  image              = "opensuse155armo"
+//  provider_settings = {
+//    mac                = "aa:b2:92:42:00:e0"
+//    memory             = 2048
+//    vcpu               = 2
+//    xslt               = file("../../susemanager-ci/terracumber_config/tf_files/common/tune-aarch64.xslt")
+//  }
+//  use_os_released_updates = false
+//  ssh_key_path            = "./salt/controller/id_rsa.pub"
+//}
 
 module "slemicro51-sshminion" {
   source             = "./modules/sshminion"
@@ -1065,7 +1187,7 @@ module "slemicro52-sshminion" {
   name               = "minssh-slemicro52"
   image              = "slemicro52-ign"
   provider_settings = {
-    mac                = "aa:b2:92:42:00:e0"
+    mac                = "aa:b2:92:42:00:e7"
     memory             = 2048
   }
   use_os_released_updates = false
@@ -1079,7 +1201,7 @@ module "slemicro53-sshminion" {
   name               = "minssh-slemicro53"
   image              = "slemicro53-ign"
   provider_settings = {
-    mac                = "aa:b2:92:42:00:e4"
+    mac                = "aa:b2:92:42:00:e8"
     memory             = 2048
   }
   use_os_released_updates = false
@@ -1093,7 +1215,7 @@ module "slemicro54-sshminion" {
   name               = "minssh-slemicro54"
   image              = "slemicro54-ign"
   provider_settings = {
-    mac                = "aa:b2:92:42:00:d2"
+    mac                = "aa:b2:92:42:00:e9"
     memory             = 2048
   }
   use_os_released_updates = false
@@ -1227,6 +1349,10 @@ module "controller" {
   sle15sp4_minion_configuration    = module.sles15sp4-minion.configuration
   sle15sp4_sshminion_configuration = module.sles15sp4-sshminion.configuration
 
+  sle15sp5_client_configuration    = module.sles15sp5-client.configuration
+  sle15sp5_minion_configuration    = module.sles15sp5-minion.configuration
+  sle15sp5_sshminion_configuration = module.sles15sp5-sshminion.configuration
+
   alma9_minion_configuration    = module.alma9-minion.configuration
   alma9_sshminion_configuration = module.alma9-sshminion.configuration
 
@@ -1234,8 +1360,8 @@ module "controller" {
   centos7_minion_configuration    = module.centos7-minion.configuration
   centos7_sshminion_configuration = module.centos7-sshminion.configuration
 
-//  liberty9_minion_configuration    = module.liberty9-minion.configuration
-//  liberty9_sshminion_configuration = module.liberty9-sshminion.configuration
+  liberty9_minion_configuration    = module.liberty9-minion.configuration
+  liberty9_sshminion_configuration = module.liberty9-sshminion.configuration
 
   oracle9_minion_configuration    = module.oracle9-minion.configuration
   oracle9_sshminion_configuration = module.oracle9-sshminion.configuration
@@ -1245,9 +1371,6 @@ module "controller" {
 
   rocky9_minion_configuration    = module.rocky9-minion.configuration
   rocky9_sshminion_configuration = module.rocky9-sshminion.configuration
-
-  ubuntu1804_minion_configuration    = module.ubuntu1804-minion.configuration
-  ubuntu1804_sshminion_configuration = module.ubuntu1804-sshminion.configuration
 
   ubuntu2004_minion_configuration    = module.ubuntu2004-minion.configuration
   ubuntu2004_sshminion_configuration = module.ubuntu2004-sshminion.configuration
@@ -1261,8 +1384,15 @@ module "controller" {
   debian11_minion_configuration    = module.debian11-minion.configuration
   debian11_sshminion_configuration = module.debian11-sshminion.configuration
 
-  opensuse154arm_minion_configuration    = module.opensuse154arm-minion.configuration
-  opensuse154arm_sshminion_configuration = module.opensuse154arm-sshminion.configuration
+  debian12_minion_configuration    = module.debian12-minion.configuration
+  debian12_sshminion_configuration = module.debian12-sshminion.configuration
+
+// WORKAROUND: overdrive3 has been disconnected by mistake
+//  opensuse154arm_minion_configuration    = module.opensuse154arm-minion.configuration
+//  opensuse154arm_sshminion_configuration = module.opensuse154arm-sshminion.configuration
+//
+//  opensuse155arm_minion_configuration    = module.opensuse155arm-minion.configuration
+//  opensuse155arm_sshminion_configuration = module.opensuse155arm-sshminion.configuration
 
   slemicro51_minion_configuration    = module.slemicro51-minion.configuration
   slemicro51_sshminion_configuration = module.slemicro51-sshminion.configuration

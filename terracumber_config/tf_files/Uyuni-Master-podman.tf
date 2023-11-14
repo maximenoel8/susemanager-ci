@@ -1,23 +1,23 @@
 // Mandatory variables for terracumber
 variable "URL_PREFIX" {
   type = string
-  default = "https://ci.suse.de/view/Manager/view/Manager-4.3/job/manager-4.3-dev-acceptance-tests-NUE"
+  default = "https://ci.suse.de/view/Manager/view/Uyuni/job/uyuni-master-dev-acceptance-tests-podman"
 }
 
 // Not really used as this is for --runall parameter, and we run cucumber step by step
 variable "CUCUMBER_COMMAND" {
   type = string
-  default = "export PRODUCT='SUSE-Manager' && run-testsuite"
+  default = "export PRODUCT='Uyuni' && run-testsuite"
 }
 
 variable "CUCUMBER_GITREPO" {
   type = string
-  default = "https://github.com/SUSE/spacewalk.git"
+  default = "https://github.com/uyuni-project/uyuni.git"
 }
 
 variable "CUCUMBER_BRANCH" {
   type = string
-  default = "Manager-4.3"
+  default = "master"
 }
 
 variable "CUCUMBER_RESULTS" {
@@ -27,22 +27,22 @@ variable "CUCUMBER_RESULTS" {
 
 variable "MAIL_SUBJECT" {
   type = string
-  default = "Results 4.3-NUE (backup and staging) $status: $tests scenarios ($failures failed, $errors errors, $skipped skipped, $passed passed)"
+  default = "Results Uyuni-Master podman $status: $tests scenarios ($failures failed, $errors errors, $skipped skipped, $passed passed)"
 }
 
 variable "MAIL_TEMPLATE" {
   type = string
-  default = "../mail_templates/mail-template-jenkins-backup.txt"
+  default = "../mail_templates/mail-template-jenkins.txt"
 }
 
 variable "MAIL_SUBJECT_ENV_FAIL" {
   type = string
-  default = "Results 4.3-NUE: Environment setup failed"
+  default = "Results Uyuni-Master podman: Environment setup failed"
 }
 
 variable "MAIL_TEMPLATE_ENV_FAIL" {
   type = string
-  default = "../mail_templates/mail-template-jenkins-backupenv-fail.txt"
+  default = "../mail_templates/mail-template-jenkins-env-fail.txt"
 }
 
 variable "MAIL_FROM" {
@@ -91,7 +91,7 @@ provider "libvirt" {
 module "cucumber_testsuite" {
   source = "./modules/cucumber_testsuite"
 
-  product_version = "4.3-nightly"
+  product_version = "uyuni-master"
 
   // Cucumber repository configuration for the controller
   git_username = var.GIT_USER
@@ -102,139 +102,140 @@ module "cucumber_testsuite" {
   cc_username = var.SCC_USER
   cc_password = var.SCC_PASSWORD
 
-  images = ["centos7o", "opensuse154o", "sles15sp4o", "ubuntu2204o"]
+  images = ["rocky8o", "opensuse154o", "opensuse155o", "ubuntu2204o", "sles15sp4o"]
 
   use_avahi    = false
-  name_prefix  = "suma-43-"
+  name_prefix  = "uyuni-master-podman-"
   domain       = "mgr.suse.de"
   from_email   = "root@suse.de"
 
-  no_auth_registry       = "registry.mgr.suse.de"
-  auth_registry          = "registry.mgr.suse.de:5000/cucutest"
+  no_auth_registry = "registry.mgr.suse.de"
+  auth_registry      = "registry.mgr.suse.de:5000/cucutest"
   auth_registry_username = "cucutest"
   auth_registry_password = "cucusecret"
-  git_profiles_repo      = "https://github.com/uyuni-project/uyuni.git#:testsuite/features/profiles/internal_nue"
+  git_profiles_repo = "https://github.com/uyuni-project/uyuni.git#:testsuite/features/profiles/internal_nue"
+  
+  container_server = true
 
   mirror                   = "minima-mirror-ci-bv.mgr.suse.de"
   use_mirror_images        = true
-  server_http_proxy        = "http-proxy.mgr.suse.de:3128"
+
+  server_http_proxy = "http-proxy.mgr.suse.de:3128"
   custom_download_endpoint = "ftp://minima-mirror-ci-bv.mgr.suse.de:445"
 
   # when changing images, please also keep in mind to adjust the image matrix at the end of the README.
   host_settings = {
     controller = {
       provider_settings = {
-        mac = "aa:b2:93:01:00:90"
-        vcpu = 2
-        memory = 2048
+        mac = "aa:b2:93:01:00:20"
       }
     }
-    server = {
+    server_containerized = {
       provider_settings = {
-        mac = "aa:b2:93:01:00:91"
-        vcpu = 8
-        memory = 32768
+        mac = "aa:b2:93:01:00:21"
+        memory = 16384
       }
+      runtime = "podman"
+      container_repository = "registry.opensuse.org/systemsmanagement/uyuni/master/containers/uyuni"
+      helm_chart_url = "oci://registry.opensuse.org/systemsmanagement/uyuni/master/charts/uyuni/server"
+      login_timeout = 28800
     }
     proxy = {
       provider_settings = {
-        mac = "aa:b2:93:01:00:92"
-        vcpu = 2
-        memory = 2048
+        mac = "aa:b2:93:01:00:22"
       }
       additional_packages = [ "venv-salt-minion" ]
       install_salt_bundle = true
     }
-    suse-client = {
-      image = "sles15sp4o"
-      name = "cli-sles15"
-      provider_settings = {
-        mac = "aa:b2:93:01:00:94"
-        vcpu = 2
-        memory = 2048
-      }
-    }
     suse-minion = {
-      image = "sles15sp4o"
-      name = "min-sles15"
+      image = "opensuse154o"
+      name = "min-suse"
       provider_settings = {
-        mac = "aa:b2:93:01:00:96"
-        vcpu = 2
-        memory = 2048
+        mac = "aa:b2:93:01:00:26"
       }
       additional_packages = [ "venv-salt-minion" ]
       install_salt_bundle = true
     }
     suse-sshminion = {
-      image = "sles15sp4o"
-      name = "minssh-sles15"
+      image = "opensuse154o"
+      name = "minssh-suse"
       provider_settings = {
-        mac = "aa:b2:93:01:00:98"
-        vcpu = 2
-        memory = 2048
+        mac = "aa:b2:93:01:00:28"
       }
       additional_packages = [ "venv-salt-minion", "iptables" ]
       install_salt_bundle = true
     }
     redhat-minion = {
-      image = "centos7o"
-      name = "min-centos7"
+      image = "rocky8o"
+      name = "min-rocky8"
       provider_settings = {
-        mac = "aa:b2:93:01:00:99"
+        mac = "aa:b2:93:01:00:2a"
         // Since start of May we have problems with the instance not booting after a restart if there is only a CPU and only 1024Mb for RAM
         // Also, openscap cannot run with less than 1.25 GB of RAM
-        vcpu = 2
         memory = 2048
+        vcpu = 2
       }
       additional_packages = [ "venv-salt-minion" ]
       install_salt_bundle = true
     }
     debian-minion = {
-      image = "ubuntu2204o"
       name = "min-ubuntu2204"
+      image = "ubuntu2204o"
       provider_settings = {
-        mac = "aa:b2:93:01:00:9b"
-        vcpu = 2
-        memory = 2048
+        mac = "aa:b2:93:01:00:2b"
       }
       additional_packages = [ "venv-salt-minion" ]
-      install_salt_bundle = true
+
+      // FIXME: cloudl-init fails if venv-salt-minion is not avaiable
+      // We can set "install_salt_bundle = true" as soon as venv-salt-minion is available Uyuni:Stable
+      install_salt_bundle = false
     }
     build-host = {
       image = "sles15sp4o"
+      name = "min-build"
       provider_settings = {
-        mac = "aa:b2:93:01:00:9d"
-        vcpu = 4
-        memory = 8192
+        mac = "aa:b2:93:01:00:2d"
+        memory = 2048
       }
       additional_packages = [ "venv-salt-minion" ]
       install_salt_bundle = true
     }
     pxeboot-minion = {
       image = "sles15sp4o"
-      provider_settings = {
-        vcpu = 2
-        memory = 2048
-      }
+      additional_packages = [ "venv-salt-minion" ]
+      install_salt_bundle = true
     }
     kvm-host = {
-      image = "sles15sp4o"
+      image = "opensuse154o"
       name = "min-kvm"
+      additional_grains = {
+        hvm_disk_image = {
+          leap = {
+            hostname = "uyuni-master-podman-min-nested"
+            image = "http://minima-mirror-ci-bv.mgr.suse.de/distribution/leap/15.5/appliances/openSUSE-Leap-15.5-Minimal-VM.x86_64-Cloud.qcow2"
+            hash = "http://minima-mirror-ci-bv.mgr.suse.de/distribution/leap/15.5/appliances/openSUSE-Leap-15.5-Minimal-VM.x86_64-Cloud.qcow2.sha256"
+          }
+          sles = {
+            hostname = "uyuni-master-podman-min-nested"
+            image = "http://minima-mirror-ci-bv.mgr.suse.de/install/SLE-15-SP4-Minimal-GM/SLES15-SP4-Minimal-VM.x86_64-OpenStack-Cloud-GM.qcow2"
+            hash = "http://minima-mirror-ci-bv.mgr.suse.de/install/SLE-15-SP4-Minimal-GM/SLES15-SP4-Minimal-VM.x86_64-OpenStack-Cloud-GM.qcow2.sha256"
+          }
+        }
+      }
       provider_settings = {
-        mac = "aa:b2:93:01:00:9e"
-        vcpu = 4
-        memory = 8192
+        mac = "aa:b2:93:01:00:2e"
       }
       additional_packages = [ "venv-salt-minion" ]
       install_salt_bundle = true
     }
   }
-  nested_vm_host = "min-nested"
+  nested_vm_host = "uyuni-master-podman-min-nested"
+  nested_vm_mac =  "aa:b2:93:01:00:2f"
   provider_settings = {
-    pool = "ssd"
-    network_name = null
-    bridge = "br0"
-    additional_network = "192.168.43.0/24"
+    pool               = "ssd"
+    network_name       = null
+    bridge             = "br0"
+    additional_network = "192.168.102.0/24"
   }
 }
 

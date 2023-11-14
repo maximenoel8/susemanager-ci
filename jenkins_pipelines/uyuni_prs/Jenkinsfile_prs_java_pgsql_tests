@@ -83,7 +83,7 @@ pipeline {
                     "source /var/lib/jenkins/.sonar-credentials; " +
                     "docker run --rm -v \$PWD:/usr/src " +
                         "-v \$PWD/../.sonar:/opt/sonar-scanner/.sonar " +
-                        "-e SONAR_LOGIN " +
+                        "-e SONAR_TOKEN " +
                         "sonarsource/sonar-scanner-cli " +
                         "-Dsonar.pullrequest.key=${params.PR_NUMBER} " +
                         "-Dsonar.pullrequest.branch=\$PR_BRANCH " +

@@ -47,7 +47,7 @@ variable "MAIL_TEMPLATE_ENV_FAIL" {
 
 variable "MAIL_FROM" {
   type = string
-  default = "galaxy-ci@suse.de"
+  default = "jenkins@suse.de"
 }
 
 variable "MAIL_TO" {
@@ -85,7 +85,8 @@ terraform {
 }
 
 provider "libvirt" {
-  uri = "qemu+tcp://cthulhu.mgr.suse.de/system"
+  //uri = "qemu+tcp://cthulhu.mgr.suse.de/system"
+  uri = "qemu+tcp://suma-03.mgr.suse.de/system"
 }
 
 module "cucumber_testsuite" {
@@ -103,7 +104,7 @@ module "cucumber_testsuite" {
   cc_username = var.SCC_USER
   cc_password = var.SCC_PASSWORD
 
-  images = ["rocky8o", "opensuse154o", "sles15sp4o"]
+  images = ["rocky8o", "opensuse154o", "opensuse155o", "ubuntu2204o", "sles15sp4o"]
 
   use_avahi    = false
   name_prefix  = "suma-testhexagon-"
@@ -115,9 +116,14 @@ module "cucumber_testsuite" {
   auth_registry_username = "cucutest"
   auth_registry_password = "cucusecret"
   git_profiles_repo = "https://github.com/uyuni-project/uyuni.git#:testsuite/features/profiles/internal_nue"
+  
+  container_server = true
+  
+  mirror                   = "minima-mirror-ci-bv.mgr.suse.de"
+  use_mirror_images        = true
 
   server_http_proxy = "http-proxy.mgr.suse.de:3128"
-  custom_download_endpoint = "ftp://minima-mirror.mgr.suse.de:445"
+  custom_download_endpoint = "ftp://minima-mirror-ci-bv.mgr.suse.de:445"
 
   host_settings = {
     controller = {
@@ -128,8 +134,9 @@ module "cucumber_testsuite" {
     server_containerized = {
       provider_settings = {
         mac = "aa:b2:93:01:00:51"
-        memory = 13312
+        memory = 16384
       }
+      login_timeout = 28800
       runtime = "podman"
       container_repository = "registry.opensuse.org/systemsmanagement/uyuni/master/servercontainer/containers/uyuni"
       //additional_repos = {
@@ -146,18 +153,10 @@ module "cucumber_testsuite" {
       additional_packages = [ "venv-salt-minion" ]
       install_salt_bundle = true
     }
-    suse-client = {
-      image = "sles15sp4o"
-      name = "cli-sles15"
-      provider_settings = {
-        mac = "aa:b2:93:01:00:54"
-      }
-      additional_packages = [ "venv-salt-minion" ]
-      install_salt_bundle = true
-    }
+
     suse-minion = {
-      image = "sles15sp4o"
-      name = "min-sles15"
+      image = "opensuse154o"
+      name = "min-suse"
       provider_settings = {
         mac = "aa:b2:93:01:00:56"
       }
@@ -165,8 +164,8 @@ module "cucumber_testsuite" {
       install_salt_bundle = true
     }
     suse-sshminion = {
-      image = "sles15sp4o"
-      name = "minssh-sles15"
+      image = "opensuse154o"
+      name = "minssh-suse"
       provider_settings = {
         mac = "aa:b2:93:01:00:58"
       }
@@ -174,29 +173,75 @@ module "cucumber_testsuite" {
       install_salt_bundle = true
     }
     redhat-minion = {
+      image = "rocky8o"
+      name = "min-rocky8"
       provider_settings = {
         mac = "aa:b2:93:01:00:5a"
         // Since start of May we have problems with the instance not booting after a restart if there is only a CPU and only 1024Mb for RAM
         // Still researching, but it will do it for now
         memory = 2048
+      }
+      additional_packages = [ "venv-salt-minion" ]
+      install_salt_bundle = true
+    }
+    debian-minion = {
+      image = "ubuntu2204o"
+      name = "min-ubuntu2204"
+      provider_settings = {
+        mac = "aa:b2:93:01:00:5b"
         vcpu = 2
       }
       additional_packages = [ "venv-salt-minion" ]
       install_salt_bundle = true
     }
-    pxeboot-minion = {
-      image = "sles15sp4o"
-    }
     build-host = {
       image = "sles15sp4o"
       provider_settings = {
         mac = "aa:b2:93:01:00:5d"
+        vcpu = 4
+        memory = 8192
+      }
+      name = "min-build"
+      additional_packages = [ "venv-salt-minion" ]
+      install_salt_bundle = true
+    }
+    pxeboot-minion = {
+      image = "sles15sp4o"
+      additional_packages = [ "venv-salt-minion" ]
+      install_salt_bundle = true
+      provider_settings = {
+        vcpu = 2
         memory = 2048
+      }
+    }
+    kvm-host = {
+      image = "opensuse154o"
+      name = "min-kvm"
+      additional_grains = {
+        hvm_disk_image = {
+          leap = {
+            hostname = "suma-testhexagon-min-nested"
+            image = "http://minima-mirror-ci-bv.mgr.suse.de/distribution/leap/15.4/appliances/openSUSE-Leap-15.4-JeOS.x86_64-OpenStack-Cloud.qcow2"
+            hash = "http://minima-mirror-ci-bv.mgr.suse.de/distribution/leap/15.4/appliances/openSUSE-Leap-15.4-JeOS.x86_64-OpenStack-Cloud.qcow2.sha256"
+          }
+          sles = {
+            hostname = "suma-testhexagon-min-nested"
+            image = "http://minima-mirror-ci-bv.mgr.suse.de/install/SLE-15-SP4-Minimal-GM/SLES15-SP4-Minimal-VM.x86_64-OpenStack-Cloud-GM.qcow2"
+            hash = "http://minima-mirror-ci-bv.mgr.suse.de/install/SLE-15-SP4-Minimal-GM/SLES15-SP4-Minimal-VM.x86_64-OpenStack-Cloud-GM.qcow2.sha256"
+          }
+        }
+      }
+      provider_settings = {
+        mac = "aa:b2:93:01:00:5e"
+        vcpu = 4
+        memory = 8192
       }
       additional_packages = [ "venv-salt-minion" ]
       install_salt_bundle = true
     }
   }
+  nested_vm_host = "suma-testhexagon-min-nested"
+  nested_vm_mac =  "aa:b2:93:01:00:5f"
   provider_settings = {
     pool         = "ssd"
     network_name = null
@@ -204,6 +249,17 @@ module "cucumber_testsuite" {
   }
 }
 
+resource "null_resource" "cdn_workaround" {
+ provisioner "remote-exec" {
+    inline = [ "echo techpreview.ZYPP_MEDIANETWORK=1 >> /etc/zypp/zypp.conf" ]
+    connection {
+      type     = "ssh"
+      user     = "root"
+      password = "linux"
+      host     = "${module.cucumber_testsuite.configuration.server.hostname}"
+    }
+  }
+}
 output "configuration" {
   value = module.cucumber_testsuite.configuration
 }

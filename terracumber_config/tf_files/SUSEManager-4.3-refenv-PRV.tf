@@ -51,7 +51,7 @@ variable "MAIL_TEMPLATE_ENV_FAIL" {
 
 variable "MAIL_FROM" {
   type = string
-  default = "galaxy-ci@suse.de"
+  default = "jenkins@suse.de"
 }
 
 variable "MAIL_TO" {
@@ -79,7 +79,7 @@ terraform {
 }
 
 provider "libvirt" {
-  uri = "qemu+tcp://bloodymary.mgr.prv.suse.net/system"
+  uri = "qemu+tcp://metropolis.mgr.prv.suse.net/system"
 }
 
 module "base" {
@@ -92,7 +92,7 @@ module "base" {
   use_avahi         = false
   domain            = "mgr.prv.suse.net"
   images            = ["centos7o", "sles15sp1o", "sles15sp2o", "sles15sp3o", "sles15sp4o", "ubuntu2204o"]
-  mirror            = "minima-mirror.mgr.prv.suse.net"
+  mirror            = "minima-mirror-ci-bv.mgr.prv.suse.net"
   use_mirror_images = true
 
   provider_settings = {
@@ -199,6 +199,14 @@ module "build-host" {
 
   provider_settings = {
     mac = "aa:b2:92:03:00:9d"
+  }
+  additional_repos = {
+        cloud_pool_repo = "http://minima-mirror-ci-bv.mgr.prv.suse.net/SUSE/Products/SLE-Module-Public-Cloud/15-SP4/x86_64/product/",
+        cloud_updates_repo = "http://minima-mirror-ci-bv.mgr.prv.suse.net/SUSE/Updates/SLE-Module-Public-Cloud/15-SP4/x86_64/update/",
+        desktop_pool_repo = "http://minima-mirror-ci-bv.mgr.prv.suse.net/SUSE/Products/SLE-Module-Desktop-Applications/15-SP4/x86_64/product/",
+        desktop_updates_repo = "http://minima-mirror-ci-bv.mgr.prv.suse.net/SUSE/Updates/SLE-Module-Desktop-Applications/15-SP4/x86_64/update/",
+        devel_pool_repo = "http://minima-mirror-ci-bv.mgr.prv.suse.net/SUSE/Products/SLE-Module-Development-Tools/15-SP4/x86_64/product/",
+        devel_updates_repo = "http://minima-mirror-ci-bv.mgr.prv.suse.net/SUSE/Updates/SLE-Module-Development-Tools/15-SP4/x86_64/update/"
   }
   additional_packages = [ "venv-salt-minion" ]
   install_salt_bundle = true

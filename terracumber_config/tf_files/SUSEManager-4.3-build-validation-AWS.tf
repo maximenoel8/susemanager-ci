@@ -170,6 +170,7 @@ module "server" {
   repository_disk_size       = 1500
   server_registration_code   = var.SERVER_REGISTRATION_CODE
 
+  java_debugging                 = false
   auto_accept                    = false
   monitored                      = true
   disable_firewall               = false
@@ -183,6 +184,7 @@ module "server" {
   publish_private_ssl_key        = false
   use_os_released_updates        = false
   disable_download_tokens        = false
+  disable_auto_bootstrap         = true
   ssh_key_path            = "./salt/controller/id_rsa.pub"
   provider_settings = {
     instance_type = "m6a.xlarge"
@@ -306,23 +308,6 @@ module "sles15sp3-client" {
   //sle15sp3-client_additional_repos
 }
 
-module "ubuntu1804-minion" {
-
-  source             = "./modules/minion"
-  base_configuration = module.base.configuration
-  product_version    = "4.3-released"
-  name               = "min-ubuntu1804"
-  image              = "ubuntu1804"
-  server_configuration = module.server.configuration
-  auto_connect_to_master  = false
-  use_os_released_updates = false
-  ssh_key_path            = "./salt/controller/id_rsa.pub"
-
-  provider_settings = {
-    instance_type = "t3a.medium"
-  }
-}
-
 module "ubuntu2004-minion" {
   source             = "./modules/minion"
   base_configuration = module.base.configuration
@@ -353,6 +338,25 @@ module "ubuntu2004-minion" {
 //  provider_settings = {
 //    instance_type = "t3a.medium"
 //  }
+//}
+
+//module "debian12-minion" {
+//  source             = "./modules/minion"
+//  base_configuration = module.base.configuration
+//  product_version    = "4.3-released"
+//  name               = "min-debian12"
+//  image              = "debian12"
+//  server_configuration = module.server.configuration
+//  auto_connect_to_master  = false
+//  use_os_released_updates = false
+//  ssh_key_path            = "./salt/controller/id_rsa.pub"
+//
+//  provider_settings = {
+//    instance_type = "t3a.medium"
+//  }
+//
+//  additional_packages = [ "venv-salt-minion" ]
+//  install_salt_bundle = true
 //}
 
 module "rocky8-minion" {
@@ -459,20 +463,6 @@ module "sles15sp3-minion" {
 
 }
 
-module "ubuntu1804-sshminion" {
-  source             = "./modules/sshminion"
-  base_configuration = module.base.configuration
-  product_version    = "4.3-released"
-  name               = "minssh-ubuntu1804"
-  image              = "ubuntu1804"
-  use_os_released_updates = false
-  ssh_key_path            = "./salt/controller/id_rsa.pub"
-
-  provider_settings = {
-    instance_type = "t3a.medium"
-  }
-}
-
 module "ubuntu2004-sshminion" {
   source             = "./modules/sshminion"
   base_configuration = module.base.configuration
@@ -486,7 +476,7 @@ module "ubuntu2004-sshminion" {
     instance_type = "t3a.medium"
   }
 }
-//
+
 //module "debian11-sshminion" {
 //  source             = "./modules/sshminion"
 //  base_configuration = module.base.configuration
@@ -499,6 +489,23 @@ module "ubuntu2004-sshminion" {
 //  provider_settings = {
 //    instance_type = "t3a.medium"
 //  }
+//}
+
+//module "debian12-sshminion" {
+//  source             = "./modules/sshminion"
+//  base_configuration = module.base.configuration
+//  product_version    = "4.3-released"
+//  name               = "minssh-debian12"
+//  image              = "debian12"
+//  use_os_released_updates = false
+//  ssh_key_path            = "./salt/controller/id_rsa.pub"
+//
+//  provider_settings = {
+//    instance_type = "t3a.medium"
+//  }
+//
+//  additional_packages = [ "venv-salt-minion" ]
+//  install_salt_bundle = true
 //}
 
 module "rocky8-sshminion" {
@@ -691,9 +698,6 @@ module "controller" {
   rocky8_minion_configuration    = module.rocky8-minion.configuration
   rocky8_sshminion_configuration = module.rocky8-sshminion.configuration
 
-  ubuntu1804_minion_configuration    = module.ubuntu1804-minion.configuration
-  ubuntu1804_sshminion_configuration = module.ubuntu1804-sshminion.configuration
-
   ubuntu2004_minion_configuration    = module.ubuntu2004-minion.configuration
   ubuntu2004_sshminion_configuration = module.ubuntu2004-sshminion.configuration
 
@@ -702,6 +706,9 @@ module "controller" {
 
 //  debian11_minion_configuration    = module.debian11-minion.configuration
 //  debian11_sshminion_configuration = module.debian11-sshminion.configuration
+
+//  debian12_minion_configuration    = module.debian12-minion.configuration
+//  debian12_sshminion_configuration = module.debian12-sshminion.configuration
 
   rhel9_minion_configuration          = module.rhel9-minion.configuration
 

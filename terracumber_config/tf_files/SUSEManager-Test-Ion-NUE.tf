@@ -47,7 +47,7 @@ variable "MAIL_TEMPLATE_ENV_FAIL" {
 
 variable "MAIL_FROM" {
   type = string
-  default = "galaxy-ci@suse.de"
+  default = "jenkins@suse.de"
 }
 
 variable "MAIL_TO" {
@@ -85,7 +85,8 @@ terraform {
 }
 
 provider "libvirt" {
-  uri = "qemu+tcp://cthulhu.mgr.suse.de/system"
+  //uri = "qemu+tcp://cthulhu.mgr.suse.de/system"
+  uri = "qemu+tcp://suma-04.mgr.suse.de/system"
 }
 
 module "cucumber_testsuite" {
@@ -116,7 +117,7 @@ module "cucumber_testsuite" {
   git_profiles_repo = "https://github.com/uyuni-project/uyuni.git#:testsuite/features/profiles/internal_nue"
 
   server_http_proxy = "http-proxy.mgr.suse.de:3128"
-  custom_download_endpoint = "ftp://minima-mirror.mgr.suse.de:445"
+  custom_download_endpoint = "ftp://minima-mirror-ci-bv.mgr.suse.de:445"
 
   host_settings = {
     controller = {
@@ -175,6 +176,19 @@ module "cucumber_testsuite" {
       name = "min-rocky8"
       provider_settings = {
         mac = "aa:b2:93:01:00:49"
+        // Since start of May we have problems with the instance not booting after a restart if there is only a CPU and only 1024Mb for RAM
+        // Also, openscap cannot run with less than 1.25 GB of RAM
+        memory = 2048
+        vcpu = 2
+      }
+      additional_packages = [ "venv-salt-minion" ]
+      install_salt_bundle = true
+    }
+    ubuntu-minion = {
+      image = "ubuntu2204o"
+      name = "min-ubuntu2204o"
+      provider_settings = {
+//        mac = "aa:b2:93:01:00:50"
         // Since start of May we have problems with the instance not booting after a restart if there is only a CPU and only 1024Mb for RAM
         // Also, openscap cannot run with less than 1.25 GB of RAM
         memory = 2048

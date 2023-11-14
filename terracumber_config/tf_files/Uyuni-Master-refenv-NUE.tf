@@ -51,7 +51,7 @@ variable "MAIL_TEMPLATE_ENV_FAIL" {
 
 variable "MAIL_FROM" {
   type = string
-  default = "galaxy-ci@suse.de"
+  default = "jenkins@suse.de"
 }
 
 variable "MAIL_TO" {
@@ -106,7 +106,7 @@ module "cucumber_testsuite" {
   cc_username = var.SCC_USER
   cc_password = var.SCC_PASSWORD
 
-  images = ["rocky8o", "opensuse154o", "sles15sp4o", "ubuntu2204o"]
+  images = ["rocky8o", "opensuse154o", "opensuse155o", "ubuntu2204o", "sles15sp4o"]
 
   use_avahi    = false
   name_prefix  = "uyuni-refmaster-"
@@ -120,7 +120,7 @@ module "cucumber_testsuite" {
   git_profiles_repo      = "https://github.com/uyuni-project/uyuni.git#:testsuite/features/profiles/internal_nue"
 
   server_http_proxy        = "http-proxy.mgr.suse.de:3128"
-  custom_download_endpoint = "ftp://minima-mirror.mgr.suse.de:445"
+  custom_download_endpoint = "ftp://minima-mirror-ci-bv.mgr.suse.de:445"
 
   # when changing images, please also keep in mind to adjust the image matrix at the end of the README.
   host_settings = {
@@ -132,6 +132,7 @@ module "cucumber_testsuite" {
       }
     }
     server = {
+      repository_disk_size = 250
       provider_settings = {
         mac = "aa:b2:93:01:00:e1"
         vcpu = 4
@@ -148,8 +149,8 @@ module "cucumber_testsuite" {
       install_salt_bundle = true
     }
     suse-minion = {
-      image = "sles15sp4o"
-      name = "min-sles15"
+      image = "opensuse154o"
+      name = "min-suse"
       provider_settings = {
         mac = "aa:b2:93:01:00:e6"
         vcpu = 2
@@ -159,8 +160,8 @@ module "cucumber_testsuite" {
       install_salt_bundle = true
     }
     suse-sshminion = {
-      image = "sles15sp4o"
-      name = "minssh-sles15"
+      image = "opensuse154o"
+      name = "minssh-suse"
       provider_settings = {
         mac = "aa:b2:93:01:00:e8"
         vcpu = 2
@@ -204,7 +205,7 @@ module "cucumber_testsuite" {
       install_salt_bundle = true
     }
     kvm-host = {
-      image = "sles15sp4o"
+      image = "opensuse154o"
       name = "min-kvm"
       provider_settings = {
         mac = "aa:b2:93:01:00:ee"

@@ -47,7 +47,7 @@ variable "MAIL_TEMPLATE_ENV_FAIL" {
 
 variable "MAIL_FROM" {
   type = string
-  default = "galaxy-ci@suse.de"
+  default = "jenkins@suse.de"
 }
 
 variable "MAIL_TO" {
@@ -85,9 +85,8 @@ terraform {
 }
 
 provider "libvirt" {
-// Switching temporarily because metropolis is down
-//  uri = "qemu+tcp://metropolis.mgr.prv.suse.net/system"
-  uri = "qemu+tcp://bloodymary.mgr.prv.suse.net/system"
+  uri = "qemu+tcp://metropolis.mgr.prv.suse.net/system"
+//  uri = "qemu+tcp://bloodymary.mgr.prv.suse.net/system"
 }
 
 
@@ -118,10 +117,10 @@ module "cucumber_testsuite" {
   auth_registry_password = "cucusecret"
   git_profiles_repo      = "https://github.com/uyuni-project/uyuni.git#:testsuite/features/profiles/internal_prv"
 
-  mirror                   = "minima-mirror.mgr.prv.suse.net"
+  mirror                   = "minima-mirror-ci-bv.mgr.prv.suse.net"
   use_mirror_images        = true
   server_http_proxy        = "http-proxy.mgr.prv.suse.net:3128"
-  custom_download_endpoint = "ftp://minima-mirror.mgr.prv.suse.net:445"
+  custom_download_endpoint = "ftp://minima-mirror-ci-bv.mgr.prv.suse.net:445"
 
   # when changing images, please also keep in mind to adjust the image matrix at the end of the README.
   host_settings = {
@@ -222,8 +221,8 @@ module "cucumber_testsuite" {
         hvm_disk_image = {
           leap = {
             hostname = "min-nested"
-            image = "http://minima-mirror.mgr.prv.suse.net/distribution/leap/15.4/appliances/openSUSE-Leap-15.4-JeOS.x86_64-OpenStack-Cloud.qcow2"
-            hash = "http://minima-mirror.mgr.prv.suse.net/distribution/leap/15.4/appliances/openSUSE-Leap-15.4-JeOS.x86_64-OpenStack-Cloud.qcow2.sha256"
+            image = "http://minima-mirror-ci-bv.mgr.suse.de/distribution/leap/15.5/appliances/openSUSE-Leap-15.5-Minimal-VM.x86_64-Cloud.qcow2"
+            hash = "http://minima-mirror-ci-bv.mgr.suse.de/distribution/leap/15.5/appliances/openSUSE-Leap-15.5-Minimal-VM.x86_64-Cloud.qcow2.sha256"
           }
         }
       }

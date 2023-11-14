@@ -1,0 +1,68 @@
+name: Sumaform validation
+
+on:
+  pull_request:
+    paths:
+      - 'terracumber_config/tf_files/**'
+
+jobs:
+  validate_sumaform:
+    name: Validate sumaform files
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - id: tf_files
+        name: Get modified .tf files
+        uses: Ana06/get-changed-files@v2.2.0
+        with:
+          filter: '*.tf'
+      - name: Install terraform
+        if: steps.tf_files.outputs.added_modified
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.0.10
+      - name: Checkout sumaform
+        if: steps.tf_files.outputs.added_modified
+        uses: actions/checkout@v4
+        with:
+          repository: uyuni-project/sumaform
+          path: sumaform
+      - name: Validate files
+        if: steps.tf_files.outputs.added_modified
+        env:
+          TF_VAR_SCC_USER: "user"
+          TF_VAR_SCC_PASSWORD: "password"
+          TF_VAR_MIRROR: ""
+          TF_VAR_PULL_REQUEST_REPO: ""
+          TF_VAR_MASTER_REPO: ""
+          TF_VAR_MASTER_OTHER_REPO: ""
+          TF_VAR_MASTER_SUMAFORM_TOOLS_REPO: ""
+          TF_VAR_UPDATE_REPO: ""
+          TF_VAR_ADDITIONAL_REPO_URL: ""
+          TF_VAR_TEST_PACKAGES_REPO: ""
+          TF_VAR_SLE_CLIENT_REPO: ""
+          TF_VAR_RHLIKE_CLIENT_REPO: ""
+          TF_VAR_DEBLIKE_CLIENT_REPO: ""
+          TF_VAR_OPENSUSE_CLIENT_REPO: ""
+        run: |
+          # Remove libvirt provider settings
+          sed -i \
+            -e '/provider *"/,/^[ \/#]*\}\s*$/d' \
+            -e '/libvirt = {/,/^[ \/#]*\}\s*$/d' \
+            -e '/libvirt =/d' \
+            ${{steps.tf_files.outputs.added_modified}}
+
+          # Setup sumaform with the 'null' backend
+          cd sumaform
+          ln -sfn ../backend_modules/null modules/backend
+
+          for tf_file in ${{steps.tf_files.outputs.added_modified}}; do
+            echo "::notice::Validating '`basename $tf_file`'..."
+            cp ../$tf_file main.tf
+            # Uncomment for Terraform detailed logging
+            # export TF_LOG=trace
+            terraform init -input=false
+            terraform validate
+            terraform plan -input=false
+            echo
+          done
