@@ -101,6 +101,7 @@ locals {
 
 module "base" {
   source = "./modules/base"
+  mirror      = "minima-mirror-ci-bv.mgr.prv.suse.net"
   ssh_key_path = var.SSH_KEY
   cc_username = var.SCC_USER
   cc_password = var.SCC_PASSWORD
