@@ -160,7 +160,7 @@ module "mirror" {
 }
 
 module "server" {
-  source                     = "./sumaform/modules/server"
+  source                     = "./modules/server"
   base_configuration = merge(module.base.configuration,
     {
       mirror = null
@@ -223,7 +223,7 @@ module "proxy" {
 }
 
 module "suse-minion-paygo" {
-  source             = "./sumaform/modules/minion"
+  source             = "./modules/minion"
   base_configuration = module.base.configuration
   product_version    = "paygo"
   name               = "min-sles15-paygo"
