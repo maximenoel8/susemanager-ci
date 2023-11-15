@@ -526,6 +526,7 @@ module "sles12sp5-sshminion" {
   provider_settings = {
     instance_type = "t3a.medium"
   }
+  additional_packages = [ "chrony" ]
 }
 
 module "sles15sp2-sshminion" {
