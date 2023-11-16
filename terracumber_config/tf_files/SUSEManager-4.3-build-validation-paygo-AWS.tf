@@ -215,7 +215,7 @@ module "suse-minion-paygo" {
   source             = "./modules/minion"
   base_configuration = module.base.configuration
   product_version    = "paygo"
-  name               = "min-sles15-paygo"
+  name               = "min-sles15sp5-paygo"
   image              = "sles15sp5-paygo"
   provider_settings = {
     instance_type = "t3a.medium"
