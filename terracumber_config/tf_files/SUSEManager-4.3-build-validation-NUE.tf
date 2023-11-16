@@ -1420,3 +1420,9 @@ output "configuration" {
     controller = module.controller.configuration
   }
 }
+
+output "server_instance_id" {
+  value = {
+    server_instance_id = module.server.configuration.ids[0]
+  }
+}
