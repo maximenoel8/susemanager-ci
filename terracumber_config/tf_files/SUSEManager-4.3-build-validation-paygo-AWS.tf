@@ -694,3 +694,7 @@ output "configuration" {
     }
   }
 }
+
+output "server_instance_id" {
+  value = module.server.configuration.id
+}
