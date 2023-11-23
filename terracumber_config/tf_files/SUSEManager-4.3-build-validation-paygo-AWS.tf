@@ -211,7 +211,24 @@ module "proxy" {
 
 }
 
-module "suse-minion-paygo" {
+module "sles12sp5paygo-minion" {
+  source             = "./modules/minion"
+  base_configuration = module.base.configuration
+  product_version    = "paygo"
+  name               = "min-sles12sp5-paygo"
+  image              = "sles12sp5-paygo"
+  provider_settings = {
+    instance_type = "t3a.medium"
+    //    overwrite_fqdn = "${local.prefix}-min-sles15.${local.domain}"
+  }
+  server_configuration = module.server.configuration
+  #  sles_registration_code = var.SLES_REGISTRATION_CODE
+  auto_connect_to_master  = false
+  use_os_released_updates = false
+  ssh_key_path            = "./salt/controller/id_rsa.pub"
+}
+
+module "sles15sp5paygo-minion" {
   source             = "./modules/minion"
   base_configuration = module.base.configuration
   product_version    = "paygo"
@@ -226,7 +243,23 @@ module "suse-minion-paygo" {
   auto_connect_to_master  = false
   use_os_released_updates = false
   ssh_key_path            = "./salt/controller/id_rsa.pub"
+}
 
+module "sap15sp5paygo-minion" {
+  source             = "./modules/minion"
+  base_configuration = module.base.configuration
+  product_version    = "paygo"
+  name               = "min-sap15sp5-paygo"
+  image              = "sap15sp5-paygo"
+  provider_settings = {
+    instance_type = "t3a.medium"
+    //    overwrite_fqdn = "${local.prefix}-min-sles15.${local.domain}"
+  }
+  server_configuration = module.server.configuration
+  #  sles_registration_code = var.SLES_REGISTRATION_CODE
+  auto_connect_to_master  = false
+  use_os_released_updates = false
+  ssh_key_path            = "./salt/controller/id_rsa.pub"
 }
 
 
@@ -627,21 +660,27 @@ module "controller" {
 
   swap_file_size = null
   no_mirror = true
-  is_using_build_image = false
+  is_using_build_image      = false
   is_using_scc_repositories = true
+  is_using_paygo_server     = true
   // Cucumber repository configuration for the controller
   git_username = var.GIT_USER
   git_password = var.GIT_PASSWORD
   git_repo     = var.CUCUMBER_GITREPO
   branch       = var.CUCUMBER_BRANCH
+  server_instance_id  =  module.server.configuration.id
+
 
   server_configuration    = module.server.configuration
   proxy_configuration     = module.proxy.configuration
 
+  sle12paygo_minion_configuration  = module.sles12sp5paygo-minion.configuration
+  sle15paygo_minion_configuration  = module.sles15sp5paygo-minion.configuration
+  sappaygo_minion_configuration    = module.sap15sp5paygo-minion.configuration
+
   sle12sp5_client_configuration    = module.sles12sp5-client.configuration
   sle12sp5_minion_configuration    = module.sles12sp5-minion.configuration
   sle12sp5_sshminion_configuration = module.sles12sp5-sshminion.configuration
-
 
   sle15sp2_client_configuration    = module.sles15sp2-client.configuration
   sle15sp2_minion_configuration    = module.sles15sp2-minion.configuration
