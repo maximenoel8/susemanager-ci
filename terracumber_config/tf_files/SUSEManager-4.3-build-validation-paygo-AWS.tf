@@ -245,22 +245,22 @@ module "sles15sp5paygo-minion" {
   ssh_key_path            = "./salt/controller/id_rsa.pub"
 }
 
-module "sap15sp5paygo-minion" {
-  source             = "./modules/minion"
-  base_configuration = module.base.configuration
-  product_version    = "paygo"
-  name               = "min-sap15sp5-paygo"
-  image              = "sap15sp5-paygo"
-  provider_settings = {
-    instance_type = "t3a.medium"
-    //    overwrite_fqdn = "${local.prefix}-min-sles15.${local.domain}"
-  }
-  server_configuration = module.server.configuration
-  #  sles_registration_code = var.SLES_REGISTRATION_CODE
-  auto_connect_to_master  = false
-  use_os_released_updates = false
-  ssh_key_path            = "./salt/controller/id_rsa.pub"
-}
+#module "sap15sp5paygo-minion" {
+#  source             = "./modules/minion"
+#  base_configuration = module.base.configuration
+#  product_version    = "paygo"
+#  name               = "min-sap15sp5-paygo"
+#  image              = "sap15sp5-paygo"
+#  provider_settings = {
+#    instance_type = "t3a.medium"
+#    //    overwrite_fqdn = "${local.prefix}-min-sles15.${local.domain}"
+#  }
+#  server_configuration = module.server.configuration
+#  #  sles_registration_code = var.SLES_REGISTRATION_CODE
+#  auto_connect_to_master  = false
+#  use_os_released_updates = false
+#  ssh_key_path            = "./salt/controller/id_rsa.pub"
+#}
 
 
 module "sles12sp5-client" {
@@ -676,7 +676,7 @@ module "controller" {
 
   sle12paygo_minion_configuration  = module.sles12sp5paygo-minion.configuration
   sle15paygo_minion_configuration  = module.sles15sp5paygo-minion.configuration
-  sappaygo_minion_configuration    = module.sap15sp5paygo-minion.configuration
+#  sappaygo_minion_configuration    = module.sap15sp5paygo-minion.configuration
 
   sle12sp5_client_configuration    = module.sles12sp5-client.configuration
   sle12sp5_minion_configuration    = module.sles12sp5-minion.configuration
