@@ -350,41 +350,6 @@ module "ubuntu2004-minion" {
   }
 }
 
-//module "debian11-minion" {
-//  source             = "./modules/minion"
-//  base_configuration = module.base.configuration
-//  product_version    = "4.3-released"
-//  name               = "min-debian11"
-//  image              = "debian11"
-//  server_configuration = module.server.configuration
-//  auto_connect_to_master  = false
-//  use_os_released_updates = false
-//  ssh_key_path            = "./salt/controller/id_rsa.pub"
-//
-//  provider_settings = {
-//    instance_type = "t3a.medium"
-//  }
-//}
-
-//module "debian12-minion" {
-//  source             = "./modules/minion"
-//  base_configuration = module.base.configuration
-//  product_version    = "4.3-released"
-//  name               = "min-debian12"
-//  image              = "debian12"
-//  server_configuration = module.server.configuration
-//  auto_connect_to_master  = false
-//  use_os_released_updates = false
-//  ssh_key_path            = "./salt/controller/id_rsa.pub"
-//
-//  provider_settings = {
-//    instance_type = "t3a.medium"
-//  }
-//
-//  additional_packages = [ "venv-salt-minion" ]
-//  install_salt_bundle = true
-//}
-
 module "rocky8-minion" {
   source             = "./modules/minion"
   base_configuration = module.base.configuration
@@ -487,37 +452,6 @@ module "ubuntu2004-sshminion" {
     instance_type = "t3a.medium"
   }
 }
-
-//module "debian11-sshminion" {
-//  source             = "./modules/sshminion"
-//  base_configuration = module.base.configuration
-//  product_version    = "4.3-released"
-//  name               = "minssh-debian11"
-//  image              = "debian11"
-//  use_os_released_updates = false
-//  ssh_key_path            = "./salt/controller/id_rsa.pub"
-//
-//  provider_settings = {
-//    instance_type = "t3a.medium"
-//  }
-//}
-
-//module "debian12-sshminion" {
-//  source             = "./modules/sshminion"
-//  base_configuration = module.base.configuration
-//  product_version    = "4.3-released"
-//  name               = "minssh-debian12"
-//  image              = "debian12"
-//  use_os_released_updates = false
-//  ssh_key_path            = "./salt/controller/id_rsa.pub"
-//
-//  provider_settings = {
-//    instance_type = "t3a.medium"
-//  }
-//
-//  additional_packages = [ "venv-salt-minion" ]
-//  install_salt_bundle = true
-//}
 
 module "rocky8-sshminion" {
   source             = "./modules/sshminion"
@@ -676,7 +610,7 @@ module "controller" {
 
   sle12paygo_minion_configuration  = module.sles12sp5paygo-minion.configuration
   sle15paygo_minion_configuration  = module.sles15sp5paygo-minion.configuration
-#  sappaygo_minion_configuration    = module.sap15sp5paygo-minion.configuration
+  sappaygo_minion_configuration    = module.sap15sp5paygo-minion.configuration
 
   sle12sp5_client_configuration    = module.sles12sp5-client.configuration
   sle12sp5_minion_configuration    = module.sles12sp5-minion.configuration
@@ -702,12 +636,6 @@ module "controller" {
 
   ubuntu2204_minion_configuration    = module.ubuntu2204-minion.configuration
   ubuntu2204_sshminion_configuration = module.ubuntu2204-sshminion.configuration
-
-//  debian11_minion_configuration    = module.debian11-minion.configuration
-//  debian11_sshminion_configuration = module.debian11-sshminion.configuration
-
-//  debian12_minion_configuration    = module.debian12-minion.configuration
-//  debian12_sshminion_configuration = module.debian12-sshminion.configuration
 
   rhel9_minion_configuration          = module.rhel9-minion.configuration
 
