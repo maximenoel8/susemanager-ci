@@ -183,7 +183,6 @@ module "server" {
 }
 
 module "proxy" {
-
   source                    = "./modules/proxy"
   base_configuration        = module.base.configuration
   server_configuration      = module.server.configuration
