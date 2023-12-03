@@ -157,7 +157,7 @@ module "server" {
     })
   name                       = "server"
   product_version            = "paygo"
-  image                      = "suma-server-43-paygo"
+  image                      = "suma-server-43-ltd-paygo"
   repository_disk_size       = 1500
 
   auto_accept                    = false
