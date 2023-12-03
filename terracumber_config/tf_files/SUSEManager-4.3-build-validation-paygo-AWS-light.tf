@@ -118,6 +118,7 @@ variable "NAME_PREFIX" {
 
 provider "aws" {
   region     = var.REGION
+  profile    = "paygo"
 }
 
 module "base" {
