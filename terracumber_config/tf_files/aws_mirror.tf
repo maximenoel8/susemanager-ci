@@ -122,6 +122,7 @@ locals {
 
 provider "aws" {
   region = var.REGION
+  profile    = "paygo"
 }
 
 module "base" {
