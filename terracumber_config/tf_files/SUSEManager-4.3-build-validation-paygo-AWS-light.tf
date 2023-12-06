@@ -298,43 +298,6 @@ module "sles12sp5-minion" {
   //sle12sp5-minion_additional_repos
 }
 
-module "sles15sp2-minion" {
-  source             = "./modules/minion"
-  base_configuration = module.base.configuration
-  product_version    = "4.3-released"
-  name               = "min-sles15sp2"
-  image              = "sles15sp2o"
-  server_configuration = module.server.configuration
-  sles_registration_code = var.SLES_REGISTRATION_CODE
-  auto_connect_to_master  = false
-  use_os_released_updates = false
-  ssh_key_path            = "./salt/controller/id_rsa.pub"
-  provider_settings = {
-    instance_type = "t3a.medium"
-  }
-
-  //sle15sp2-minion_additional_repos
-}
-
-module "sles15sp3-minion" {
-  source             = "./modules/minion"
-  base_configuration = module.base.configuration
-  product_version    = "4.3-released"
-  name               = "min-sles15sp3"
-  image              = "sles15sp3o"
-  server_configuration = module.server.configuration
-  sles_registration_code = var.SLES_REGISTRATION_CODE
-  auto_connect_to_master  = false
-  use_os_released_updates = false
-  ssh_key_path            = "./salt/controller/id_rsa.pub"
-  provider_settings = {
-    instance_type = "t3a.medium"
-  }
-
-  //sle15sp3-minion_additional_repos
-
-}
-
 module "sles15sp4-minion" {
   source             = "./modules/minion"
   base_configuration = module.base.configuration
@@ -353,8 +316,6 @@ module "sles15sp4-minion" {
   //sle15sp4-minion_additional_repos
 
 }
-
-
 
 module "rhel9-minion" {
 
@@ -375,8 +336,6 @@ module "rhel9-minion" {
   //rhel9-minion_additional_repos
 
 }
-
-
 
 module "ubuntu2204-minion" {
   source             = "./modules/minion"
@@ -425,8 +384,6 @@ module "controller" {
   sleforsap15_paygo_minion_configuration = module.slesforsap15sp5-paygo-minion.configuration
 
   sle12sp5_minion_configuration    = module.sles12sp5-minion.configuration
-  sle15sp2_minion_configuration    = module.sles15sp2-minion.configuration
-  sle15sp3_minion_configuration    = module.sles15sp3-minion.configuration
   sle15sp4_minion_configuration    = module.sles15sp4-minion.configuration
   rocky8_minion_configuration      = module.rocky8-minion.configuration
   ubuntu2204_minion_configuration  = module.ubuntu2204-minion.configuration
