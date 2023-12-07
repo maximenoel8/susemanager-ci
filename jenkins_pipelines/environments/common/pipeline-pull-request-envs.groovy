@@ -7,8 +7,8 @@ build_url = 'https://build.opensuse.org'
 builder_project = 'systemsmanagement:Uyuni:Master:PR'
 source_project = 'systemsmanagement:Uyuni:Master'
 other_project = "${source_project}:Other"
-el_client_repo = "${source_project}:EL8-Uyuni-Client-Tools"
-EL_8 = 'EL_8'
+el_client_repo = "${source_project}:EL9-Uyuni-Client-Tools"
+EL = 'EL_9'
 sles_client_repo = "${source_project}:SLE15-Uyuni-Client-Tools"
 openSUSE_client_repo = "${source_project}:openSUSE_Leap_15-Uyuni-Client-Tools"
 ubuntu_client_repo = "${source_project}:Ubuntu2204-Uyuni-Client-Tools"
@@ -53,6 +53,39 @@ if (env.JOB_NAME == "uyuni-prs-ci-tests-jordi") {
     last_env = 4;
 } else if (env.JOB_NAME == "suma43-prs-ci-tests") {
     first_env =5;
+    last_env = 5;
+    // spacewalk suma43 settings
+    // TODO: what happens if we change the environment? Will it break the environment??
+    server_release_package = '000product:sle-module-suse-manager-server-release'
+    proxy_release_package = '000product:sle-module-suse-manager-proxy-release'
+    pull_request_repo = 'https://github.com/SUSE/spacewalk.git'
+    builder_api = 'https://api.suse.de'
+    build_url = 'https://build.suse.de'
+    builder_project = 'Devel:Galaxy:Manager:4.3:PR'
+    source_project = 'Devel:Galaxy:Manager:4.3'
+    sumaform_tools_project = 'openSUSE.org:systemsmanagement:sumaform:tools'
+    test_packages_project = 'openSUSE.org:systemsmanagement:Uyuni:Test-Packages:Pool'
+    other_project = 'Devel:Galaxy:Manager:Head:Other'
+    el_client_repo = "${source_project}:EL9-SUSE-Manager-Tools"
+    EL = 'SUSE_EL-9_Update_standard'
+    sles_client_repo = "${source_project}:SLE15-SUSE-Manager-Tools"
+    openSUSE_client_repo = "openSUSE.org:systemsmanagement:Uyuni:Master:openSUSE_Leap_15-Uyuni-Client-Tools"
+    ubuntu_client_repo = "${source_project}:Ubuntu22.04-SUSE-Manager-Tools"
+    build_repo = 'SLE_15_SP4'
+    other_build_repo = 'openSUSE_Leap_15.4'
+    url_prefix="https://ci.suse.de/view/Manager/view/Manager-4.3/job/${env.JOB_NAME}"
+    product_name = "SUSE-Manager-4.3"
+    short_product_name = "suma43"
+    update_repo = "http://minima-mirror-ci-bv.mgr.prv.suse.net/jordi/some-updates43/"
+    additional_repo = "http://minima-mirror-ci-bv.mgr.prv.suse.net/jordi/dummy43/"
+    rn_package = "release-notes-susemanager"
+    rn_project = "Devel:Galaxy:Manager:4.3:ToSLE"
+} else if (env.JOB_NAME == "suma43-prs-ci-tests-reference") {
+    email_to = "discuss-susemanager-p-aaaag32rrv4bcp3adzknwc42m4@suse.slack.com";
+    cucumber_gitrepo = "https://github.com/SUSE/spacewalk.git";
+    cucumber_ref = "Manager-4.3";
+    pull_request_number = "Manager-4.3";
+    first_env =6;
     last_env = 6;
     // spacewalk suma43 settings
     // TODO: what happens if we change the environment? Will it break the environment??
@@ -66,8 +99,8 @@ if (env.JOB_NAME == "uyuni-prs-ci-tests-jordi") {
     sumaform_tools_project = 'openSUSE.org:systemsmanagement:sumaform:tools'
     test_packages_project = 'openSUSE.org:systemsmanagement:Uyuni:Test-Packages:Pool'
     other_project = 'Devel:Galaxy:Manager:Head:Other'
-    el_client_repo = "${source_project}:EL8-SUSE-Manager-Tools"
-    EL_8 = 'SUSE_EL-8_Update_standard'
+    el_client_repo = "${source_project}:EL9-SUSE-Manager-Tools"
+    EL = 'SUSE_EL-9_Update_standard'
     sles_client_repo = "${source_project}:SLE15-SUSE-Manager-Tools"
     openSUSE_client_repo = "openSUSE.org:systemsmanagement:Uyuni:Master:openSUSE_Leap_15-Uyuni-Client-Tools"
     ubuntu_client_repo = "${source_project}:Ubuntu22.04-SUSE-Manager-Tools"

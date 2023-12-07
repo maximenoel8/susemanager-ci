@@ -77,12 +77,12 @@ def run(params) {
                         sh "git config --global user.name 'jenkins'"
                         //TODO: When checking out spacewalk, we will need credentials in the Jenkins Slave
                         //      Inside userRemoteConfigs add credentialsId: 'github'
-                        if (pull_request_number == "master") {
+                        if (pull_request_number == "master" || pull_request_number == "Manager-4.3") {
                             checkout([
                                     $class: 'GitSCM',
-                                    branches: [[name: "master"]],
+                                    branches: [[name: "${pull_request_number}"]],
                                     extensions: [[$class: 'CloneOption', depth: 1, timeout: 30, shallow: true, noTags: true, honorRefspec: true]],
-                                    userRemoteConfigs: [[refspec: '+refs/heads/master:refs/remotes/origin/master', url: "${pull_request_repo}"]],
+                                    userRemoteConfigs: [[refspec: "+refs/heads/${pull_request_number}:refs/remotes/origin/${pull_request_number}", url: "${pull_request_repo}"]],
                                    ])
                         } else {
                             checkout([
@@ -164,9 +164,9 @@ def run(params) {
                           // We do not clean up the previous packages. This speeds up the checkout. We are assuming this project won't ever get deleted, so new builds should always have new release numbers.
                           sh "bash susemanager-utils/testing/automation/publish-rpms.sh -A ${builder_api} -p \"${test_packages_project}\" -r rpm -a x86_64 -d \"${environment_workspace}/repos\" > ${environment_workspace}/repos/publish_logs/${test_packages_project} 2>&1 || touch ${environment_workspace}/repos/publish_logs/${test_packages_project}.error"
 
-                          echo "Publishing packages into http://${fqdn_jenkins_node}/workspace/${short_product_name}-pr${env_number}/repos/${el_client_repo}/${EL_8}/x86_64"
+                          echo "Publishing packages into http://${fqdn_jenkins_node}/workspace/${short_product_name}-pr${env_number}/repos/${el_client_repo}/${EL}/x86_64"
                           // We do not clean up the previous packages. This speeds up the checkout. We are assuming this project won't ever get deleted, so new builds should always have new release numbers.
-                          sh "bash susemanager-utils/testing/automation/publish-rpms.sh -A ${builder_api} -p \"${el_client_repo}\" -r ${EL_8} -a ${arch} -d \"${environment_workspace}/repos\" > ${environment_workspace}/repos/publish_logs/${el_client_repo} 2>&1 || touch ${environment_workspace}/repos/publish_logs/${el_client_repo}.error"
+                          sh "bash susemanager-utils/testing/automation/publish-rpms.sh -A ${builder_api} -p \"${el_client_repo}\" -r ${EL} -a ${arch} -d \"${environment_workspace}/repos\" > ${environment_workspace}/repos/publish_logs/${el_client_repo} 2>&1 || touch ${environment_workspace}/repos/publish_logs/${el_client_repo}.error"
 
                           echo "Publishing packages into http://${fqdn_jenkins_node}/workspace/${short_product_name}-pr${env_number}/repos/${sles_client_repo}/SLE_15/${arch}"
                           // We do not clean up the previous packages. This speeds up the checkout. We are assuming this project won't ever get deleted, so new builds should always have new release numbers.
@@ -246,7 +246,7 @@ def run(params) {
                         }
 
                         env.SLE_CLIENT_REPO = "http://${fqdn_jenkins_node}/workspace/${short_product_name}-pr${env_number}/repos/${sles_client_repo}/SLE_15/${arch}"
-                        env.RHLIKE_CLIENT_REPO = "http://${fqdn_jenkins_node}/workspace/${short_product_name}-pr${env_number}/repos/${el_client_repo}/${EL_8}/${arch}"
+                        env.RHLIKE_CLIENT_REPO = "http://${fqdn_jenkins_node}/workspace/${short_product_name}-pr${env_number}/repos/${el_client_repo}/${EL}/${arch}"
                         env.DEBLIKE_CLIENT_REPO = "http://${fqdn_jenkins_node}/workspace/${short_product_name}-pr${env_number}/repos/${ubuntu_client_repo}/xUbuntu_22.04/${arch}"
                         env.OPENSUSE_CLIENT_REPO = "http://${fqdn_jenkins_node}/workspace/${short_product_name}-pr${env_number}/repos/${openSUSE_client_repo}/openSUSE_Leap_15.0/${arch}"
 
@@ -263,8 +263,9 @@ def run(params) {
                         deployed = true
   
                         // Collect and tag Flaky tests from the GitHub Board
-                        sh script:"./terracumber-cli ${common_params} --logfile ${resultdirbuild}/testsuite.log --runstep cucumber --cucumber-cmd 'cd /root/spacewalk/testsuite; export BUILD_NUMBER=${BUILD_NUMBER}; rake utils:collect_and_tag_flaky_tests'", returnStatus:true
-		            }
+                        def statusCode = sh script:"./terracumber-cli ${common_params} --logfile ${resultdirbuild}/testsuite.log --runstep cucumber --cucumber-cmd 'cd /root/spacewalk/testsuite; export BUILD_NUMBER=${BUILD_NUMBER}; rake utils:collect_and_tag_flaky_tests'", returnStatus:true
+                        sh "exit 0"
+                    }
                 }
             }
             stage('Sanity Check') {
