@@ -324,6 +324,12 @@ module "controller" {
   provider_settings = {
     instance_type = "c6i.xlarge"
   }
+  base_configuration = merge(module.base.configuration,
+    {
+      cc_username = var.SCC_USER
+      cc_password = var.SCC_PASSWORD
+    })
+
 
   swap_file_size = null
   no_mirror = true
