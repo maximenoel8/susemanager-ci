@@ -76,6 +76,18 @@ variable "MIRROR"{
   default = null
 }
 
+
+// sumaform specific variables
+variable "SCC_USER" {
+  type = string
+  default = null
+}
+
+variable "SCC_PASSWORD" {
+  type = string
+  default = null
+}
+
 variable "AVAILABILITY_ZONE" {
   type = string
   default = null
