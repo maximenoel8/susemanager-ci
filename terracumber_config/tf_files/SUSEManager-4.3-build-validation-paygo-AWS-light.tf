@@ -319,7 +319,7 @@ module "sles15sp4-minion" {
 
 module "controller" {
   source             = "./modules/controller"
-  base_configuration = module.base.configuration
+#  base_configuration = module.base.configuration
   name               = "ctl"
   provider_settings = {
     instance_type = "c6i.xlarge"
