@@ -329,6 +329,26 @@ module "sles15sp4-minion" {
 
 }
 
+
+module "sles15sp5-minion" {
+  source             = "./modules/minion"
+  base_configuration = module.base.configuration
+  product_version    = "4.3-released"
+  name               = "min-sles15sp5"
+  image              = "sles15sp5o"
+  server_configuration = module.server.configuration
+  sles_registration_code = var.SLES_REGISTRATION_CODE
+  auto_connect_to_master  = false
+  use_os_released_updates = false
+  ssh_key_path            = "./salt/controller/id_rsa.pub"
+  provider_settings = {
+    instance_type = "t3a.medium"
+  }
+
+  //sle15sp4-minion_additional_repos
+
+}
+
 module "controller" {
   source             = "./modules/controller"
 #  base_configuration = module.base.configuration
@@ -365,6 +385,7 @@ module "controller" {
 
   sle12sp5_minion_configuration    = module.sles12sp5-minion.configuration
   sle15sp4_minion_configuration    = module.sles15sp4-minion.configuration
+  sle15sp5_minion_configuration    = module.sles15sp5-minion.configuration
   rocky8_minion_configuration      = module.rocky8-minion.configuration
 
 }
