@@ -379,9 +379,9 @@ module "controller" {
   server_configuration    = module.server.configuration
   proxy_configuration     = module.proxy.configuration
 
-  sle12_paygo_minion_configuration       = module.sles12sp5-paygo-minion.configuration
-  sle15_paygo_minion_configuration       = module.sles15sp5-paygo-minion.configuration
-  sleforsap15_paygo_minion_configuration = module.slesforsap15sp5-paygo-minion.configuration
+  sle12sp5_paygo_minion_configuration       = module.sles12sp5-paygo-minion.configuration
+  sle15sp5_paygo_minion_configuration       = module.sles15sp5-paygo-minion.configuration
+  sleforsap15sp5_paygo_minion_configuration = module.slesforsap15sp5-paygo-minion.configuration
 
   sle12sp5_minion_configuration    = module.sles12sp5-minion.configuration
   sle15sp4_minion_configuration    = module.sles15sp4-minion.configuration
