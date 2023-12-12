@@ -490,7 +490,7 @@ def clientTestingStages(capybara_timeout, default_timeout, minion_type = 'defaul
     println minion_type
     //Get minion list from terraform state list command
     def nodesHandler = getNodesHandler(minion_type)
-    println nodesHandler
+    println nodesHandler.envVariableList.toList()
     def mu_sync_status = nodesHandler.MUSyncStatus
 
 
@@ -631,6 +631,7 @@ def getNodesHandler(minionType = 'default') {
     modules = sh(script: "cd ${resultdir}/sumaform-aws; terraform state list",
             returnStdout: true)
     String[] moduleList = modules.split("\n")
+    println moduleList
     moduleList.each { lane ->
         def instanceList = lane.tokenize(".")
         if ( minionType == 'default' && (instanceList[1].contains('minion') || instanceList[1].contains('client'))) {
@@ -638,6 +639,7 @@ def getNodesHandler(minionType = 'default') {
             envVar.add(instanceList[1].replaceAll('-', '_').replaceAll('sles', 'sle').toUpperCase())
         }
         else if (( minionType == 'paygo' && (instanceList[1].contains('paygo') || instanceList[1].contains('byos')))) {
+            println("Chec paygo client")
             nodeList.add(instanceList[1].replaceAll('-', '_').replaceAll('sshminion', 'ssh_minion').replaceAll('sles', 'sle'))
             envVar.add(instanceList[1].replaceAll('-', '_').replaceAll('sles', 'sle').toUpperCase())
         }
