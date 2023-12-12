@@ -490,13 +490,14 @@ def clientTestingStages(capybara_timeout, default_timeout, minion_type = 'defaul
     println minion_type
     //Get minion list from terraform state list command
     def nodesHandler = getNodesHandler(minion_type)
-    println nodesHandler.envVariableList.toList()
+    println nodesHandler.nodeList
     def mu_sync_status = nodesHandler.MUSyncStatus
 
 
 
     // Construct a stage list for each node.
     nodesHandler.nodeList.each { node ->
+        println("Create tests for pago")
         tests["${node}"] = {
             // Generate a temporary list that comprises of all the minions except the one currently undergoing testing.
             // This list is utilized to establish an SSH session exclusively with the minion undergoing testing.
