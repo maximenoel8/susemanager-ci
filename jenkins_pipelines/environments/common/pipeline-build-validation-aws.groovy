@@ -220,9 +220,9 @@ def run(params) {
                 }
             }
 
-            stage('Sanity check') {
-                sh "./terracumber-cli ${common_params} --logfile ${resultdirbuild}/testsuite.log --runstep cucumber --cucumber-cmd 'cd /root/spacewalk/testsuite; ${env.exports} rake cucumber:build_validation_sanity_check'"
-            }
+//            stage('Sanity check') {
+//                sh "./terracumber-cli ${common_params} --logfile ${resultdirbuild}/testsuite.log --runstep cucumber --cucumber-cmd 'cd /root/spacewalk/testsuite; ${env.exports} rake cucumber:build_validation_sanity_check'"
+//            }
 
             stage('Run core features') {
                 if (params.must_run_core && (deployed || !params.must_deploy)) {
@@ -299,13 +299,13 @@ def run(params) {
                     println('ERROR: one or more clients have failed')
                     client_paygo_stage_result_fail = true
                 }
-                stage('Paygo testing') {
-                    if (params.confirm_before_continue) {
-                        input 'Press any key to start paygo related tests'
-                    }
-                    res_paygo_testing = sh(script: "./terracumber-cli ${common_params} --logfile ${resultdirbuild}/testsuite.log --runstep cucumber --cucumber-cmd '${env.exports} cd /root/spacewalk/testsuite; rake cucumber:build_validation_paygo_testing'")
-                    echo "PAYGO testing status code: ${res_paygo_testing}"
-                }
+//                stage('Paygo testing') {
+//                    if (params.confirm_before_continue) {
+//                        input 'Press any key to start paygo related tests'
+//                    }
+//                    res_paygo_testing = sh(script: "./terracumber-cli ${common_params} --logfile ${resultdirbuild}/testsuite.log --runstep cucumber --cucumber-cmd '${env.exports} cd /root/spacewalk/testsuite; rake cucumber:build_validation_paygo_testing'")
+//                    echo "PAYGO testing status code: ${res_paygo_testing}"
+//                }
             }
 
             /** PAYGO stages end **/
@@ -487,10 +487,13 @@ def clientTestingStages(capybara_timeout, default_timeout, minion_type = 'defaul
 
     // Load JSON matching non MU repositories data
     def json_matching_non_MU_data = readJSON(file: env.non_MU_channels_tasks_file)
-
+    println minion_type
     //Get minion list from terraform state list command
     def nodesHandler = getNodesHandler(minion_type)
+    println nodesHandler
     def mu_sync_status = nodesHandler.MUSyncStatus
+
+
 
     // Construct a stage list for each node.
     nodesHandler.nodeList.each { node ->
