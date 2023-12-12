@@ -303,7 +303,7 @@ def run(params) {
                     if (params.confirm_before_continue) {
                         input 'Press any key to start paygo related tests'
                     }
-                    res_paygo_testing = sh(script: "./terracumber-cli ${common_params} --logfile ${resultdirbuild}/testsuite.log --runstep cucumber --cucumber-cmd '${env.exports} cd /root/spacewalk/testsuite; rake cucumber:build_validation_paygo_testing.yml'")
+                    res_paygo_testing = sh(script: "./terracumber-cli ${common_params} --logfile ${resultdirbuild}/testsuite.log --runstep cucumber --cucumber-cmd '${env.exports} cd /root/spacewalk/testsuite; rake cucumber:build_validation_paygo_testing'")
                     echo "PAYGO testing status code: ${res_paygo_testing}"
                 }
             }
