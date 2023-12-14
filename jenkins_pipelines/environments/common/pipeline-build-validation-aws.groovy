@@ -288,7 +288,7 @@ def run(params) {
             /** Proxy stages end **/
 
             /** PAYGO stages begin **/
-            if (params.paygo_stages) {
+            if (params.enable_paygo_stages) {
                 // Call the minion testing.
                 try {
                     stage('Clients paygo stages') {
@@ -456,6 +456,10 @@ def run(params) {
                 sh "./terracumber-cli ${common_params} --logfile ${resultdirbuild}/mail.log --runstep mail"
                 // Clean up old results
                 sh "./clean-old-results -r ${resultdir}"
+                // Fail pipeline if paygo client stages failed
+                if (client_paygo_stage_result_fail) {
+                    error("Paygo client stage failed")
+                }
                 // Fail pipeline if client stages failed
                 if (client_stage_result_fail) {
                     error("Client stage failed")
@@ -604,7 +608,7 @@ def clientTestingStages(capybara_timeout, default_timeout, minion_type = 'defaul
                 }
             }
             stage("Run Smoke Tests ${node}") {
-                if (params.must_run_tests) {
+                if (params.must_run_tests && !node.contains('byos')) {
                     if (params.confirm_before_continue) {
                         input 'Press any key to start running the smoke tests'
                     }
