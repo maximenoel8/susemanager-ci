@@ -86,6 +86,7 @@ def run(params) {
 //            }
 
             stage('Sync. products and channels') {
+                deployed = true
                 if (params.must_sync && (deployed || !params.must_deploy)) {
                     // Get minion list from terraform state list command
                     def nodesHandler = getNodesHandler()
