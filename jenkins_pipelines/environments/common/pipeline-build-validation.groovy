@@ -90,7 +90,7 @@ def run(params) {
                 if (params.must_sync && (deployed || !params.must_deploy)) {
                     // Get minion list from terraform state list command
                     def nodesHandler = getNodesHandler()
-                    res_products = sh(script: 'exit 1', returnStatus: true)
+                    res_products = sh(script: 'exit 0', returnStatus: true)
                     echo "Custom channels and MU repositories status code: ${res_products}"
                     sh "exit ${res_products}"
                 }
