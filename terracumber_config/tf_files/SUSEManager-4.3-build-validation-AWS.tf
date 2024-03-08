@@ -184,7 +184,7 @@ module "server" {
   create_sample_activation_key   = false
   create_sample_bootstrap_script = false
   publish_private_ssl_key        = false
-  use_os_released_updates        = false
+  use_os_released_updates        = true
   disable_download_tokens        = false
   disable_auto_bootstrap         = true
   large_deployment               = true
