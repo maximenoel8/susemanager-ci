@@ -139,6 +139,7 @@ module "base" {
   testsuite                = true
   use_avahi                = false
   use_eip_bastion          = false
+  is_server_paygo_instance       = false
 
   provider_settings = {
     availability_zone = var.AVAILABILITY_ZONE
@@ -188,7 +189,6 @@ module "server" {
   disable_download_tokens        = false
   disable_auto_bootstrap         = true
   large_deployment               = true
-  is_server_paygo_instance       = false
   ssh_key_path                   = "./salt/controller/id_rsa.pub"
   provider_settings = {
     instance_type = "m6a.xlarge"
