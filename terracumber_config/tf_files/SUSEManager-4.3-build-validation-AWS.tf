@@ -169,7 +169,7 @@ module "server" {
   product_version            = "4.3-released"
   main_disk_size             = 20
   repository_disk_size       = 1500
-  database_disk_size         = 100
+  database_disk_size         = 0
   server_registration_code   = var.SERVER_REGISTRATION_CODE
 
   java_debugging                 = false
@@ -188,6 +188,7 @@ module "server" {
   disable_download_tokens        = false
   disable_auto_bootstrap         = true
   large_deployment               = true
+  is_server_paygo_instance       = false
   ssh_key_path                   = "./salt/controller/id_rsa.pub"
   provider_settings = {
     instance_type = "m6a.xlarge"
