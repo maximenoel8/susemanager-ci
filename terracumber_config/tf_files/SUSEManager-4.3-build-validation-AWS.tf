@@ -240,6 +240,7 @@ module "sles12sp5-client" {
   provider_settings = {
     instance_type = "t3a.medium"
   }
+  additional_packages = [ "chrony" ]
 }
 
 module "sles15sp2-client" {
@@ -379,6 +380,7 @@ module "sles12sp5-minion" {
   provider_settings = {
     instance_type = "t3a.medium"
   }
+  additional_packages = [ "chrony" ]
 }
 
 module "sles15sp2-minion" {
