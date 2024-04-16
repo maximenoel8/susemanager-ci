@@ -194,7 +194,6 @@ module "server" {
   provider_settings = {
     instance_type = "m6a.xlarge"
   }
-  //server_additional_repos
 
 }
 
@@ -219,7 +218,9 @@ module "proxy" {
   ssh_key_path              = "./salt/controller/id_rsa.pub"
   additional_packages       = [ "venv-salt-minion" ]
   install_salt_bundle       = true
-
+  provider_settings = {
+    instance_type = "c6i.large"
+  }
 }
 
 module "suse-minion" {
@@ -227,7 +228,7 @@ module "suse-minion" {
   base_configuration      = module.base.configuration
   product_version         = "4.3-released"
   name                    = "min-sles15"
-  image                   = "sles15sp4o"
+  image                   = "sles15sp5o"
   server_configuration    = module.server.configuration
   sles_registration_code  = var.SLES_REGISTRATION_CODE
   auto_connect_to_master  = false
@@ -246,8 +247,7 @@ module "controller" {
   base_configuration = module.base.configuration
   name               = "ctl"
   provider_settings = {
-    memory             = 16384
-    vcpu               = 8
+    instance_type = "c6i.xlarge"
   }
   swap_file_size = null
   no_mirror = true
