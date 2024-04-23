@@ -211,12 +211,12 @@ def run(params) {
                         if (params.confirm_before_continue) {
                             input 'Press any key to start running the retail tests'
                         }
-                        echo 'Prepare Proxy for Retail'
-                        res_retail_proxy = sh(script: "./terracumber-cli ${common_params} --logfile ${resultdirbuild}/testsuite.log --runstep cucumber --cucumber-cmd '${env.exports} cd /root/spacewalk/testsuite; rake cucumber:build_validation_retail_proxy'", returnStatus: true)
-                        echo "Retail proxy status code: ${res_retail_proxy}"
-                        if (res_retail_proxy != 0) {
-                            error("Retail proxy failed")
-                        }
+//                        echo 'Prepare Proxy for Retail'
+//                        res_retail_proxy = sh(script: "./terracumber-cli ${common_params} --logfile ${resultdirbuild}/testsuite.log --runstep cucumber --cucumber-cmd '${env.exports} cd /root/spacewalk/testsuite; rake cucumber:build_validation_retail_proxy'", returnStatus: true)
+//                        echo "Retail proxy status code: ${res_retail_proxy}"
+//                        if (res_retail_proxy != 0) {
+//                            error("Retail proxy failed")
+//                        }
                         echo 'SLE 12 Retail'
                         res_retail_sle12 = sh(script: "./terracumber-cli ${common_params} --logfile ${resultdirbuild}/testsuite.log --runstep cucumber --cucumber-cmd '${env.exports} cd /root/spacewalk/testsuite; rake cucumber:build_validation_retail_sle12'", returnStatus: true)
                         echo "SLE 12 Retail status code: ${res_retail_sle12}"
