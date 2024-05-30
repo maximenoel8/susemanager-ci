@@ -1215,7 +1215,7 @@ module "slmicro60-minion" {
   source             = "./modules/minion"
   base_configuration = module.base_new_sle.configuration
   product_version    = "4.3-released"
-  name               = "min-slmicro60"
+  name               = "min-slemicro60"
   image              = "slmicro60o"
   provider_settings = {
     mac                = "aa:b2:92:42:00:cb"
