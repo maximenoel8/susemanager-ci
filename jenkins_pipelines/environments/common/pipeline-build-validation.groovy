@@ -353,6 +353,10 @@ def clientTestingStages() {
             // Generate a temporary list that comprises of all the minions except the one currently undergoing testing.
             // This list is utilized to establish an SSH session exclusively with the minion undergoing testing.
             def temporaryList = nodesHandler.envVariableList.toList() - node.replaceAll('sles', 'sle').toUpperCase()
+            // WORKAROUND: nodeTag replace should be remove once those issues are done:
+            // - https://github.com/SUSE/spacewalk/issues/25591
+            // - https://github.com/SUSE/spacewalk/issues/25592
+            // - https://github.com/SUSE/spacewalk/issues/25594
             def nodeTag = node.replace('sles1','sle1')
             stage("${node}") {
                 echo "Testing ${node}"
@@ -554,7 +558,11 @@ def clientMigrationStages() {
     String[] migration_features = features_list.split("\n").findAll { it.contains("_migration.feature") }
     // create a stage for each migration feature
     migration_features.each{ feature ->
-        def minion = feature.replace("_migration.feature", "")
+        // WORKAROUND: ssh_minion replace should be remove once those issues are done:
+        // - https://github.com/SUSE/spacewalk/issues/25591
+        // - https://github.com/SUSE/spacewalk/issues/25592
+        // - https://github.com/SUSE/spacewalk/issues/25594
+        def minion = feature.replace("_migration.feature", "").replace("ssh_minion","sshminion")
 
         migration_tests["${minion}"] = {
             if (params.confirm_before_continue) {
