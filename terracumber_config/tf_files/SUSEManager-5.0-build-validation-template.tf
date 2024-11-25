@@ -17,7 +17,7 @@ terraform {
 }
 
 provider "libvirt" {
-  uri = "qemu+tcp://suma-06.mgr.suse.de/system"
+  uri = "qemu+tcp://${var.ENVIRONMENT_CONFIGURATION[var.ENVIRONMENT].hypervisor}/system"
 }
 
 provider "libvirt" {
@@ -1046,7 +1046,7 @@ module "dhcp_dns" {
     module.sles15sp4_terminal.configuration
   ]
   hypervisor = {
-    host        = "suma-06.mgr.suse.de"
+    host        = ${var.ENVIRONMENT_CONFIGURATION[var.ENVIRONMENT].hypervisor}
     user        = "root"
     private_key = file("~/.ssh/id_rsa")
   }

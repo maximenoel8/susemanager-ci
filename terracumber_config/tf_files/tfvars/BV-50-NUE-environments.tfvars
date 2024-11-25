@@ -6,7 +6,7 @@ DOWNLOAD_ENDPOINT = "minima-mirror-ci-bv.mgr.suse.de"
 USE_MIRROR_IMAGES = false
 GIT_PROFILES_REPO = "https://github.com/uyuni-project/uyuni.git#:testsuite/features/profiles/internal_nue"
 ENVIRONMENT_CONFIGURATION = {
-  "suma-bv-50-" = {
+  "release" = {
     mac = {
       controller     = "aa:b2:93:01:03:50"
       server         = "aa:b2:93:01:03:51"
@@ -22,8 +22,9 @@ ENVIRONMENT_CONFIGURATION = {
     additional_network = "192.168.111.0/24"
     pool = "ssd"
     bridge = "br0"
+    prefix = "suma-bv-50-"
   },
-  "suma-bv-weekly-50-" = {
+  "weekly" = {
     mac = {
       controller     = "aa:b2:93:01:03:5c"
       server         = "aa:b2:93:01:03:5d"
@@ -35,9 +36,10 @@ ENVIRONMENT_CONFIGURATION = {
       build-host     = "aa:b2:93:01:03:65"
       kvm-host       = "aa:b2:93:01:03:66"
     }
-    hypervisor = "suma-08.mgr.suse.de"
-    additional_network = "192.168.112.0/24"
-    pool = "ssd"
-    bridge = "br0"
+    hypervisor          = "suma-08.mgr.suse.de"
+    additional_network  = "192.168.112.0/24"
+    pool                = "ssd"
+    bridge              = "br0"
+    prefix              = "suma-bv-weekly-50-"
   }
 }
