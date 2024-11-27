@@ -22,6 +22,11 @@ def run(params) {
         tfvars_platform_localisation = "susemanager-ci/terracumber_config/tf_files/tfvars/PR-testing-${platform_localisation}-environments.tfvars"
         tf_local_variables = 'susemanager-ci/terracumber_config/tf_files/tfvars/PR-testing-additionnal-repos.tf'
         try {
+            stage('Checkout pipeline') {
+                dir("susemanager-ci") {
+                    checkout scm
+                }
+            }
             stage('Get environment') {
                   echo "DEBUG: first environment: ${first_env}"
                   echo "DEBUG: last environment: ${last_env}"
@@ -31,7 +36,7 @@ def run(params) {
                   }
                   if(params.remove_previous_environment) {
                     if(email_to!='' && pull_request_number!='') {
-                        sh "bash ${WORKSPACE}/jenkins_pipelines/scripts/cleanup-lock.sh -u ${email_to} -p ${pull_request_number} -x ${short_product_name}"
+                        sh "bash ${WORKSPACE}/susemanager-ci/jenkins_pipelines/scripts/cleanup-lock.sh -u ${email_to} -p ${pull_request_number} -x ${short_product_name}"
                     }
                   }
                   running_same_pr = sh(script: "lockfile -001 -r1 -! ${env.suma_pr_lockfile} 2>/dev/null && echo 'yes' || echo 'no'", returnStdout: true).trim()
