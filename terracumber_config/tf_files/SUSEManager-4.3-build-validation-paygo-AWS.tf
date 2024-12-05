@@ -135,6 +135,7 @@ provider "aws" {
 module "base" {
   source = "./modules/base"
 
+  product_version          = "4.3-released"
   name_prefix              = var.NAME_PREFIX
   mirror                   = var.MIRROR
   testsuite                = true
@@ -167,7 +168,7 @@ module "server" {
       mirror = null
     })
   name                       = "server"
-  product_version            = "paygo"
+  product_version            = "4.3-paygo"
   image                      = "suma-server-43-ltd-paygo"
   main_disk_size             = 200
   repository_disk_size       = 1500
@@ -200,10 +201,9 @@ module "proxy" {
   source                    = "./modules/proxy"
   base_configuration        = module.base.configuration
   server_configuration      = module.server.configuration
-  product_version           = "4.3-released"
   name                      = "proxy"
   proxy_registration_code   = var.PROXY_REGISTRATION_CODE
-  image = "suma-proxy-43-byos"
+  image                     = "suma-proxy-43-byos"
 
 
   auto_register             = false
@@ -225,8 +225,8 @@ module "proxy" {
 module "sles12sp5_paygo_minion" {
   source             = "./modules/minion"
   base_configuration = module.base.configuration
-  product_version    = "paygo"
-  name               = "min-sles12sp5-paygo"
+  product_version    = "4.3-paygo"
+  name               = "sles12sp5-paygo-minion"
   image              = "sles12sp5-paygo"
   provider_settings = {
     instance_type = "t3a.medium"
@@ -241,26 +241,26 @@ module "sles12sp5_paygo_minion" {
 module "sles15sp5_paygo_minion" {
   source             = "./modules/minion"
   base_configuration = module.base.configuration
-  product_version    = "paygo"
-  name               = "min-sles15sp5-paygo"
+  product_version    = "4.3-paygo"
+  name               = "sles15sp5-paygo-minion"
   image              = "sles15sp5-paygo"
   provider_settings = {
     instance_type = "t3a.medium"
   }
-  server_configuration = module.server.configuration
+  server_configuration    = module.server.configuration
   auto_connect_to_master  = false
   use_os_released_updates = false
   ssh_key_path            = "./salt/controller/id_rsa.pub"
-  additional_packages = [ "python-instance-billing-flavor-check" ]
+  additional_packages     = [ "python-instance-billing-flavor-check" ]
 }
 
 module "sles15sp6_paygo_minion" {
-  source             = "./modules/minion"
-  base_configuration = module.base.configuration
-  product_version    = "paygo"
-  name               = "min-sles15sp6-paygo"
-  image              = "sles15sp6-paygo"
-  provider_settings = {
+  source              = "./modules/minion"
+  base_configuration  = module.base.configuration
+  product_version     = "4.3-paygo"
+  name                = "sles15sp6-paygo-minion"
+  image               = "sles15sp6-paygo"
+  provider_settings   = {
     instance_type = "t3a.medium"
   }
   server_configuration = module.server.configuration
@@ -273,8 +273,8 @@ module "sles15sp6_paygo_minion" {
 module "slesforsap15sp5_paygo_minion" {
   source             = "./modules/minion"
   base_configuration = module.base.configuration
-  product_version    = "paygo"
-  name               = "min-slesforsap15sp5-paygo"
+  product_version    = "4.3-paygo"
+  name               = "slesforsap15sp5-paygo-minion"
   image              = "slesforsap15sp5-paygo"
   provider_settings = {
     instance_type = "t3.large"
@@ -288,101 +288,95 @@ module "slesforsap15sp5_paygo_minion" {
 
 
 module "sles12sp5_client" {
-  source             = "./modules/client"
-  base_configuration = module.base.configuration
-  product_version    = "4.3-released"
-  name               = "cli-sles12sp5"
-  image              = "sles12sp5"
-  server_configuration = module.server.configuration
-  sles_registration_code = var.SLES_REGISTRATION_CODE
+  source                  = "./modules/client"
+  base_configuration      = module.base.configuration
+  name                    = "sles12sp5-client"
+  image                   = "sles12sp5"
+  server_configuration    = module.server.configuration
+  sles_registration_code  = var.SLES_REGISTRATION_CODE
   auto_register           = false
   use_os_released_updates = false
   ssh_key_path            = "./salt/controller/id_rsa.pub"
-  provider_settings = {
+  provider_settings       = {
     instance_type = "t3a.medium"
   }
-  additional_packages = [ "chrony" ]
+  additional_packages     = [ "chrony" ]
 
 }
 
 module "sles15sp4_client" {
 
-  source             = "./modules/client"
-  base_configuration = module.base.configuration
-  name                 = "cli-sles15sp4"
-  image                = "sles15sp4o"
-  product_version    = "4.3-released"
-  server_configuration = module.server.configuration
-  sles_registration_code = var.SLES_REGISTRATION_CODE
+  source                  = "./modules/client"
+  base_configuration      = module.base.configuration
+  name                    = "sles15sp4-client"
+  image                   = "sles15sp4o"
+  server_configuration    = module.server.configuration
+  sles_registration_code  = var.SLES_REGISTRATION_CODE
   auto_register           = false
   use_os_released_updates = false
   ssh_key_path            = "./salt/controller/id_rsa.pub"
-  provider_settings = {
+  provider_settings       = {
     instance_type = "t3a.medium"
   }
 
 }
 
 module "sles12sp5_minion" {
-  source             = "./modules/minion"
-  base_configuration = module.base.configuration
-  product_version    = "4.3-released"
-  name               = "min-sles12sp5"
-  image              = "sles12sp5"
-  server_configuration = module.server.configuration
-  sles_registration_code = var.SLES_REGISTRATION_CODE
+  source                  = "./modules/minion"
+  base_configuration      = module.base.configuration
+  name                    = "sles12sp5-minion"
+  image                   = "sles12sp5"
+  server_configuration    = module.server.configuration
+  sles_registration_code  = var.SLES_REGISTRATION_CODE
   auto_connect_to_master  = false
   use_os_released_updates = false
   ssh_key_path            = "./salt/controller/id_rsa.pub"
-  provider_settings = {
+  provider_settings       = {
     instance_type = "t3a.medium"
   }
-  additional_packages = [ "chrony" ]
+  additional_packages     = [ "chrony" ]
 
 }
 
 module "sles15sp4_byos_minion" {
-  source             = "./modules/minion"
-  base_configuration = module.base.configuration
-  product_version    = "4.3-released"
-  name               = "min-sles15sp4-byos"
-  image              = "sles15sp4o"
-  server_configuration = module.server.configuration
-  sles_registration_code = var.SLES_REGISTRATION_CODE
+  source                  = "./modules/minion"
+  base_configuration      = module.base.configuration
+  name                    = "sles15sp4-byos-minion"
+  image                   = "sles15sp4o"
+  server_configuration    = module.server.configuration
+  sles_registration_code  = var.SLES_REGISTRATION_CODE
   auto_connect_to_master  = false
   use_os_released_updates = false
   ssh_key_path            = "./salt/controller/id_rsa.pub"
-  provider_settings = {
+  provider_settings       = {
     instance_type = "t3a.medium"
   }
 
 }
 
 module "sles15sp4_minion" {
-  source             = "./modules/minion"
-  base_configuration = module.base.configuration
-  product_version    = "4.3-released"
-  name               = "min-sles15sp4"
-  image              = "sles15sp4o"
-  server_configuration = module.server.configuration
-  sles_registration_code = var.SLES_REGISTRATION_CODE
+  source                  = "./modules/minion"
+  base_configuration      = module.base.configuration
+  name                    = "sles15sp4-minion"
+  image                   = "sles15sp4o"
+  server_configuration    = module.server.configuration
+  sles_registration_code  = var.SLES_REGISTRATION_CODE
   auto_connect_to_master  = false
   use_os_released_updates = false
   ssh_key_path            = "./salt/controller/id_rsa.pub"
-  provider_settings = {
+  provider_settings       = {
     instance_type = "t3a.medium"
   }
 
 }
 
 module "sles15sp5_minion" {
-  source             = "./modules/minion"
-  base_configuration = module.base.configuration
-  product_version    = "4.3-released"
-  name               = "min-sles15sp5"
-  image              = "sles15sp5o"
-  server_configuration = module.server.configuration
-  sles_registration_code = var.SLES_REGISTRATION_CODE
+  source                  = "./modules/minion"
+  base_configuration      = module.base.configuration
+  name                    = "sles15sp5-minion"
+  image                   = "sles15sp5o"
+  server_configuration    = module.server.configuration
+  sles_registration_code  = var.SLES_REGISTRATION_CODE
   auto_connect_to_master  = false
   use_os_released_updates = false
   ssh_key_path            = "./salt/controller/id_rsa.pub"
@@ -393,87 +387,82 @@ module "sles15sp5_minion" {
 }
 
 module "sles15sp6_minion" {
-  source             = "./modules/minion"
-  base_configuration = module.base.configuration
-  product_version    = "4.3-released"
-  name               = "min-sles15sp6"
-  image              = "sles15sp6o"
-  server_configuration = module.server.configuration
-  sles_registration_code = var.SLES_REGISTRATION_CODE
+  source                  = "./modules/minion"
+  base_configuration      = module.base.configuration
+  name                    = "sles15sp6-minion"
+  image                   = "sles15sp6o"
+  server_configuration    = module.server.configuration
+  sles_registration_code  = var.SLES_REGISTRATION_CODE
   auto_connect_to_master  = false
   use_os_released_updates = false
   ssh_key_path            = "./salt/controller/id_rsa.pub"
-  provider_settings = {
+  provider_settings       = {
     instance_type = "t3a.medium"
   }
 
 }
 
 module "sles12sp5_sshminion" {
-  source             = "./modules/sshminion"
-  base_configuration = module.base.configuration
-  product_version    = "4.3-released"
-  name               = "minssh-sles12sp5"
-  image              = "sles12sp5"
+  source                  = "./modules/sshminion"
+  base_configuration      = module.base.configuration
+  name                    = "sles12sp5-sshminion"
+  image                   = "sles12sp5"
   use_os_released_updates = false
-  sles_registration_code = var.SLES_REGISTRATION_CODE
+  sles_registration_code  = var.SLES_REGISTRATION_CODE
   ssh_key_path            = "./salt/controller/id_rsa.pub"
   gpg_keys                = ["default/gpg_keys/galaxy.key"]
-  provider_settings = {
+  provider_settings       = {
     instance_type = "t3a.medium"
   }
-  additional_packages = [ "chrony" ]
+  additional_packages     = [ "chrony" ]
 }
 
 module "sles15sp4_sshminion" {
-  source             = "./modules/sshminion"
-  base_configuration = module.base.configuration
-  product_version    = "4.3-released"
-  name               = "minssh-sles15sp4"
-  image              = "sles15sp4o"
-  sles_registration_code = var.SLES_REGISTRATION_CODE
+  source                  = "./modules/sshminion"
+  base_configuration      = module.base.configuration
+  name                    = "sles15sp4-sshminion"
+  image                   = "sles15sp4o"
+  sles_registration_code  = var.SLES_REGISTRATION_CODE
   use_os_released_updates = false
   ssh_key_path            = "./salt/controller/id_rsa.pub"
-  provider_settings = {
+  provider_settings       = {
     instance_type = "t3a.medium"
   }
 }
 
 
 module "sles15sp5_sshminion" {
-  source             = "./modules/sshminion"
-  base_configuration = module.base.configuration
-  product_version    = "4.3-released"
-  name               = "minssh-sles15sp5"
-  image              = "sles15sp5o"
-  sles_registration_code = var.SLES_REGISTRATION_CODE
+  source                  = "./modules/sshminion"
+  base_configuration      = module.base.configuration
+  name                    = "sles15sp5-sshminion"
+  image                   = "sles15sp5o"
+  sles_registration_code  = var.SLES_REGISTRATION_CODE
   use_os_released_updates = false
   ssh_key_path            = "./salt/controller/id_rsa.pub"
-  provider_settings = {
+  provider_settings       = {
     instance_type = "t3a.medium"
   }
 
 }
 
 module "sles15sp6_sshminion" {
-  source             = "./modules/sshminion"
-  base_configuration = module.base.configuration
-  product_version    = "4.3-released"
-  name               = "minssh-sles15sp6"
-  image              = "sles15sp6o"
-  sles_registration_code = var.SLES_REGISTRATION_CODE
+  source                  = "./modules/sshminion"
+  base_configuration      = module.base.configuration
+  name                    = "sles15sp6-minion"
+  image                   = "sles15sp6o"
+  sles_registration_code  = var.SLES_REGISTRATION_CODE
   use_os_released_updates = false
   ssh_key_path            = "./salt/controller/id_rsa.pub"
-  provider_settings = {
+  provider_settings       = {
     instance_type = "t3a.medium"
   }
 
 }
 
 module "controller" {
-  source             = "./modules/controller"
-  name               = "ctl"
-  provider_settings = {
+  source              = "./modules/controller"
+  name                = "controller"
+  provider_settings   = {
     instance_type = "c6i.xlarge"
   }
   base_configuration = merge(module.base.configuration,
@@ -482,39 +471,38 @@ module "controller" {
       cc_password = var.SCC_PASSWORD
     })
 
-  product_version    = "4.3-released"
-  swap_file_size = null
-  no_mirror = true
+  swap_file_size            = null
+  no_mirror                 = true
   is_using_build_image      = false
   is_using_scc_repositories = false
   is_using_paygo_server     = true
   // Cucumber repository configuration for the controller
-  git_username = var.GIT_USER
-  git_password = var.GIT_PASSWORD
-  git_repo     = var.CUCUMBER_GITREPO
-  branch       = var.CUCUMBER_BRANCH
-  server_instance_id  =  module.server.configuration.id
+  git_username              = var.GIT_USER
+  git_password              = var.GIT_PASSWORD
+  git_repo                  = var.CUCUMBER_GITREPO
+  branch                    = var.CUCUMBER_BRANCH
+  server_instance_id        = module.server.configuration.id
 
 
-  server_configuration    = module.server.configuration
-  proxy_configuration     = module.proxy.configuration
+  server_configuration                      = module.server.configuration
+  proxy_configuration                       = module.proxy.configuration
 
   sle12sp5_paygo_minion_configuration       = module.sles12sp5_paygo_minion.configuration
-  sle15sp4_byos_minion_configuration       = module.sles15sp4_byos_minion.configuration
+  sle15sp4_byos_minion_configuration        = module.sles15sp4_byos_minion.configuration
   sle15sp5_paygo_minion_configuration       = module.sles15sp5_paygo_minion.configuration
   sle15sp6_paygo_minion_configuration       = module.sles15sp6_paygo_minion.configuration
   sleforsap15sp5_paygo_minion_configuration = module.slesforsap15sp5_paygo_minion.configuration
 
-  sle12sp5_client_configuration    = module.sles12sp5_client.configuration
-  sle12sp5_minion_configuration    = module.sles12sp5_minion.configuration
-  sle12sp5_sshminion_configuration = module.sles12sp5_sshminion.configuration
+  sle12sp5_client_configuration             = module.sles12sp5_client.configuration
+  sle12sp5_minion_configuration             = module.sles12sp5_minion.configuration
+  sle12sp5_sshminion_configuration          = module.sles12sp5_sshminion.configuration
 
-  sle15sp4_client_configuration    = module.sles15sp4_client.configuration
-  sle15sp4_minion_configuration    = module.sles15sp4_minion.configuration
-  sle15sp4_sshminion_configuration = module.sles15sp4_sshminion.configuration
+  sle15sp4_client_configuration             = module.sles15sp4_client.configuration
+  sle15sp4_minion_configuration             = module.sles15sp4_minion.configuration
+  sle15sp4_sshminion_configuration          = module.sles15sp4_sshminion.configuration
 
-  sle15sp5_minion_configuration    = module.sles15sp5_minion.configuration
-  sle15sp6_minion_configuration    = module.sles15sp6_minion.configuration
+  sle15sp5_minion_configuration             = module.sles15sp5_minion.configuration
+  sle15sp6_minion_configuration             = module.sles15sp6_minion.configuration
 }
 
 output "bastion_public_name" {
