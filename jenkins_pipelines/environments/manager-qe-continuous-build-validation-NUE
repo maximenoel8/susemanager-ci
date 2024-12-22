@@ -24,7 +24,7 @@ node('sumaform-cucumber') {
         disableConcurrentBuilds(),
         parameters([
             string(name: 'cucumber_gitrepo', defaultValue: 'https://github.com/uyuni-project/uyuni.git', description: 'Testsuite Git Repository'),
-            string(name: 'cucumber_ref', defaultValue: 'manager', description: 'Branch prepared for the MU tested'),
+            string(name: 'cucumber_ref', defaultValue: 'master', description: 'Branch prepared for the MU tested'),
             string(name: 'tf_file', defaultValue: 'susemanager-ci/terracumber_config/tf_files/SUSEManager-continuous-build-validation-NUE.tf', description: 'Path to the tf file to be used'),
             string(name: 'sumaform_gitrepo', defaultValue: 'https://github.com/uyuni-project/sumaform.git', description: 'Sumaform Git Repository'),
             string(name: 'sumaform_ref', defaultValue: 'master', description: 'Sumaform Git reference (branch, tag...)'),
@@ -35,7 +35,7 @@ node('sumaform-cucumber') {
             // Temporary: should move to uyuni-project
             string(name: 'terracumber_gitrepo', defaultValue: 'https://github.com/uyuni-project/terracumber.git', description: 'Terracumber Git Repository'),
             string(name: 'terracumber_ref', defaultValue: 'master', description: 'Terracumber Git ref (branch, tag...)'),
-            string(name: 'product_version', defaultValue: 'head', description: 'Server product version'),
+            choice(name: 'product_version', choices: ['head', '5.0-released'], description: 'Server product version'),
             extendedChoice(name: 'minions_to_run',  multiSelectDelimiter: ', ', quoteValue: false, saveJSONParameterToFile: false, type: 'PT_CHECKBOX', visibleItemCount: 15,
                     value: minionList,
                     defaultValue: minionList,
