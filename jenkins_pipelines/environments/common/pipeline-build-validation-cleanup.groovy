@@ -220,7 +220,7 @@ def run(params) {
                     archiveArtifacts artifacts: "results/sumaform/terraform.tfstate"
                     // Delete the old tfstate file after archiving
                     sh "rm -f ${localTfStateFile}"
-                    sh "rm -rf ${localSumaformDirPath}main.tf ${localSumaformDirPath}./terraform"
+//                    sh "rm -rf ${localSumaformDirPath}main.tf ${localSumaformDirPath}./terraform"
                 }
             }
         }
