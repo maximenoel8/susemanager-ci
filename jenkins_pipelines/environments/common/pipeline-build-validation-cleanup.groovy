@@ -179,14 +179,14 @@ def run(params) {
                 """
             }
 
-            stage('Redeploy the environment with new client VMs') {
-                // Run Terracumber to deploy the environment
-                sh """
-                    ${environmentVars}
-                    set +x
-                    ${WORKSPACE}/terracumber-cli ${commonParams} --logfile ${resultdirbuild}/sumaform.log --init --sumaform-backend ${sumaform_backend} --runstep provision
-                """
-            }
+//            stage('Redeploy the environment with new client VMs') {
+//                // Run Terracumber to deploy the environment
+//                sh """
+//                    ${environmentVars}
+//                    set +x
+//                    ${WORKSPACE}/terracumber-cli ${commonParams} --logfile ${resultdirbuild}/sumaform.log --init --sumaform-backend ${sumaform_backend} --runstep provision
+//                """
+//            }
 
             stage('Sanity check') {
                 sh "${WORKSPACE}/terracumber-cli ${commonParams} --logfile ${resultdirbuild}/testsuite.log --runstep cucumber --cucumber-cmd 'cd /root/spacewalk/testsuite; ${exports} rake cucumber:build_validation_sanity_check'"
