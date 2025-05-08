@@ -114,21 +114,21 @@ def run(params) {
             stage('Delete the systems') {
                 sh(script: "${programCall} delete_systems")
             }
-            stage('Delete config projects') {
-                sh(script: "${programCall} delete_config_projects")
-            }
-            stage('Delete software channels') {
-                sh(script: "${programCall} delete_software_channels")
-            }
-            stage('Delete activation keys') {
-                sh(script: "${programCall} delete_activation_keys")
-            }
+//            stage('Delete config projects') {
+//                sh(script: "${programCall} delete_config_projects")
+//            }
+//            stage('Delete software channels') {
+//                sh(script: "${programCall} delete_software_channels")
+//            }
+//            stage('Delete activation keys') {
+//                sh(script: "${programCall} delete_activation_keys")
+//            }
             stage('Delete minion users') {
                 sh(script: "${programCall} delete_users")
             }
-            stage('Delete channel repositories') {
-                sh(script: "${programCall} delete_repositories")
-            }
+//            stage('Delete channel repositories') {
+//                sh(script: "${programCall} delete_repositories")
+//            }
             stage('Delete salt keys') {
                 sh(script: "${programCall} delete_salt_keys")
             }
