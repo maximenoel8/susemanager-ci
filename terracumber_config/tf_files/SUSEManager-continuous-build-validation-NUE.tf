@@ -184,63 +184,63 @@ module "base_s390" {
   testsuite         = true
 }
 
-# module "server_containerized" {
-#   source             = "./modules/server_containerized"
-#   base_configuration = module.base_core.configuration
-#   name               = "server"
-#   beta_enabled       = false
-#   provider_settings = {
-#     mac                = "aa:b2:93:01:02:81"
-#     memory             = 40960
-#     vcpu               = 10
-#     data_pool          = "ssd"
-#   }
-#   runtime = "podman"
-#   container_repository  = var.SERVER_CONTAINER_REPOSITORY
-#   container_image       = var.SERVER_CONTAINER_IMAGE
-#   main_disk_size        = 100
-#   repository_disk_size  = 3072
-#   database_disk_size    = 150
-#   container_tag         = "latest"
-#
-#   server_mounted_mirror          = "minima-mirror-ci-bv.mgr.suse.de"
-#   java_debugging                 = false
-#   auto_accept                    = false
-#   disable_firewall               = false
-#   allow_postgres_connections     = false
-#   skip_changelog_import          = false
-#   mgr_sync_autologin             = false
-#   create_sample_channel          = false
-#   create_sample_activation_key   = false
-#   create_sample_bootstrap_script = false
-#   publish_private_ssl_key        = false
-#   use_os_released_updates        = true
-#   disable_download_tokens        = false
-#   large_deployment               = true
-#   ssh_key_path                   = "./salt/controller/id_ed25519.pub"
-#   from_email                     = "root@suse.de"
-#
-#   //server_additional_repos
-#
-# }
-#
-# module "proxy_containerized" {
-#   source             = "./modules/proxy_containerized"
-#   base_configuration = module.base_core.configuration
-#   name               = "proxy"
-#   provider_settings = {
-#     mac                = "aa:b2:93:01:02:82"
-#     memory             = 4096
-#   }
-#   runtime                   = "podman"
-#   container_repository      = var.PROXY_CONTAINER_REPOSITORY
-#   container_tag             = "latest"
-#   auto_configure            = false
-#   ssh_key_path              = "./salt/controller/id_ed25519.pub"
-#
-#   //proxy_additional_repos
-#
-# }
+module "server_containerized" {
+  source             = "./modules/server_containerized"
+  base_configuration = module.base_core.configuration
+  name               = "server"
+  beta_enabled       = false
+  provider_settings = {
+    mac                = "aa:b2:93:01:02:81"
+    memory             = 40960
+    vcpu               = 10
+    data_pool          = "ssd"
+  }
+  runtime = "podman"
+  container_repository  = var.SERVER_CONTAINER_REPOSITORY
+  container_image       = var.SERVER_CONTAINER_IMAGE
+  main_disk_size        = 100
+  repository_disk_size  = 3072
+  database_disk_size    = 150
+  container_tag         = "latest"
+
+  server_mounted_mirror          = "minima-mirror-ci-bv.mgr.suse.de"
+  java_debugging                 = false
+  auto_accept                    = false
+  disable_firewall               = false
+  allow_postgres_connections     = false
+  skip_changelog_import          = false
+  mgr_sync_autologin             = false
+  create_sample_channel          = false
+  create_sample_activation_key   = false
+  create_sample_bootstrap_script = false
+  publish_private_ssl_key        = false
+  use_os_released_updates        = true
+  disable_download_tokens        = false
+  large_deployment               = true
+  ssh_key_path                   = "./salt/controller/id_ed25519.pub"
+  from_email                     = "root@suse.de"
+
+  //server_additional_repos
+
+}
+
+module "proxy_containerized" {
+  source             = "./modules/proxy_containerized"
+  base_configuration = module.base_core.configuration
+  name               = "proxy"
+  provider_settings = {
+    mac                = "aa:b2:93:01:02:82"
+    memory             = 4096
+  }
+  runtime                   = "podman"
+  container_repository      = var.PROXY_CONTAINER_REPOSITORY
+  container_tag             = "latest"
+  auto_configure            = false
+  ssh_key_path              = "./salt/controller/id_ed25519.pub"
+
+  //proxy_additional_repos
+
+}
 
 module "sles12sp5_minion" {
   source             = "./modules/minion"
