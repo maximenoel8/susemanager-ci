@@ -1150,6 +1150,7 @@ module "controller" {
   branch       = var.CUCUMBER_BRANCH
 
   # server_configuration = module.server_containerized.configuration
+  server_configuration = module.sles12sp5_minion.configuration
   #
   # proxy_configuration  = module.proxy_containerized.configuration
 
