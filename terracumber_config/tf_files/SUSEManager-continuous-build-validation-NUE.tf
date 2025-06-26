@@ -1131,126 +1131,125 @@ module "monitoring_server" {
   ssh_key_path            = "./salt/controller/id_ed25519.pub"
 }
 
-module "controller" {
-  source             = "./modules/controller"
-  base_configuration = module.base_core.configuration
-  name               = "controller"
-  provider_settings = {
-    mac                = "aa:b2:93:01:02:80"
-    memory             = 16384
-    vcpu               = 8
-  }
-  swap_file_size = null
-  beta_enabled = false
-
-  // Cucumber repository configuration for the controller
-  git_username = var.GIT_USER
-  git_password = var.GIT_PASSWORD
-  git_repo     = var.CUCUMBER_GITREPO
-  branch       = var.CUCUMBER_BRANCH
-
-  # server_configuration = module.server_containerized.configuration
-  server_configuration = module.sles12sp5_minion.configuration
-  #
-  # proxy_configuration  = module.proxy_containerized.configuration
-
-  sle12sp5_minion_configuration    = module.sles12sp5_minion.configuration
-  sle12sp5_sshminion_configuration = module.sles12sp5_sshminion.configuration
-
-  sle15sp3_minion_configuration    = module.sles15sp3_minion.configuration
-  sle15sp3_sshminion_configuration = module.sles15sp3_sshminion.configuration
-
-  sle15sp4_minion_configuration    = module.sles15sp4_minion.configuration
-  sle15sp4_sshminion_configuration = module.sles15sp4_sshminion.configuration
-
-  sle15sp5_minion_configuration    = module.sles15sp5_minion.configuration
-  sle15sp5_sshminion_configuration = module.sles15sp5_sshminion.configuration
-
-  sle15sp6_minion_configuration    = module.sles15sp6_minion.configuration
-  sle15sp6_sshminion_configuration = module.sles15sp6_sshminion.configuration
-
-  sle15sp7_minion_configuration    = module.sles15sp7_minion.configuration
-  sle15sp7_sshminion_configuration = module.sles15sp7_sshminion.configuration
-
-  alma8_minion_configuration    = module.alma8_minion.configuration
-  alma8_sshminion_configuration = module.alma8_sshminion.configuration
-
-  alma9_minion_configuration    = module.alma9_minion.configuration
-  alma9_sshminion_configuration = module.alma9_sshminion.configuration
-
-  amazon2023_minion_configuration    = module.amazon2023_minion.configuration
-  amazon2023_sshminion_configuration = module.amazon2023_sshminion.configuration
-
-  centos7_minion_configuration    = module.centos7_minion.configuration
-  centos7_sshminion_configuration = module.centos7_sshminion.configuration
-
-  liberty9_minion_configuration    = module.liberty9_minion.configuration
-  liberty9_sshminion_configuration = module.liberty9_sshminion.configuration
-
-  oracle9_minion_configuration    = module.oracle9_minion.configuration
-  oracle9_sshminion_configuration = module.oracle9_sshminion.configuration
-
-  // rhel9 is tested only in AWS for legal reasons
-
-  rocky8_minion_configuration    = module.rocky8_minion.configuration
-  rocky8_sshminion_configuration = module.rocky8_sshminion.configuration
-
-  rocky9_minion_configuration    = module.rocky9_minion.configuration
-  rocky9_sshminion_configuration = module.rocky9_sshminion.configuration
-
-  ubuntu2204_minion_configuration    = module.ubuntu2204_minion.configuration
-  ubuntu2204_sshminion_configuration = module.ubuntu2204_sshminion.configuration
-
-  ubuntu2404_minion_configuration    = module.ubuntu2404_minion.configuration
-  ubuntu2404_sshminion_configuration = module.ubuntu2404_sshminion.configuration
-
-  debian12_minion_configuration    = module.debian12_minion.configuration
-  debian12_sshminion_configuration = module.debian12_sshminion.configuration
-
-  opensuse156arm_minion_configuration    = module.opensuse156arm_minion.configuration
-  opensuse156arm_sshminion_configuration = module.opensuse156arm_sshminion.configuration
-
-  sle15sp5s390_minion_configuration    = module.sles15sp5s390_minion.configuration
-  sle15sp5s390_sshminion_configuration = module.sles15sp5s390_sshminion.configuration
-
-  salt_migration_minion_configuration = module.salt_migration_minion.configuration
-
-  slemicro51_minion_configuration    = module.slemicro51_minion.configuration
-//  WORKAROUND until https://bugzilla.suse.com/show_bug.cgi?id=1208045 gets fixed
-//  slemicro51_sshminion_configuration = module.slemicro51_sshminion.configuration
-
-  slemicro52_minion_configuration    = module.slemicro52_minion.configuration
-//  WORKAROUND until https://bugzilla.suse.com/show_bug.cgi?id=1208045 gets fixed
-//  slemicro52_sshminion_configuration = module.slemicro52_sshminion.configuration
-
-  slemicro53_minion_configuration    = module.slemicro53_minion.configuration
-//  WORKAROUND until https://bugzilla.suse.com/show_bug.cgi?id=1208045 gets fixed
-//  slemicro53_sshminion_configuration = module.slemicro53_sshminion.configuration
-
-  slemicro54_minion_configuration    = module.slemicro54_minion.configuration
-//  WORKAROUND until https://bugzilla.suse.com/show_bug.cgi?id=1208045 gets fixed
-//  slemicro54_sshminion_configuration = module.slemicro54_sshminion.configuration
-
-  slemicro55_minion_configuration    = module.slemicro55_minion.configuration
-//  WORKAROUND until https://bugzilla.suse.com/show_bug.cgi?id=1208045 gets fixed
-//  slemicro55_sshminion_configuration = module.slemicro55_sshminion.configuration
-
-  slmicro60_minion_configuration    = module.slmicro60_minion.configuration
-//  WORKAROUND until https://bugzilla.suse.com/show_bug.cgi?id=1208045 gets fixed
-//  slmicro60_sshminion_configuration = module.slmicro60_sshminion.configuration
-
-  slmicro61_minion_configuration    = module.slmicro61_minion.configuration
-//  WORKAROUND until https://bugzilla.suse.com/show_bug.cgi?id=1208045 gets fixed
-//  slmicro61_sshminion_configuration = module.slmicro61_sshminion.configuration
-
-  sle12sp5_buildhost_configuration = module.sles12sp5_buildhost.configuration
-  sle15sp4_buildhost_configuration = module.sles15sp4_buildhost.configuration
-
-  sle12sp5_terminal_configuration = module.sles12sp5_terminal.configuration
-  sle15sp4_terminal_configuration = module.sles15sp4_terminal.configuration
-
-  monitoringserver_configuration = module.monitoring_server.configuration
-}
+# module "controller" {
+#   source             = "./modules/controller"
+#   base_configuration = module.base_core.configuration
+#   name               = "controller"
+#   provider_settings = {
+#     mac                = "aa:b2:93:01:02:80"
+#     memory             = 16384
+#     vcpu               = 8
+#   }
+#   swap_file_size = null
+#   beta_enabled = false
+#
+#   // Cucumber repository configuration for the controller
+#   git_username = var.GIT_USER
+#   git_password = var.GIT_PASSWORD
+#   git_repo     = var.CUCUMBER_GITREPO
+#   branch       = var.CUCUMBER_BRANCH
+#
+#   server_configuration = module.server_containerized.configuration
+#
+#   proxy_configuration  = module.proxy_containerized.configuration
+#
+#   sle12sp5_minion_configuration    = module.sles12sp5_minion.configuration
+#   sle12sp5_sshminion_configuration = module.sles12sp5_sshminion.configuration
+#
+#   sle15sp3_minion_configuration    = module.sles15sp3_minion.configuration
+#   sle15sp3_sshminion_configuration = module.sles15sp3_sshminion.configuration
+#
+#   sle15sp4_minion_configuration    = module.sles15sp4_minion.configuration
+#   sle15sp4_sshminion_configuration = module.sles15sp4_sshminion.configuration
+#
+#   sle15sp5_minion_configuration    = module.sles15sp5_minion.configuration
+#   sle15sp5_sshminion_configuration = module.sles15sp5_sshminion.configuration
+#
+#   sle15sp6_minion_configuration    = module.sles15sp6_minion.configuration
+#   sle15sp6_sshminion_configuration = module.sles15sp6_sshminion.configuration
+#
+#   sle15sp7_minion_configuration    = module.sles15sp7_minion.configuration
+#   sle15sp7_sshminion_configuration = module.sles15sp7_sshminion.configuration
+#
+#   alma8_minion_configuration    = module.alma8_minion.configuration
+#   alma8_sshminion_configuration = module.alma8_sshminion.configuration
+#
+#   alma9_minion_configuration    = module.alma9_minion.configuration
+#   alma9_sshminion_configuration = module.alma9_sshminion.configuration
+#
+#   amazon2023_minion_configuration    = module.amazon2023_minion.configuration
+#   amazon2023_sshminion_configuration = module.amazon2023_sshminion.configuration
+#
+#   centos7_minion_configuration    = module.centos7_minion.configuration
+#   centos7_sshminion_configuration = module.centos7_sshminion.configuration
+#
+#   liberty9_minion_configuration    = module.liberty9_minion.configuration
+#   liberty9_sshminion_configuration = module.liberty9_sshminion.configuration
+#
+#   oracle9_minion_configuration    = module.oracle9_minion.configuration
+#   oracle9_sshminion_configuration = module.oracle9_sshminion.configuration
+#
+#   // rhel9 is tested only in AWS for legal reasons
+#
+#   rocky8_minion_configuration    = module.rocky8_minion.configuration
+#   rocky8_sshminion_configuration = module.rocky8_sshminion.configuration
+#
+#   rocky9_minion_configuration    = module.rocky9_minion.configuration
+#   rocky9_sshminion_configuration = module.rocky9_sshminion.configuration
+#
+#   ubuntu2204_minion_configuration    = module.ubuntu2204_minion.configuration
+#   ubuntu2204_sshminion_configuration = module.ubuntu2204_sshminion.configuration
+#
+#   ubuntu2404_minion_configuration    = module.ubuntu2404_minion.configuration
+#   ubuntu2404_sshminion_configuration = module.ubuntu2404_sshminion.configuration
+#
+#   debian12_minion_configuration    = module.debian12_minion.configuration
+#   debian12_sshminion_configuration = module.debian12_sshminion.configuration
+#
+#   opensuse156arm_minion_configuration    = module.opensuse156arm_minion.configuration
+#   opensuse156arm_sshminion_configuration = module.opensuse156arm_sshminion.configuration
+#
+#   sle15sp5s390_minion_configuration    = module.sles15sp5s390_minion.configuration
+#   sle15sp5s390_sshminion_configuration = module.sles15sp5s390_sshminion.configuration
+#
+#   salt_migration_minion_configuration = module.salt_migration_minion.configuration
+#
+#   slemicro51_minion_configuration    = module.slemicro51_minion.configuration
+# //  WORKAROUND until https://bugzilla.suse.com/show_bug.cgi?id=1208045 gets fixed
+# //  slemicro51_sshminion_configuration = module.slemicro51_sshminion.configuration
+#
+#   slemicro52_minion_configuration    = module.slemicro52_minion.configuration
+# //  WORKAROUND until https://bugzilla.suse.com/show_bug.cgi?id=1208045 gets fixed
+# //  slemicro52_sshminion_configuration = module.slemicro52_sshminion.configuration
+#
+#   slemicro53_minion_configuration    = module.slemicro53_minion.configuration
+# //  WORKAROUND until https://bugzilla.suse.com/show_bug.cgi?id=1208045 gets fixed
+# //  slemicro53_sshminion_configuration = module.slemicro53_sshminion.configuration
+#
+#   slemicro54_minion_configuration    = module.slemicro54_minion.configuration
+# //  WORKAROUND until https://bugzilla.suse.com/show_bug.cgi?id=1208045 gets fixed
+# //  slemicro54_sshminion_configuration = module.slemicro54_sshminion.configuration
+#
+#   slemicro55_minion_configuration    = module.slemicro55_minion.configuration
+# //  WORKAROUND until https://bugzilla.suse.com/show_bug.cgi?id=1208045 gets fixed
+# //  slemicro55_sshminion_configuration = module.slemicro55_sshminion.configuration
+#
+#   slmicro60_minion_configuration    = module.slmicro60_minion.configuration
+# //  WORKAROUND until https://bugzilla.suse.com/show_bug.cgi?id=1208045 gets fixed
+# //  slmicro60_sshminion_configuration = module.slmicro60_sshminion.configuration
+#
+#   slmicro61_minion_configuration    = module.slmicro61_minion.configuration
+# //  WORKAROUND until https://bugzilla.suse.com/show_bug.cgi?id=1208045 gets fixed
+# //  slmicro61_sshminion_configuration = module.slmicro61_sshminion.configuration
+#
+#   sle12sp5_buildhost_configuration = module.sles12sp5_buildhost.configuration
+#   sle15sp4_buildhost_configuration = module.sles15sp4_buildhost.configuration
+#
+#   sle12sp5_terminal_configuration = module.sles12sp5_terminal.configuration
+#   sle15sp4_terminal_configuration = module.sles15sp4_terminal.configuration
+#
+#   monitoringserver_configuration = module.monitoring_server.configuration
+# }
 
 output "configuration" {
   value = {
