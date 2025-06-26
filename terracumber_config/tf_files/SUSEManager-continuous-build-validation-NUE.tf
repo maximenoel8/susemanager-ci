@@ -1251,9 +1251,9 @@ module "monitoring_server" {
 #   monitoringserver_configuration = module.monitoring_server.configuration
 # }
 
-output "configuration" {
-  value = {
-    controller  = module.controller.configuration
-    # server      = module.server_containerized.configuration
-  }
-}
+# output "configuration" {
+#   value = {
+#     controller  = module.controller.configuration
+#     server      = module.server_containerized.configuration
+#   }
+# }
