@@ -27,7 +27,7 @@ variable "CUCUMBER_RESULTS" {
 
 variable "PRODUCT_VERSION" {
   type = string
-  default = "uyuni-master"
+  default = ""
 }
 
 variable "MAIL_SUBJECT" {
