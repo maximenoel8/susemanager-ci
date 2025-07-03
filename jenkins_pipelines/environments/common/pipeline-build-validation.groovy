@@ -38,22 +38,31 @@ def run(params) {
         }
         stage('Name run') {
             def buildLabel = []
-            def proxyOptions = []
+            def options = []
 
             if (params.must_deploy) buildLabel << 'deploy'
             if (params.must_run_core) buildLabel << 'core'
             if (params.must_sync) buildLabel << 'reposync'
 
+            if (params.must_add_MU_repositories) options << 'AddMU'
+            if (params.must_add_non_MU_repositories) options << 'AddNonMU'
+            if (params.must_add_keys) options << 'ActKeys'
+            if (params.must_create_bootstrap_repos) options << 'CrBoot'
+            if (params.must_boot_node) options << 'Boot'
+            if (params.must_run_tests) options << 'Smoke'
+
             if (params.enable_proxy_stages) {
-                if (params.must_add_MU_repositories) proxyOptions << 'AddMU'
-                if (params.must_add_keys) proxyOptions << 'ActKeys'
-                if (params.must_create_bootstrap_repos) proxyOptions << 'CrBoot'
-                if (params.must_boot_node) proxyOptions << 'Bootstrap'
-                buildLabel << "proxy [${proxyOptions.join(' ')}]"
+                buildLabel << "proxy[${options.join(' ')}]"
             }
 
-            if (params.must_run_tests) buildLabel << 'smoke'
-            if (params.must_run_products_and_salt_migration_tests) buildLabel << 'salt-migration'
+            if (params.enable_monitoring_stages) {
+                buildLabel << "monitoring[${options.join(' ')}]"
+            }
+
+            if (params.enable_client_stages) {
+                buildLabel << "client[${options.join(' ')}]"
+            }
+            if (params.must_run_products_and_salt_migration_tests) buildLabel << 'migration'
             if (params.must_prepare_retail) buildLabel << 'retail'
 
             def fullLabel = "${params.product_version}_${params.base_os} - ${buildLabel.join(' ')}"
