@@ -58,7 +58,7 @@ def run(params) {
 
             def fullLabel = "${params.product_version}_${params.base_os} - ${buildLabel.join(' ')}"
 
-            if (fullLabel.length() > 54) {
+            if (fullLabel.length() > 120) {
                 currentBuild.displayName = "#${env.BUILD_NUMBER} - ${params.product_version}_${params.base_os}"
             } else {
                 currentBuild.displayName = "${fullLabel}"
