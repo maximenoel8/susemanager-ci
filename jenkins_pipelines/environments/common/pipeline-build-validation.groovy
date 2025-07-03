@@ -44,23 +44,30 @@ def run(params) {
             if (params.must_run_core) buildLabel << 'core'
             if (params.must_sync) buildLabel << 'reposync'
 
-            if (params.must_add_MU_repositories) options << 'AddMU'
-            if (params.must_add_non_MU_repositories) options << 'AddNonMU'
-            if (params.must_add_keys) options << 'ActKeys'
-            if (params.must_create_bootstrap_repos) options << 'CrBoot'
-            if (params.must_boot_node) options << 'Boot'
-            if (params.must_run_tests) options << 'Smoke'
-
             if (params.enable_proxy_stages) {
-                buildLabel << "proxy[${options.join(' ')}]"
+                if (params.must_add_MU_repositories) proxyOptions << 'AddMU'
+                if (params.must_add_keys) proxyOptions << 'ActKeys'
+                if (params.must_create_bootstrap_repos) proxyOptions << 'CrBoot'
+                if (params.must_boot_node) proxyOptions << 'Boot'
+                buildLabel << "proxy[${proxyOptions.join(' ')}]"
             }
 
             if (params.enable_monitoring_stages) {
-                buildLabel << "monitoring[${options.join(' ')}]"
+                if (params.must_add_MU_repositories) monitoringOptions << 'AddMU'
+                if (params.must_add_keys) monitoringOptions << 'ActKeys'
+                if (params.must_create_bootstrap_repos) monitoringOptions << 'CrBoot'
+                if (params.must_boot_node) monitoringOptions << 'Boot'
+                buildLabel << "monitoring[${monitoringOptions.join(' ')}]"
             }
 
             if (params.enable_client_stages) {
-                buildLabel << "client[${options.join(' ')}]"
+                if (params.must_add_MU_repositories) clientOptions << 'AddMU'
+                if (params.must_add_non_MU_repositories) clientOptions << 'AddNonMU'
+                if (params.must_add_keys) clientOptions << 'ActKeys'
+                if (params.must_create_bootstrap_repos) clientOptions << 'CrBoot'
+                if (params.must_boot_node) clientOptions << 'Boot'
+                if (params.must_run_tests) clientOptions << 'Smoke'
+                buildLabel << "client[${clientOptions.join(' ')}]"
             }
             if (params.must_run_products_and_salt_migration_tests) buildLabel << 'migration'
             if (params.must_prepare_retail) buildLabel << 'retail'
