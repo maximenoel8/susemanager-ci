@@ -38,7 +38,10 @@ def run(params) {
         }
         stage('Name run') {
             def buildLabel = []
-            def options = []
+            def proxyOptions = []
+            def monitoringOptions = []
+            def clientOptions = []
+
 
             if (params.must_deploy) buildLabel << 'deploy'
             if (params.must_run_core) buildLabel << 'core'
