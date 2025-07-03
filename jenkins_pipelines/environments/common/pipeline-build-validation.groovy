@@ -36,8 +36,34 @@ def run(params) {
         if (params.terraform_parallelism) {
             env.common_params = "${env.common_params} --parallelism ${params.terraform_parallelism}"
         }
-        stage('Init') {
-            currentBuild.displayName = "#${BUILD_NUMBER} -test tests 1"
+        stage('Name run') {
+            def buildLabel = []
+            def proxyOptions = []
+
+            if (params.must_deploy) buildLabel << 'deployment'
+            if (params.must_run_core) buildLabel << 'core'
+            if (params.must_sync) buildLabel << 'reposync'
+
+            if (params.enable_proxy_stages) {
+                if (params.must_add_MU_repositories) proxyOptions << 'AddMU'
+                if (params.must_add_keys) proxyOptions << 'ActKeys'
+                if (params.must_create_bootstrap_repos) proxyOptions << 'CrBoot'
+                if (params.must_boot_node) proxyOptions << 'Bootstrap'
+                buildLabel << "proxy [${proxyOptions.join(' ')}]"
+            }
+
+            if (params.must_run_tests) buildLabel << 'smoke'
+            if (params.must_run_products_and_salt_migration_tests) buildLabel << 'salt-migration'
+            if (params.must_prepare_retail) buildLabel << 'retail'
+
+            def fullLabel = "${params.product_version}-${params.base_os} - ${buildLabel.join(' ')}"
+
+            if (fullLabel.length() > 24) {
+                currentBuild.displayName = "#${env.BUILD_NUMBER} - ${params.product_version}"
+            } else {
+                currentBuild.displayName = "#${env.BUILD_NUMBER} - ${fullLabel}"
+            }
+
         }
     }
 }
