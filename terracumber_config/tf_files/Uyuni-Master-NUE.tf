@@ -12,12 +12,12 @@ variable "CUCUMBER_COMMAND" {
 
 variable "CUCUMBER_GITREPO" {
   type = string
-  default = "https://github.com/uyuni-project/uyuni.git"
+  default = "https://github.com/SUSE/spacewalk.git"
 }
 
 variable "CUCUMBER_BRANCH" {
   type = string
-  default = "master"
+  default = "Manager-5.0"
 }
 
 variable "CUCUMBER_RESULTS" {
@@ -101,7 +101,7 @@ provider "libvirt" {
 module "cucumber_testsuite" {
   source = "./modules/cucumber_testsuite"
 
-  product_version = "uyuni-master"
+  product_version = "5.0-nightly"
 
   // Cucumber repository configuration for the controller
   git_username = var.GIT_USER
@@ -112,7 +112,7 @@ module "cucumber_testsuite" {
   cc_username   = var.SCC_USER
   cc_password   = var.SCC_PASSWORD
 
-  images        = ["rocky8o", "opensuse155o", "opensuse156o", "leapmicro55o", "ubuntu2404o", "sles15sp4o"]
+  images        = ["rocky8o", "opensuse155o", "opensuse156o", "leapmicro55o", "ubuntu2404o", "sles15sp4o", "slemicro55o"]
 
   use_avahi     = false
   name_prefix   = "uyuni-ci-master-"
@@ -148,7 +148,7 @@ module "cucumber_testsuite" {
         mac     = "aa:b2:93:01:00:d1"
       }
       runtime = "podman"
-      container_repository = "registry.opensuse.org/systemsmanagement/uyuni/master/containerfile"
+      container_repository = "registry.suse.de/devel/galaxy/manager/5.0/containerfile"
       container_tag = "latest"
       helm_chart_url = "oci://registry.opensuse.org/systemsmanagement/uyuni/master/charts/uyuni/server"
       main_disk_size        = 80
@@ -162,7 +162,7 @@ module "cucumber_testsuite" {
         mac     = "aa:b2:93:01:00:d2"
       }
       runtime = "podman"
-      container_repository = "registry.opensuse.org/systemsmanagement/uyuni/master/containerfile"
+      container_repository = "registry.suse.de/devel/galaxy/manager/5.0/containerfile"
       container_tag = "latest"
     }
     suse_minion = {
