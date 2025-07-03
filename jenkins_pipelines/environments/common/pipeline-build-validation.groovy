@@ -40,7 +40,7 @@ def run(params) {
             def buildLabel = []
             def proxyOptions = []
 
-            if (params.must_deploy) buildLabel << 'deployment'
+            if (params.must_deploy) buildLabel << 'deploy'
             if (params.must_run_core) buildLabel << 'core'
             if (params.must_sync) buildLabel << 'reposync'
 
@@ -56,10 +56,10 @@ def run(params) {
             if (params.must_run_products_and_salt_migration_tests) buildLabel << 'salt-migration'
             if (params.must_prepare_retail) buildLabel << 'retail'
 
-            def fullLabel = "${params.product_version}-${params.base_os} - ${buildLabel.join(' ')}"
+            def fullLabel = "${params.product_version}_${params.base_os} - ${buildLabel.join(' ')}"
 
             if (fullLabel.length() > 54) {
-                currentBuild.displayName = "#${env.BUILD_NUMBER} - ${params.product_version}"
+                currentBuild.displayName = "#${env.BUILD_NUMBER} - ${params.product_version}_${params.base_os}"
             } else {
                 currentBuild.displayName = "${fullLabel}"
             }
