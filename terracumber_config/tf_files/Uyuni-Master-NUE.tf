@@ -138,8 +138,8 @@ module "cucumber_testsuite" {
     controller = {
       provider_settings = {
         mac     = "aa:b2:93:01:00:d0"
-        memory = 10240
-        vcpu = 4
+        memory = 16384
+        vcpu = 8
         cpu_model = "host-passthrough"
       }
     }
