@@ -7,7 +7,7 @@ variable "URL_PREFIX" {
 // Not really used as this is for --runall parameter, and we run cucumber step by step
 variable "CUCUMBER_COMMAND" {
   type = string
-  default = "export PRODUCT='Uyuni' && run-testsuite"
+  default = "export PRODUCT='SUSE-Manager' && run-testsuite"
 }
 
 variable "CUCUMBER_GITREPO" {
@@ -79,11 +79,6 @@ variable "PROMETHEUS_PUSH_GATEWAY_URL" {
   default = null
 }
 
-variable "GEMINI_API_KEY" {
-  type = string
-  default = null
-}
-
 terraform {
   required_version = "1.0.10"
   required_providers {
@@ -138,29 +133,33 @@ module "cucumber_testsuite" {
     controller = {
       provider_settings = {
         mac     = "aa:b2:93:01:00:d0"
-        memory = 16384
-        vcpu = 8
-        cpu_model = "host-passthrough"
+        vcpu = 4
+        memory = 4096
       }
     }
     server_containerized = {
+      image = "slemicro55o"
       provider_settings     = {
         mac     = "aa:b2:93:01:00:d1"
+        vcpu = 8
+        memory = 32768
       }
-      runtime = "podman"
+      main_disk_size       = 500
+      login_timeout        = 28800
+      large_deployment     = true
+      runtime              = "podman"
       container_repository = "registry.suse.de/devel/galaxy/manager/5.0/containerfile"
-      container_tag = "latest"
-      helm_chart_url = "oci://registry.opensuse.org/systemsmanagement/uyuni/master/charts/uyuni/server"
-      main_disk_size        = 80
-      repository_disk_size  = 200
-      database_disk_size    = 50
-      login_timeout         = 28800
-      large_deployment      = true
+      container_tag        = "latest"
+
     }
     proxy_containerized = {
+      image = "slemicro55o"
       provider_settings = {
         mac     = "aa:b2:93:01:00:d2"
+        vcpu = 2
+        memory = 2048
       }
+      main_disk_size = 200
       runtime = "podman"
       container_repository = "registry.suse.de/devel/galaxy/manager/5.0/containerfile"
       container_tag = "latest"
@@ -222,7 +221,6 @@ module "cucumber_testsuite" {
   }
 }
 
-
 resource "null_resource" "configure_quality_intelligence" {
 
   triggers = {
@@ -232,7 +230,6 @@ resource "null_resource" "configure_quality_intelligence" {
   provisioner "remote-exec" {
     inline = [ "echo export QUALITY_INTELLIGENCE=true >> ~/.bashrc",
       "echo export PROMETHEUS_PUSH_GATEWAY_URL=${var.PROMETHEUS_PUSH_GATEWAY_URL} >> ~/.bashrc",
-      "echo export GEMINI_API_KEY=${var.GEMINI_API_KEY} >> ~/.bashrc",
       "source ~/.bashrc"
     ]
     connection {
