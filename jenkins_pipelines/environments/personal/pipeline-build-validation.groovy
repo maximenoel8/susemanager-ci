@@ -75,6 +75,26 @@ def run(params) {
                             }
                         }
                     }
+                    def tfvarsFile = new File('terraform.tfvars')
+                    def tfVarsData = [
+                            "SERVER_CONTAINER_REPOSITORY": server_container_repository,
+                            "PROXY_CONTAINER_REPOSITORY": proxy_container_repository,
+                            "SERVER_CONTAINER_IMAGE": server_container_image,
+                            // Accessing variables within the 'params' object/map
+                            "CUCUMBER_GITREPO": params.cucumber_gitrepo,
+                            "CUCUMBER_BRANCH": params.cucumber_ref,
+                            "PRODUCT_VERSION": product_version,
+                            "BASE_OS": base_os
+                    ]
+                    content = tfVarsData.collect { key, value ->
+                        // Terraform tfvars typically require string values to be quoted.
+                        // We use Groovy GString interpolation to insert the value dynamically.
+                        "${key} = \"${value}\""
+                    }.join('\n')
+
+                    tfvarsFile.text = content
+
+                    println "Successfully generated terraform.tfvars with ${tfVarsData.size()} variables."
                     // Run Terracumber to deploy the environment
                     sh """
                         set +x
