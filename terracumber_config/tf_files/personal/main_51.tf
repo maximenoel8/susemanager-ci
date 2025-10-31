@@ -91,7 +91,7 @@ module "cucumber_testsuite" {
       container_tag = "latest"
     }
     suse_minion = {
-      image = "sles15sp4o"
+      image = "sles15sp7o"
       provider_settings = {
         mac = var.ENVIRONMENT_CONFIGURATION[var.ENVIRONMENT].mac["suse-minion"]
         vcpu = 2
@@ -99,7 +99,7 @@ module "cucumber_testsuite" {
       }
     }
     suse_sshminion = {
-      image = "sles15sp4o"
+      image = "sles15sp7o"
       provider_settings = {
         mac = var.ENVIRONMENT_CONFIGURATION[var.ENVIRONMENT].mac["suse-sshminion"]
         vcpu = 2
