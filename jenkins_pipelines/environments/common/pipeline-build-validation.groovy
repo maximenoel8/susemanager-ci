@@ -301,19 +301,12 @@ def run(params) {
             /** Products and Salt migration stages stages end **/
 
             /** Retail stages begin **/
-            stage('Retail: Prepare Proxy and bootstrap build hosts') {
+            stage('Retail: Bootstrap build hosts') {
                 if (params.must_prepare_retail) {
                     if (params.confirm_before_continue) {
                         input 'Press any key to start running the retail tests'
                     }
                     parallel (
-                            'Configure retail proxy branch': {
-                                stage('Configure retail proxy') {
-                                    def res_configure_retail_proxy = runCucumberRakeTarget('cucumber:build_validation_retail_configure_proxy', true)
-                                    echo "Retail proxy status code: ${res_configure_retail_proxy}"
-                                    sh "exit ${res_configure_retail_proxy}"
-                                }
-                            },
                             'Init build host sles15sp7': {
                                 stage('Init build host sles15sp7') {
                                     def res_init_buildhost_sles15sp7 = runCucumberRakeTarget('cucumber:build_validation_retail_init_sles15sp7_buildhost', true)
@@ -343,6 +336,24 @@ def run(params) {
                             stage("Build image for ${terminal}") {
                                 def res_build_image = runCucumberRakeTarget("cucumber:build_validation_retail_build_image_${terminal}", true)
                                 sh "exit ${res_build_image}"
+                            }
+                            // TODO: Move back configure retail proxy to Retail: Bootstrap build hosts stage once 4.3 and 5.0 are EOL
+                            stage('Configure retail proxy') {
+                                // Lock with a 5-minute timeout (300 seconds / 60 seconds/minute = 5 minutes).
+                                lock(resource: 'retail-proxy-configuration-lock', timeout: 5) {
+                                    if (!proxy_configured) {
+                                        echo "Running shared Configure retail proxy for the first time..."
+                                        // Need to be executed after building images
+                                        def res_configure_retail_proxy = runCucumberRakeTarget('cucumber:build_validation_retail_configure_proxy', true)
+                                        echo "Retail proxy status code: ${res_configure_retail_proxy}"
+                                        sh "exit ${res_configure_retail_proxy}"
+
+                                        // Set flag to true so other branches skip this block
+                                        proxy_configured = true
+                                    } else {
+                                        echo "Configure retail proxy already completed by another terminal branch."
+                                    }
+                                } // Lock released; all branches can proceed past this point
                             }
                             stage("Prepare group and saltboot for ${terminal}") {
                                 def res_prepare_group_saltboot = runCucumberRakeTarget("cucumber:build_validation_retail_prepare_group_saltboot_${terminal}", true)
@@ -761,7 +772,8 @@ def nameDisplay(params) {
     ], params.enable_client_stages)
 
     if (params.must_run_products_and_salt_migration_tests) buildLabel << 'migration'
-    if (params.must_prepare_retail) buildLabel << 'retail'
+    if (params.must_prepare_retail) buildLabel << 'PrepRetail'
+    if (params.must_test_retail_terminal) buildLabel << 'TestRetail'
 
     // Manually filter null/empty items to avoid findAll()
     def filteredLabel = []
