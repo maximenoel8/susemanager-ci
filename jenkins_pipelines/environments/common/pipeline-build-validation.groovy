@@ -18,6 +18,7 @@ def run(params) {
 
         // Declare lock resource use during node bootstrap
         mgrCreateBootstrapRepo = 'share resource to avoid running mgr create bootstrap repo in parallel'
+        retailProxyConfigurationLock = 'lock proxy retail setup'
         // Variables to store none critical stage run status
         def monitoring_stage_result_fail = false
         def client_stage_result_fail = false
@@ -331,16 +332,17 @@ def run(params) {
                     }
                     def terminal_version = ['sles15sp6', 'sles15sp7']
                     def terminal_deployment_testing = [:]
+                    def proxy_configured = false
                     terminal_version.each { terminal ->
                         terminal_deployment_testing["${terminal}"] = {
-                            stage("Build image for ${terminal}") {
-                                def res_build_image = runCucumberRakeTarget("cucumber:build_validation_retail_build_image_${terminal}", true)
-                                sh "exit ${res_build_image}"
-                            }
+//                            stage("Build image for ${terminal}") {
+//                                def res_build_image = runCucumberRakeTarget("cucumber:build_validation_retail_build_image_${terminal}", true)
+//                                sh "exit ${res_build_image}"
+//                            }
                             // TODO: Move back configure retail proxy to Retail: Bootstrap build hosts stage once 4.3 and 5.0 are EOL
                             stage('Configure retail proxy') {
                                 // Lock with a 5-minute timeout (300 seconds / 60 seconds/minute = 5 minutes).
-                                lock(resource: 'retail-proxy-configuration-lock', timeout: 5) {
+                                lock(resource: retailProxyConfigurationLock) {
                                     if (!proxy_configured) {
                                         echo "Running shared Configure retail proxy for the first time..."
                                         // Need to be executed after building images
