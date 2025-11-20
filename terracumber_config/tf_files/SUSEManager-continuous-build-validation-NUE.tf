@@ -1215,7 +1215,7 @@ module "dhcp_dns" {
   name               = "dhcp-dns"
   image              = "opensuse155o"
   private_hosts = [
-    module.proxy_containerized.configuration,
+    module.proxy_containerized[0].configuration,
     module.sles15sp6_terminal.configuration,
     module.sles15sp7_terminal.configuration
   ]
