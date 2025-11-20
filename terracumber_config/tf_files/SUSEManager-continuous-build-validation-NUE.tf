@@ -1266,12 +1266,12 @@ module "controller" {
   server_configuration = concat(
     module.server[0].configuration,
     module.server_containerized[0].configuration
-  )
+  )[0]
 
   proxy_configuration = concat(
     module.proxy[0].configuration,
     module.proxy_containerized[0].configuration
-  )
+  )[0]
 
   sle12sp5_minion_configuration    = module.sles12sp5_minion.configuration
   sle12sp5_sshminion_configuration = module.sles12sp5_sshminion.configuration
@@ -1380,6 +1380,6 @@ output "configuration" {
     server     = concat(
       module.server[0].configuration,
       module.server_containerized[0].configuration
-    )
+    )[0]
   }
 }
