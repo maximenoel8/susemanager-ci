@@ -1241,17 +1241,6 @@ module "monitoring_server" {
   ssh_key_path            = "./salt/controller/id_ed25519.pub"
 }
 
-locals {
-  deployed_server_configuration = concat(
-    module.server[*].configuration,
-    module.server_containerized[*].configuration
-  )
-  deployed_proxy_configuration = concat(
-    module.proxy[*].configuration,
-    module.proxy_containerized[*].configuration
-  )
-}
-
 module "controller" {
   source             = "./modules/controller"
   base_configuration = module.base_core.configuration
@@ -1274,9 +1263,15 @@ module "controller" {
   branch       = var.CUCUMBER_BRANCH
   git_profiles_repo = "https://github.com/uyuni-project/uyuni.git#:testsuite/features/profiles/temporary"
 
-  server_configuration = local.deployed_server_configuration
+  server_configuration = concat(
+    module.server[0].configuration,
+    module.server_containerized[0].configuration
+  )
 
-  proxy_configuration  = local.deployed_proxy_configuration
+  proxy_configuration = concat(
+    module.proxy[0].configuration,
+    module.proxy_containerized[0].configuration
+  )
 
   sle12sp5_minion_configuration    = module.sles12sp5_minion.configuration
   sle12sp5_sshminion_configuration = module.sles12sp5_sshminion.configuration
@@ -1382,6 +1377,9 @@ module "controller" {
 output "configuration" {
   value = {
     controller = module.controller.configuration
-    server     = local.deployed_server_configuration
+    server     = concat(
+      module.server[0].configuration,
+      module.server_containerized[0].configuration
+    )
   }
 }
