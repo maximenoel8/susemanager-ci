@@ -194,8 +194,8 @@ module "base_arm" {
 
 
 locals {
-  server_configuration      = contains(var.PRODUCT_VERSION, "4.3") ? module.server[0].configuration : module.server_containerized[0].configuration
-  proxy_configuration       = contains(var.PRODUCT_VERSION, "4.3") ? module.proxy[0].configuration : module.proxy_containerized[0].configuration
+  server_configuration      = strcontains(var.PRODUCT_VERSION, "4.3") ? module.server[0].configuration : module.server_containerized[0].configuration
+  proxy_configuration       = strcontains(var.PRODUCT_VERSION, "4.3") ? module.proxy[0].configuration : module.proxy_containerized[0].configuration
 }
 
 module "base_s390" {
@@ -209,7 +209,7 @@ module "base_s390" {
 }
 
 module "server" {
-  count = contains(var.PRODUCT_VERSION, "4.3") ? 1 : 0
+  count = strcontains(var.PRODUCT_VERSION, "4.3") ? 1 : 0
 
   source             = "./modules/server"
   base_configuration = module.base_core.configuration
@@ -248,7 +248,7 @@ module "server" {
 }
 
 module "server_containerized" {
-  count = contains(var.PRODUCT_VERSION, "4.3") ? 0 : 1
+  count = strcontains(var.PRODUCT_VERSION, "4.3") ? 0 : 1
 
   source             = "./modules/server_containerized"
   base_configuration = module.base_core.configuration
@@ -291,7 +291,7 @@ module "server_containerized" {
 }
 
 module "proxy" {
-  count = contains(var.PRODUCT_VERSION, "4.3") ? 1 : 0
+  count = strcontains(var.PRODUCT_VERSION, "4.3") ? 1 : 0
 
   source             = "./modules/proxy"
   base_configuration = module.base_core.configuration
@@ -309,7 +309,7 @@ module "proxy" {
 }
 
 module "proxy_containerized" {
-  count = contains(var.PRODUCT_VERSION, "4.3") ? 0 : 1
+  count = strcontains(var.PRODUCT_VERSION, "4.3") ? 0 : 1
 
   source             = "./modules/proxy_containerized"
   base_configuration = module.base_core.configuration
@@ -1214,7 +1214,7 @@ module "sles15sp7_terminal" {
 }
 
 module "dhcp_dns" {
-  count = contains(var.PRODUCT_VERSION, "4.3") ? 0 : 1
+  count = strcontains(var.PRODUCT_VERSION, "4.3") ? 0 : 1
 
   source             = "./modules/dhcp_dns"
   base_configuration = module.base_core.configuration
