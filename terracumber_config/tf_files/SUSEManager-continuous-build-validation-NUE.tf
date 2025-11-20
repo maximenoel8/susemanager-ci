@@ -1375,7 +1375,7 @@ module "controller" {
 
 output "configuration" {
   value = {
-    controller  = module.controller.configuration
-    server      = local.deployed_server_configuration
+    controller = module.controller.configuration
+    server     = local.deployed_server_configuration
   }
-
+}
