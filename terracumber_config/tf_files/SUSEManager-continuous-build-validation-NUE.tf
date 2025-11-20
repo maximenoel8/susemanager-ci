@@ -1378,4 +1378,4 @@ output "configuration" {
     controller  = module.controller.configuration
     server      = local.deployed_server_configuration
   }
-}
+
