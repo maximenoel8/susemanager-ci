@@ -1242,8 +1242,14 @@ module "monitoring_server" {
 }
 
 locals {
-  deployed_server_configuration = length(module.server) > 0 ? ( module.server[0].configuration ) : ( module.server_containerized[0].configuration )
-  deployed_proxy_configuration  = length(module.proxy) > 0 ? ( module.proxy[0].configuration ) : ( module.proxy_containerized[0].configuration )
+  deployed_server_configuration = concat(
+    module.server[*].configuration,
+    module.server_containerized[*].configuration
+  )
+  deployed_proxy_configuration = concat(
+    module.proxy[*].configuration,
+    module.proxy_containerized[*].configuration
+  )
 }
 
 module "controller" {
