@@ -295,13 +295,21 @@ module "proxy" {
 
   source             = "./modules/proxy"
   base_configuration = module.base_core.configuration
+  server_configuration = module.server[0].configuration
   name               = "proxy"
   image              = "sles15sp4o"
   provider_settings = {
     mac                = "aa:b2:93:01:02:82"
     memory             = 4096
   }
+  auto_register             = false
+  auto_connect_to_master    = false
+  download_private_ssl_key  = false
+  install_proxy_pattern     = false
   auto_configure            = false
+  generate_bootstrap_script = false
+  publish_private_ssl_key   = false
+  use_os_released_updates   = true
   ssh_key_path              = "./salt/controller/id_ed25519.pub"
 
   //proxy_additional_repos
