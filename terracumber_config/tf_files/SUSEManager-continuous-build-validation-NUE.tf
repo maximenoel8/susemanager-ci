@@ -152,7 +152,7 @@ module "base_core" {
   use_avahi         = false
   domain            = "mgr.suse.de"
   images            = [ "sles12sp5o", "sles15sp3o", "sles15sp4o", "sles15sp5o", "sles15sp6o", "sles15sp7o", "slemicro51-ign", "slemicro52-ign", "slemicro53-ign", "slemicro54-ign", "slemicro55o", "slmicro60o", "slmicro61o", "almalinux8o", "almalinux9o", "amazonlinux2023o", "centos7o", "libertylinux9o", "oraclelinux9o", "rocky8o", "rocky9o", "ubuntu2204o", "ubuntu2404o", "debian12o", "opensuse155o", "opensuse156o" ]
-                    // disabled: "openeuler2403o"
+  // disabled: "openeuler2403o"
 
   mirror            = "minima-mirror-ci-bv.mgr.suse.de"
   use_mirror_images = true
@@ -202,7 +202,54 @@ module "base_s390" {
   testsuite         = true
 }
 
+locals {
+  is_43_tostring = tostring(contains(var.PRODUCT_VERSION, "4.3"))
+}
+
+module "server" {
+  # Deploy if var.PRODUCT_VERSION DOES contain "4.3"
+  count = lookup({ "true" = 1, "false" = 0 }, local.is_43_tostring)
+
+  source             = "./modules/server"
+  base_configuration = module.base_core.configuration
+  name               = "server"
+  image              = "sles15sp4o"
+  beta_enabled       = false
+  provider_settings = {
+    mac                = "aa:b2:93:01:02:81"
+    memory             = 40960
+    vcpu               = 10
+    data_pool          = "ssd"
+  }
+  main_disk_size        = 100
+  repository_disk_size  = 3072
+  database_disk_size    = 150
+
+  server_mounted_mirror          = "minima-mirror-ci-bv.mgr.suse.de"
+  java_debugging                 = false
+  auto_accept                    = false
+  disable_firewall               = false
+  allow_postgres_connections     = false
+  skip_changelog_import          = false
+  mgr_sync_autologin             = false
+  create_sample_channel          = false
+  create_sample_activation_key   = false
+  create_sample_bootstrap_script = false
+  publish_private_ssl_key        = false
+  use_os_released_updates        = true
+  disable_download_tokens        = false
+  large_deployment               = true
+  ssh_key_path                   = "./salt/controller/id_ed25519.pub"
+  from_email                     = "root@suse.de"
+
+  //server_additional_repos
+
+}
+
 module "server_containerized" {
+  # Deploy if var.PRODUCT_VERSION does NOT contain "4.3"
+  count = lookup({ "true" = 0, "false" = 1 }, local.is_43_tostring)
+
   source             = "./modules/server_containerized"
   base_configuration = module.base_core.configuration
   name               = "server"
@@ -243,7 +290,29 @@ module "server_containerized" {
 
 }
 
+module "proxy" {
+  # Deploy if var.PRODUCT_VERSION DOES contain "4.3"
+  count = lookup({ "true" = 1, "false" = 0 }, local.is_43_tostring)
+
+  source             = "./modules/proxy"
+  base_configuration = module.base_core.configuration
+  name               = "proxy"
+  image              = "sles15sp4o"
+  provider_settings = {
+    mac                = "aa:b2:93:01:02:82"
+    memory             = 4096
+  }
+  auto_configure            = false
+  ssh_key_path              = "./salt/controller/id_ed25519.pub"
+
+  //proxy_additional_repos
+
+}
+
 module "proxy_containerized" {
+  # Deploy if var.PRODUCT_VERSION does NOT contain "4.3"
+  count = lookup({ "true" = 0, "false" = 1 }, local.is_43_tostring)
+
   source             = "./modules/proxy_containerized"
   base_configuration = module.base_core.configuration
   name               = "proxy"
@@ -593,7 +662,7 @@ module "slemicro51_minion" {
   use_os_released_updates = false
   ssh_key_path            = "./salt/controller/id_ed25519.pub"
 
-// WORKAROUND: Does not work in sumaform, yet
+  // WORKAROUND: Does not work in sumaform, yet
   install_salt_bundle = false
 }
 
@@ -611,7 +680,7 @@ module "slemicro52_minion" {
   use_os_released_updates = false
   ssh_key_path            = "./salt/controller/id_ed25519.pub"
 
-// WORKAROUND: Does not work in sumaform, yet
+  // WORKAROUND: Does not work in sumaform, yet
   install_salt_bundle = false
 }
 
@@ -629,7 +698,7 @@ module "slemicro53_minion" {
   use_os_released_updates = false
   ssh_key_path            = "./salt/controller/id_ed25519.pub"
 
-// WORKAROUND: Does not work in sumaform, yet
+  // WORKAROUND: Does not work in sumaform, yet
   install_salt_bundle = false
 }
 
@@ -647,7 +716,7 @@ module "slemicro54_minion" {
   use_os_released_updates = false
   ssh_key_path            = "./salt/controller/id_ed25519.pub"
 
-// WORKAROUND: Does not work in sumaform, yet
+  // WORKAROUND: Does not work in sumaform, yet
   install_salt_bundle = false
 }
 
@@ -665,7 +734,7 @@ module "slemicro55_minion" {
   use_os_released_updates = false
   ssh_key_path            = "./salt/controller/id_ed25519.pub"
 
-// WORKAROUND: Does not work in sumaform, yet
+  // WORKAROUND: Does not work in sumaform, yet
   install_salt_bundle = false
 }
 
@@ -683,7 +752,7 @@ module "slmicro60_minion" {
   use_os_released_updates = false
   ssh_key_path            = "./salt/controller/id_ed25519.pub"
 
-// WORKAROUND: Does not work in sumaform, yet
+  // WORKAROUND: Does not work in sumaform, yet
   install_salt_bundle = false
 }
 
@@ -701,7 +770,7 @@ module "slmicro61_minion" {
   use_os_released_updates = false
   ssh_key_path            = "./salt/controller/id_ed25519.pub"
 
-// WORKAROUND: Does not work in sumaform, yet
+  // WORKAROUND: Does not work in sumaform, yet
   install_salt_bundle = false
 }
 
@@ -1117,12 +1186,15 @@ module "sles15sp4_terminal" {
 }
 
 module "dhcp_dns" {
+  # Deploy if var.PRODUCT_VERSION does NOT contain "4.3"
+  count = lookup({ "true" = 0, "false" = 1 }, local.is_43_tostring)
+
   source             = "./modules/dhcp_dns"
   base_configuration = module.base_core.configuration
   name               = "dhcp-dns"
   image              = "opensuse155o"
   private_hosts = [
-    module.proxy_containerized.configuration,
+    module.proxy_containerized[0].configuration,
     module.sles15sp4_terminal.configuration
   ]
   hypervisor = {
@@ -1147,6 +1219,11 @@ module "monitoring_server" {
   ssh_key_path            = "./salt/controller/id_ed25519.pub"
 }
 
+locals {
+  deployed_server_configuration = length(module.server) > 0 ? ( module.server[0].configuration ) : ( module.server_containerized[0].configuration )
+  deployed_proxy_configuration  = length(module.proxy) > 0 ? ( module.proxy[0].configuration ) : ( module.proxy_containerized[0].configuration )
+}
+
 module "controller" {
   source             = "./modules/controller"
   base_configuration = module.base_core.configuration
@@ -1168,9 +1245,9 @@ module "controller" {
   git_repo     = var.CUCUMBER_GITREPO
   branch       = var.CUCUMBER_BRANCH
 
-  server_configuration = module.server_containerized.configuration
+  server_configuration = local.deployed_server_configuration
 
-  proxy_configuration  = module.proxy_containerized.configuration
+  proxy_configuration  = local.deployed_proxy_configuration
 
   sle12sp5_minion_configuration    = module.sles12sp5_minion.configuration
   sle12sp5_sshminion_configuration = module.sles12sp5_sshminion.configuration
@@ -1237,32 +1314,32 @@ module "controller" {
   salt_migration_minion_configuration = module.salt_migration_minion.configuration
 
   slemicro51_minion_configuration    = module.slemicro51_minion.configuration
-//  WORKAROUND until https://bugzilla.suse.com/show_bug.cgi?id=1208045 gets fixed
-//  slemicro51_sshminion_configuration = module.slemicro51_sshminion.configuration
+  //  WORKAROUND until https://bugzilla.suse.com/show_bug.cgi?id=1208045 gets fixed
+  //  slemicro51_sshminion_configuration = module.slemicro51_sshminion.configuration
 
   slemicro52_minion_configuration    = module.slemicro52_minion.configuration
-//  WORKAROUND until https://bugzilla.suse.com/show_bug.cgi?id=1208045 gets fixed
-//  slemicro52_sshminion_configuration = module.slemicro52_sshminion.configuration
+  //  WORKAROUND until https://bugzilla.suse.com/show_bug.cgi?id=1208045 gets fixed
+  //  slemicro52_sshminion_configuration = module.slemicro52_sshminion.configuration
 
   slemicro53_minion_configuration    = module.slemicro53_minion.configuration
-//  WORKAROUND until https://bugzilla.suse.com/show_bug.cgi?id=1208045 gets fixed
-//  slemicro53_sshminion_configuration = module.slemicro53_sshminion.configuration
+  //  WORKAROUND until https://bugzilla.suse.com/show_bug.cgi?id=1208045 gets fixed
+  //  slemicro53_sshminion_configuration = module.slemicro53_sshminion.configuration
 
   slemicro54_minion_configuration    = module.slemicro54_minion.configuration
-//  WORKAROUND until https://bugzilla.suse.com/show_bug.cgi?id=1208045 gets fixed
-//  slemicro54_sshminion_configuration = module.slemicro54_sshminion.configuration
+  //  WORKAROUND until https://bugzilla.suse.com/show_bug.cgi?id=1208045 gets fixed
+  //  slemicro54_sshminion_configuration = module.slemicro54_sshminion.configuration
 
   slemicro55_minion_configuration    = module.slemicro55_minion.configuration
-//  WORKAROUND until https://bugzilla.suse.com/show_bug.cgi?id=1208045 gets fixed
-//  slemicro55_sshminion_configuration = module.slemicro55_sshminion.configuration
+  //  WORKAROUND until https://bugzilla.suse.com/show_bug.cgi?id=1208045 gets fixed
+  //  slemicro55_sshminion_configuration = module.slemicro55_sshminion.configuration
 
   slmicro60_minion_configuration    = module.slmicro60_minion.configuration
-//  WORKAROUND until https://bugzilla.suse.com/show_bug.cgi?id=1208045 gets fixed
-//  slmicro60_sshminion_configuration = module.slmicro60_sshminion.configuration
+  //  WORKAROUND until https://bugzilla.suse.com/show_bug.cgi?id=1208045 gets fixed
+  //  slmicro60_sshminion_configuration = module.slmicro60_sshminion.configuration
 
   slmicro61_minion_configuration    = module.slmicro61_minion.configuration
-//  WORKAROUND until https://bugzilla.suse.com/show_bug.cgi?id=1208045 gets fixed
-//  slmicro61_sshminion_configuration = module.slmicro61_sshminion.configuration
+  //  WORKAROUND until https://bugzilla.suse.com/show_bug.cgi?id=1208045 gets fixed
+  //  slmicro61_sshminion_configuration = module.slmicro61_sshminion.configuration
 
   sle15sp4_buildhost_configuration = module.sles15sp4_buildhost.configuration
 
@@ -1274,6 +1351,6 @@ module "controller" {
 output "configuration" {
   value = {
     controller  = module.controller.configuration
-    server      = module.server_containerized.configuration
+    server      = local.deployed_server_configuration
   }
 }
