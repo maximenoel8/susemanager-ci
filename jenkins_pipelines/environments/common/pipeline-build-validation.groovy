@@ -361,10 +361,10 @@ def run(params) {
                     def proxy_configured = false
                     terminal_version.each { terminal ->
                         terminal_deployment_testing["${terminal}"] = {
-//                            stage("Build image for ${terminal}") {
-//                                def res_build_image = runCucumberRakeTarget("cucumber:build_validation_retail_build_image_${terminal}", true)
-//                                sh "exit ${res_build_image}"
-//                            }
+                            stage("Build image for ${terminal}") {
+                                def res_build_image = runCucumberRakeTarget("cucumber:build_validation_retail_build_image_${terminal}", true)
+                                sh "exit ${res_build_image}"
+                            }
                             // TODO: Move back configure retail proxy to Retail: Bootstrap build hosts stage once 4.3 and 5.0 are EOL
                             stage('Configure retail proxy') {
                                 // Lock with a 5-minute timeout (300 seconds / 60 seconds/minute = 5 minutes).
