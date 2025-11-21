@@ -342,7 +342,21 @@ def run(params) {
                     if (params.confirm_before_continue) {
                         input 'Press any key to start running the retail tests'
                     }
-                    def terminal_version = ['sles15sp6', 'sles15sp7']
+                    // Dynamically create the terminal list to test depending on the state list
+                    def terminal_version = []
+                    def tf_state_list = sh(script: "cd ${resultdir}/sumaform; tofu state list",
+                            returnStdout: true).trim()
+                    def matcher = tf_state_list =~ /module\.([a-zA-Z0-9_]+)_terminal\./
+                    matcher.each { match ->
+                        // match[1] is the capture group (e.g., "sles15sp6")
+                        terminal_version.add(match[1])
+                    }
+                    terminal_version = terminal_version.unique().sort()
+                    echo "Dynamic Terminal List detected from State: ${terminal_version}"
+                    if (terminal_version.isEmpty()) {
+                        error "No terminal modules found in Terraform state! Expected format: module.<name>_terminal..."
+                    }
+                    // End create terminal list block
                     def terminal_deployment_testing = [:]
                     def proxy_configured = false
                     terminal_version.each { terminal ->
