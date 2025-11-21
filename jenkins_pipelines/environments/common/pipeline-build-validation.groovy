@@ -1,3 +1,5 @@
+import java.io.Serializable
+
 def run(params) {
     timestamps {
         //Capybara configuration
@@ -330,6 +332,7 @@ def run(params) {
                     if (params.confirm_before_continue) {
                         input 'Press any key to start running the retail tests'
                     }
+                    def proxyHandler = new RetailProxyHandler()
                     def terminal_version = ['sles15sp6', 'sles15sp7']
                     def terminal_deployment_testing = [:]
                     def proxy_configured = false
@@ -340,23 +343,24 @@ def run(params) {
                                 sh "exit ${res_build_image}"
                             }
                             // TODO: Move back configure retail proxy to Retail: Bootstrap build hosts stage once 4.3 and 5.0 are EOL
-//                            stage('Configure retail proxy') {
-//                                // Lock with a 5-minute timeout (300 seconds / 60 seconds/minute = 5 minutes).
-//                                lock(resource: retailProxyConfigurationLock) {
-//                                    if (!proxy_configured) {
-//                                        echo "Running shared Configure retail proxy for the first time..."
-//                                        // Need to be executed after building images
-//                                        def res_configure_retail_proxy = runCucumberRakeTarget('cucumber:build_validation_retail_configure_proxy', true)
-//                                        echo "Retail proxy status code: ${res_configure_retail_proxy}"
-//                                        sh "exit ${res_configure_retail_proxy}"
-//
-//                                        // Set flag to true so other branches skip this block
-//                                        proxy_configured = true
-//                                    } else {
-//                                        echo "Configure retail proxy already completed by another terminal branch."
-//                                    }
-//                                } // Lock released; all branches can proceed past this point
-//                            }
+                            // Need to be executed after building images for 5.0
+                            // Using lock and proxyHandler to make sure to run it only once, first to start.
+                            stage('Configure retail proxy') {
+                                lock(resource: retailProxyConfigurationLock) {
+                                    if (!proxyHandler.isConfigured()) {
+                                        echo "Running shared Configure retail proxy for the first time..."
+
+                                        def res_configure_retail_proxy = runCucumberRakeTarget('cucumber:build_validation_retail_configure_proxy', true)
+                                        echo "Retail proxy status code: ${res_configure_retail_proxy}"
+                                        sh "exit ${res_configure_retail_proxy}"
+
+                                        // Set flag to true so other branches skip this block
+                                        proxyHandler.setConfigured()
+                                    } else {
+                                        echo "Configure retail proxy already completed by another terminal branch."
+                                    }
+                                }
+                            }
                             stage("Prepare group and saltboot for ${terminal}") {
                                 def res_prepare_group_saltboot = runCucumberRakeTarget("cucumber:build_validation_retail_prepare_group_saltboot_${terminal}", true)
                                 sh "exit ${res_prepare_group_saltboot}"
@@ -845,6 +849,18 @@ def echoHtmlReportPath(String rake_target) {
         // This catches network errors, DNS failures, or httpRequest throwing
         // an exception if throwExceptionOnError is true (e.g., 404 response).
         echo "Error fetching HTML path from ${path_export_url}: ${e.getMessage()}"
+    }
+}
+
+class RetailProxyHandler implements Serializable {
+    private boolean configured = false
+
+    boolean isConfigured() {
+        return this.configured
+    }
+
+    void setConfigured() {
+        this.configured = true
     }
 }
 
