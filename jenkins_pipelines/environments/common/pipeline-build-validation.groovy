@@ -352,7 +352,7 @@ def run(params) {
                     moduleList.each { lane ->
                         def instanceList = lane.tokenize(".")
                         if (instanceList[1].contains('terminal')) {
-                            terminalsList.add(instanceList[1])
+                            terminalsList.add(instanceList[1].replace('_terminal', ''))
                         }
                     }
                     echo "Dynamic Terminal List detected from State: ${terminalsList}"
