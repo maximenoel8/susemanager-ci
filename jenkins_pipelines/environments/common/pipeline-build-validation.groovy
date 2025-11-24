@@ -1,5 +1,3 @@
-import java.util.concurrent.ConcurrentHashMap
-
 def run(params) {
     timestamps {
         //Capybara configuration
@@ -344,9 +342,9 @@ def run(params) {
                     if (params.confirm_before_continue) {
                         input 'Press any key to start running the retail tests'
                     }
-                    def proxyState = new ConcurrentHashMap()
-                    proxyState.put("configured", false)
-                    // Dynamically create the terminal list to test depending on the state list
+                    // This object is passed by reference, so updates are shared.
+                    def proxyState = [configured: false]
+                    // Dynamically create the terminal list
                     def terminal_version = []
                     def tf_state_list = sh(script: "cd ${resultdir}/sumaform; tofu state list", returnStdout: true).trim()
                     def matcher = tf_state_list =~ /module\.([a-zA-Z0-9_]+)_terminal\./
@@ -372,16 +370,15 @@ def run(params) {
                             // Using lock and proxyHandler to make sure to run it only once, first to start.
                             stage('Configure retail proxy') {
                                 lock(resource: retailProxyConfigurationLock) {
-                                    if (proxyState.get("configured") == false) {
+                                    if (proxyState.configured == false) {
                                         echo "Running shared Configure retail proxy for the first time..."
-
                                         def res_configure_retail_proxy = runCucumberRakeTarget('cucumber:build_validation_retail_configure_proxy', true)
                                         echo "Retail proxy status code: ${res_configure_retail_proxy}"
-                                        // Fail immediately if the script fails, so we don't set the flag to true
                                         if (res_configure_retail_proxy != 0) {
+                                            // Exit if failed so we don't mark as true
                                             sh "exit ${res_configure_retail_proxy}"
                                         }
-                                        proxyState.put("configured", true)
+                                        proxyState.configured = true
                                     } else {
                                         echo "Configure retail proxy already completed by another terminal branch."
                                     }
