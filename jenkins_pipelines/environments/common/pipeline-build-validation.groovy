@@ -351,7 +351,8 @@ def run(params) {
                         // match[1] is the capture group (e.g., "sles15sp6")
                         terminal_version.add(match[1])
                     }
-                    terminal_version = terminal_version.unique().sort()
+
+//                    terminal_version = terminal_version.unique().sort()
                     echo "Dynamic Terminal List detected from State: ${terminal_version}"
                     if (terminal_version.isEmpty()) {
                         error "No terminal modules found in Terraform state! Expected format: module.<name>_terminal..."
