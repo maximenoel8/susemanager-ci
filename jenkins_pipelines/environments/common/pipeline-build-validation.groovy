@@ -365,25 +365,25 @@ def run(params) {
                                 def res_build_image = runCucumberRakeTarget("cucumber:build_validation_retail_build_image_${terminal}", true)
                                 sh "exit ${res_build_image}"
                             }
-//                            // TODO: Move back configure retail proxy to Retail: Bootstrap build hosts stage once 4.3 and 5.0 are EOL
-//                            // Need to be executed after building images for 5.0
-//                            // Using lock and proxyHandler to make sure to run it only once, first to start.
-//                            stage('Configure retail proxy') {
-//                                lock(resource: retailProxyConfigurationLock) {
-//                                    if (proxyState.configured == false) {
-//                                        echo "Running shared Configure retail proxy for the first time..."
-//                                        def res_configure_retail_proxy = runCucumberRakeTarget('cucumber:build_validation_retail_configure_proxy', true)
-//                                        echo "Retail proxy status code: ${res_configure_retail_proxy}"
-//                                        if (res_configure_retail_proxy != 0) {
-//                                            // Exit if failed so we don't mark as true
-//                                            sh "exit ${res_configure_retail_proxy}"
-//                                        }
-//                                        proxyState.configured = true
-//                                    } else {
-//                                        echo "Configure retail proxy already completed by another terminal branch."
-//                                    }
-//                                }
-//                            }
+                            // TODO: Move back configure retail proxy to Retail: Bootstrap build hosts stage once 4.3 and 5.0 are EOL
+                            // Need to be executed after building images for 5.0
+                            // Using lock and proxyHandler to make sure to run it only once, first to start.
+                            stage('Configure retail proxy') {
+                                lock(resource: retailProxyConfigurationLock) {
+                                    if (proxyState.configured == false) {
+                                        echo "Running shared Configure retail proxy for the first time..."
+                                        def res_configure_retail_proxy = runCucumberRakeTarget('cucumber:build_validation_retail_configure_proxy', true)
+                                        echo "Retail proxy status code: ${res_configure_retail_proxy}"
+                                        if (res_configure_retail_proxy != 0) {
+                                            // Exit if failed so we don't mark as true
+                                            sh "exit ${res_configure_retail_proxy}"
+                                        }
+                                        proxyState.configured = true
+                                    } else {
+                                        echo "Configure retail proxy already completed by another terminal branch."
+                                    }
+                                }
+                            }
                             stage("Prepare group and saltboot for ${terminal}") {
                                 def res_prepare_group_saltboot = runCucumberRakeTarget("cucumber:build_validation_retail_prepare_group_saltboot_${terminal}", true)
                                 sh "exit ${res_prepare_group_saltboot}"
@@ -394,7 +394,11 @@ def run(params) {
                             }
                         }
                     }
-                    parallel terminal_deployment_testing
+                    terminal_deployment_testing.each { branchName, branchBody ->
+                        stage(branchName) {
+                            branchBody()
+                        }
+                    }
                 }
             }
             /** Retail stages end **/
