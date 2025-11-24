@@ -1,3 +1,5 @@
+import java.io.Serializable
+
 def run(params) {
     timestamps {
         //Capybara configuration
@@ -342,9 +344,8 @@ def run(params) {
                     if (params.confirm_before_continue) {
                         input 'Press any key to start running the retail tests'
                     }
-                    // This object is passed by reference, so updates are shared.
-                    def proxyState = [configured: false]
-                    // Dynamically create the terminal list
+                    def proxyHandler = new RetailProxyHandler()
+                    // Dynamically create the terminal list to test depending on the state list
                     def terminal_version = []
                     def tf_state_list = sh(script: "cd ${resultdir}/sumaform; tofu state list", returnStdout: true).trim()
                     def matcher = tf_state_list =~ /module\.([a-zA-Z0-9_]+)_terminal\./
@@ -357,8 +358,9 @@ def run(params) {
                     if (terminal_version.isEmpty()) {
                         error "No terminal modules found in Terraform state! Expected format: module.<name>_terminal..."
                     }
-
+                    // End create terminal list block
                     def terminal_deployment_testing = [:]
+                    def proxy_configured = false
                     terminal_version.each { terminal ->
                         terminal_deployment_testing["${terminal}"] = {
                             stage("Build image for ${terminal}") {
@@ -370,15 +372,15 @@ def run(params) {
                             // Using lock and proxyHandler to make sure to run it only once, first to start.
                             stage('Configure retail proxy') {
                                 lock(resource: retailProxyConfigurationLock) {
-                                    if (proxyState.configured == false) {
+                                    if (!proxyHandler.isConfigured()) {
                                         echo "Running shared Configure retail proxy for the first time..."
+
                                         def res_configure_retail_proxy = runCucumberRakeTarget('cucumber:build_validation_retail_configure_proxy', true)
                                         echo "Retail proxy status code: ${res_configure_retail_proxy}"
-                                        if (res_configure_retail_proxy != 0) {
-                                            // Exit if failed so we don't mark as true
-                                            sh "exit ${res_configure_retail_proxy}"
-                                        }
-                                        proxyState.configured = true
+                                        sh "exit ${res_configure_retail_proxy}"
+
+                                        // Set flag to true so other branches skip this block
+                                        proxyHandler.setConfigured()
                                     } else {
                                         echo "Configure retail proxy already completed by another terminal branch."
                                     }
@@ -394,11 +396,7 @@ def run(params) {
                             }
                         }
                     }
-                    terminal_deployment_testing.each { branchName, branchBody ->
-                        stage(branchName) {
-                            branchBody()
-                        }
-                    }
+                    parallel terminal_deployment_testing
                 }
             }
             /** Retail stages end **/
@@ -876,6 +874,18 @@ def echoHtmlReportPath(String rake_target) {
         // This catches network errors, DNS failures, or httpRequest throwing
         // an exception if throwExceptionOnError is true (e.g., 404 response).
         echo "Error fetching HTML path from ${path_export_url}: ${e.getMessage()}"
+    }
+}
+
+class RetailProxyHandler implements Serializable {
+    private boolean configured = false
+
+    boolean isConfigured() {
+        return this.configured
+    }
+
+    void setConfigured() {
+        this.configured = true
     }
 }
 
