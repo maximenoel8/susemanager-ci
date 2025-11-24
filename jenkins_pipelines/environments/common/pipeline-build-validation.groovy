@@ -359,7 +359,8 @@ def run(params) {
                     // End create terminal list block
                     def terminal_deployment_testing = [:]
                     def proxyHandler = new RetailProxyHandler()
-                    terminal_version.each { terminal ->
+                    terminal_version_tmp = ["sles15sp6", "sles15sp7"]
+                    terminal_version_tmp.each { terminal ->
                         terminal_deployment_testing["${terminal}"] = {
                             stage("Build image for ${terminal}") {
                                 def res_build_image = runCucumberRakeTarget("cucumber:build_validation_sanity_check", true)
