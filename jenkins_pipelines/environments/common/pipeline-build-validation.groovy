@@ -344,11 +344,6 @@ def run(params) {
                     if (params.confirm_before_continue) {
                         input 'Press any key to start running the retail tests'
                     }
-                    def temp_terminal = "sles15sp6"
-                    stage("Build image for ${temp_terminal}") {
-                        def res_build_image = runCucumberRakeTarget("cucumber:build_validation_retail_build_image_${temp_terminal}", true)
-                        sh "exit ${res_build_image}"
-                    }
                     def proxyHandler = new RetailProxyHandler()
                     // Dynamically create the terminal list to test depending on the state list
                     def terminal_version = []
