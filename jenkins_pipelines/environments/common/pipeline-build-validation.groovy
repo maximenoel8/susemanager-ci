@@ -344,6 +344,8 @@ def run(params) {
                     if (params.confirm_before_continue) {
                         input 'Press any key to start running the retail tests'
                     }
+                    // ----- Start: Get Terminal List -----
+                    // Dynamically create the terminal list to test depending on the state list
                     Set<String> terminalsList = new HashSet<String>()
                     def tfState = sh(script: "cd ${resultdir}/sumaform; tofu state list", returnStdout: true)
                     String[] moduleList = tfState.split("\n")
@@ -357,71 +359,45 @@ def run(params) {
                     if (terminalsList.isEmpty()) {
                         error "No terminal modules found in Terraform state! Expected format: module.<name>_terminal..."
                     }
-                    // End create terminal list block
+                    // ----- End: Get Terminal List -----
+
                     def terminal_deployment_testing = [:]
                     def proxyHandler = new RetailProxyHandler()
-                    terminal_version_tmp = ["sles15sp6", "sles15sp7"]
-                    terminal_version_tmp.each { terminal ->
+                    terminalsList.each { terminal ->
                         terminal_deployment_testing["${terminal}"] = {
                             stage("Build image for ${terminal}") {
-                                def res_build_image = runCucumberRakeTarget("cucumber:build_validation_sanity_check", true)
+                                def res_build_image = runCucumberRakeTarget("cucumber:build_validation_retail_build_image_${terminal}", true)
                                 sh "exit ${res_build_image}"
-                                proxyHandler.setConfigured()
+                            }
+                            // TODO: Move back configure retail proxy to Retail: Bootstrap build hosts stage once 4.3 and 5.0 are EOL
+                            // Need to be executed after building images for 5.0
+                            // Using lock and proxyHandler to make sure to run it only once, first to start.
+                            stage('Configure retail proxy') {
+                                lock(resource: retailProxyConfigurationLock) {
+                                    if (!proxyHandler.isConfigured()) {
+                                        echo "Running shared Configure retail proxy for the first time..."
+
+                                        def res_configure_retail_proxy = runCucumberRakeTarget('cucumber:build_validation_retail_configure_proxy', true)
+                                        echo "Retail proxy status code: ${res_configure_retail_proxy}"
+                                        sh "exit ${res_configure_retail_proxy}"
+
+                                        // Set flag to true so other branches skip this block
+                                        proxyHandler.setConfigured()
+                                    } else {
+                                        echo "Configure retail proxy already completed by another terminal branch."
+                                    }
+                                }
+                            }
+                            stage("Prepare group and saltboot for ${terminal}") {
+                                def res_prepare_group_saltboot = runCucumberRakeTarget("cucumber:build_validation_retail_prepare_group_saltboot_${terminal}", true)
+                                sh "exit ${res_prepare_group_saltboot}"
+                            }
+                            stage("Deploy terminal ${terminal}") {
+                                def res_deploy_terminal = runCucumberRakeTarget("cucumber:build_validation_retail_deploy_terminal_${terminal}", true)
+                                sh "exit ${res_deploy_terminal}"
                             }
                         }
                     }
-//                    def proxyHandler = new RetailProxyHandler()
-//                    // Dynamically create the terminal list to test depending on the state list
-//                    def terminal_version = []
-//                    def tf_state_list = sh(script: "cd ${resultdir}/sumaform; tofu state list", returnStdout: true).trim()
-//                    def matcher = tf_state_list =~ /module\.([a-zA-Z0-9_]+)_terminal\./
-//                    matcher.each { match ->
-//                        // match[1] is the capture group (e.g., "sles15sp6")
-//                        terminal_version.add(match[1])
-//                    }
-//                    terminal_version = terminal_version.unique().sort()
-//                    echo "Dynamic Terminal List detected from State: ${terminal_version}"
-//                    if (terminal_version.isEmpty()) {
-//                        error "No terminal modules found in Terraform state! Expected format: module.<name>_terminal..."
-//                    }
-//                    // End create terminal list block
-//                    def terminal_deployment_testing = [:]
-//                    def proxy_configured = false
-//                    terminal_version.each { terminal ->
-//                        terminal_deployment_testing["${terminal}"] = {
-//                            stage("Build image for ${terminal}") {
-//                                def res_build_image = runCucumberRakeTarget("cucumber:build_validation_retail_build_image_${terminal}", true)
-//                                sh "exit ${res_build_image}"
-//                            }
-//                            // TODO: Move back configure retail proxy to Retail: Bootstrap build hosts stage once 4.3 and 5.0 are EOL
-//                            // Need to be executed after building images for 5.0
-//                            // Using lock and proxyHandler to make sure to run it only once, first to start.
-//                            stage('Configure retail proxy') {
-//                                lock(resource: retailProxyConfigurationLock) {
-//                                    if (!proxyHandler.isConfigured()) {
-//                                        echo "Running shared Configure retail proxy for the first time..."
-//
-//                                        def res_configure_retail_proxy = runCucumberRakeTarget('cucumber:build_validation_retail_configure_proxy', true)
-//                                        echo "Retail proxy status code: ${res_configure_retail_proxy}"
-//                                        sh "exit ${res_configure_retail_proxy}"
-//
-//                                        // Set flag to true so other branches skip this block
-//                                        proxyHandler.setConfigured()
-//                                    } else {
-//                                        echo "Configure retail proxy already completed by another terminal branch."
-//                                    }
-//                                }
-//                            }
-//                            stage("Prepare group and saltboot for ${terminal}") {
-//                                def res_prepare_group_saltboot = runCucumberRakeTarget("cucumber:build_validation_retail_prepare_group_saltboot_${terminal}", true)
-//                                sh "exit ${res_prepare_group_saltboot}"
-//                            }
-//                            stage("Deploy terminal ${terminal}") {
-//                                def res_deploy_terminal = runCucumberRakeTarget("cucumber:build_validation_retail_deploy_terminal_${terminal}", true)
-//                                sh "exit ${res_deploy_terminal}"
-//                            }
-//                        }
-//                    }
                     parallel terminal_deployment_testing
                 }
             }
