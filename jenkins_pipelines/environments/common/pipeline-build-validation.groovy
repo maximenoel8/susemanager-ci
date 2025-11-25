@@ -362,27 +362,29 @@ def run(params) {
                     // ----- End: Get Terminal List -----
 
                     def terminal_deployment_testing = [:]
-                    def proxyHandler = new RetailProxyHandler()
+                    def retailProxyStatus = [configured: false]
                     terminalsList.each { terminal ->
                         terminal_deployment_testing["${terminal}"] = {
-                            stage("Build image for ${terminal}") {
-                                def res_build_image = runCucumberRakeTarget("cucumber:build_validation_retail_build_image_${terminal}", true)
-                                sh "exit ${res_build_image}"
-                            }
+//                            stage("Build image for ${terminal}") {
+//                                def res_build_image = runCucumberRakeTarget("cucumber:build_validation_retail_build_image_${terminal}", true)
+//                                sh "exit ${res_build_image}"
+//                            }
                             // TODO: Move back configure retail proxy to Retail: Bootstrap build hosts stage once 4.3 and 5.0 are EOL
                             // Need to be executed after building images for 5.0
                             // Using lock and proxyHandler to make sure to run it only once, first to start.
-                            stage('Configure retail proxy') {
+                            stage("Configure retail proxy (${terminal})") {
                                 lock(resource: retailProxyConfigurationLock) {
-                                    if (!proxyHandler.isConfigured()) {
+                                    if (!retailProxyStatus['configured']) {
                                         echo "Running shared Configure retail proxy for the first time..."
 
                                         def res_configure_retail_proxy = runCucumberRakeTarget('cucumber:build_validation_retail_configure_proxy', true)
                                         echo "Retail proxy status code: ${res_configure_retail_proxy}"
-                                        sh "exit ${res_configure_retail_proxy}"
-
+                                        // Ensure we don't mark as configured if it failed
+                                        if (res_configure_retail_proxy != 0) {
+                                            error "Retail proxy configuration failed with exit code: ${res_configure_retail_proxy}"
+                                        }
                                         // Set flag to true so other branches skip this block
-                                        proxyHandler.setConfigured()
+                                        retailProxyStatus['configured'] = true
                                     } else {
                                         echo "Configure retail proxy already completed by another terminal branch."
                                     }
