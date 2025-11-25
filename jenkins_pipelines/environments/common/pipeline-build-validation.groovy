@@ -360,7 +360,10 @@ def run(params) {
                     // ----- End: Get Terminal List -----
 
                     def terminal_deployment_testing = [:]
-                    def retailProxyStatus = [configured: false]
+                    // PENDING = Not run yet
+                    // SUCCESS = Configured successfully
+                    // FAILURE = Configured failed, do not retry
+                    def retailProxyStatus = [status: 'PENDING']
                     terminalsList.each { terminal ->
                         terminal_deployment_testing["${terminal}"] = {
 //                            stage("Build image for ${terminal}") {
@@ -372,19 +375,21 @@ def run(params) {
                             // Using lock and proxyHandler to make sure to run it only once, first to start.
                             stage("Configure retail proxy (${terminal})") {
                                 lock(resource: retailProxyConfigurationLock) {
-                                    if (!retailProxyStatus['configured']) {
-                                        echo "Running shared Configure retail proxy for the first time..."
-
-                                        def res_configure_retail_proxy = runCucumberRakeTarget('cucumber:build_validation_retail_configure_proxy', true)
-                                        echo "Retail proxy status code: ${res_configure_retail_proxy}"
-                                        // Ensure we don't mark as configured if it failed
-                                        if (res_configure_retail_proxy != 0) {
-                                            error "Retail proxy configuration failed with exit code: ${res_configure_retail_proxy}"
-                                        }
-                                        // Set flag to true so other branches skip this block
-                                        retailProxyStatus['configured'] = true
+                                    if (retailProxyStatus['status'] == 'FAILURE') {
+                                        error "Aborting ${terminal}: Retail proxy configuration failed by another branch."
+                                    } else if (retailProxyStatus['status'] == 'SUCCESS') {
+                                        echo "Configure retail proxy already completed (skipped for ${terminal})"
                                     } else {
-                                        echo "Configure retail proxy already completed by another terminal branch."
+                                        def res_configure_retail_proxy = runCucumberRakeTarget('cucumber:build_validation_retail_configure_proxy', true)
+                                        if (res_configure_retail_proxy != 0) {
+                                            // CRITICAL: Mark as FAILURE before throwing error so other waiting threads see it
+                                            retailProxyStatus['status'] = 'FAILURE'
+                                            error "Retail proxy configuration failed with exit code: ${res_configure_retail_proxy}"
+                                        } else {
+                                            // Mark as SUCCESS
+                                            retailProxyStatus['status'] = 'SUCCESS'
+                                            echo "Proxy successfully configured by ${terminal}"
+                                        }
                                     }
                                 }
                             }
