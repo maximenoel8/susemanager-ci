@@ -1,5 +1,3 @@
-import java.io.Serializable
-
 def run(params) {
     timestamps {
         //Capybara configuration
@@ -367,7 +365,7 @@ def run(params) {
                         terminal_deployment_testing["${terminal}"] = {
 //                            stage("Build image for ${terminal}") {
 //                                def res_build_image = runCucumberRakeTarget("cucumber:build_validation_retail_build_image_${terminal}", true)
-//                                sh "exit ${res_build_image}"
+//                                sh "exit ${res_build_image}"situations
 //                            }
                             // TODO: Move back configure retail proxy to Retail: Bootstrap build hosts stage once 4.3 and 5.0 are EOL
                             // Need to be executed after building images for 5.0
@@ -878,18 +876,6 @@ def echoHtmlReportPath(String rake_target) {
         // This catches network errors, DNS failures, or httpRequest throwing
         // an exception if throwExceptionOnError is true (e.g., 404 response).
         echo "Error fetching HTML path from ${path_export_url}: ${e.getMessage()}"
-    }
-}
-
-class RetailProxyHandler implements Serializable {
-    private boolean configured = false
-
-    boolean isConfigured() {
-        return this.configured
-    }
-
-    void setConfigured() {
-        this.configured = true
     }
 }
 
