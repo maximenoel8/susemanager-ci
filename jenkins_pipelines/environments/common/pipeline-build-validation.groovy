@@ -861,26 +861,24 @@ def cleanMigrationFeatureName(String feature) {
 def echoHtmlReportPath(String rake_target) {
     // Construct the full URL to the file containing the HTML path
     def path_export_url = "http://${env.controller_hostname}/results/${env.BUILD_NUMBER}/${rake_target}_html_path.txt"
-
     def html_report_path = ''
-    try {
-        // Use httpRequest to fetch the file content
-        def response = httpRequest(url: path_export_url, throwExceptionOnError: true, quiet: true)
 
-        if (response.status == 200) {
-            // The content is the full relative path to the HTML report
-            html_report_path = response.content.trim()
-
-            // Construct and log the full HTTP URL for the actual report
-            def full_html_url = "http://${env.controller_hostname}/${html_report_path}"
-            echo "HTML Report URL: ${full_html_url}"
-        } else {
-            echo "Warning: Failed to fetch HTML path file. HTTP Status: ${response.status}"
+    retry(3) {
+        try {
+            def response = httpRequest(
+                    url: path_export_url,
+                    quiet: true,
+                    timeout: 30
+            )
+            if (response.status == 200) {
+                html_report_path = response.content.trim()
+                def full_html_url = "http://${env.controller_hostname}/${html_report_path}"
+                echo "HTML Report URL: ${full_html_url}"
+            }
+        } catch (Exception e) {
+            echo "Attempt failed fetching HTML path from ${path_export_url}: ${e.getMessage()}"
+            throw e
         }
-    } catch (Exception e) {
-        // This catches network errors, DNS failures, or httpRequest throwing
-        // an exception if throwExceptionOnError is true (e.g., 404 response).
-        echo "Error fetching HTML path from ${path_export_url}: ${e.getMessage()}"
     }
 }
 
