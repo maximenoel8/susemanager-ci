@@ -7,7 +7,7 @@ def run(params) {
 
         env.controller_hostname = null
         GString TestEnvironmentCleanerProgram = "${WORKSPACE}/susemanager-ci/jenkins_pipelines/scripts/test_environment_cleaner/test_environment_cleaner_program/TestEnvironmentCleaner.py"
-        GString tfvarsPrepareScript = "${WORKSPACE}/susemanager-ci/jenkins_pipelines/scripts/tf_vars_generator/prepare_tfvars.py"
+        GString tfvarsPrepareScript = "${WORKSPACE}/susemanager-ci/jfenkins_pipelines/scripts/tf_vars_generator/prepare_tfvars.py"
 
         deployed = false
         env.resultdir = "${WORKSPACE}/results"
@@ -74,7 +74,7 @@ def run(params) {
 
                 if (params.must_deploy) {
                     // Clone sumaform
-                    sh "set +x; source /home/jenkins/.credentials set -x; ./terracumber-cli ${common_params} --gitrepo ${params.sumaform_gitrepo} --gitref ${params.sumaform_ref} --runstep gitsync"
+                    sh "set +x; source /home/jenkins/.credentials_mnoel set -x; ./terracumber-cli ${common_params} --gitrepo ${params.sumaform_gitrepo} --gitref ${params.sumaform_ref} --runstep gitsync"
 
                     // Generate custom_repositories.json file in the workspace from the value passed by parameter
                     if (params.custom_repositories?.trim()) {
@@ -136,7 +136,7 @@ def run(params) {
                     // Deploy the environment
                     sh """
                         set +x
-                        source /home/jenkins/.credentials
+                        source /home/jenkins/.credentials_mnoel
                         set -x
             
                         export TERRAFORM=${params.bin_path}
