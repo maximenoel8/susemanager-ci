@@ -1,7 +1,7 @@
 PLATFORM_LOCATION_CONFIGURATION = {
   nue = {
     domain    = "mgr.suse.de",
-    mirror    = null,
+    mirror    = "minima-mirror-ci-bv.mgr.suse.de",
     extension = "-nue"
   },
   slc1 = {
@@ -9,5 +9,4 @@ PLATFORM_LOCATION_CONFIGURATION = {
     mirror    = "minima-mirror-ci-bv.mgr.slc1.suse.org",
     extension = "-slc"
   }
-
 }
