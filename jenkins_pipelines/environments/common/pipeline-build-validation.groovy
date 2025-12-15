@@ -7,7 +7,7 @@ def run(params) {
 
         env.controller_hostname = null
         GString TestEnvironmentCleanerProgram = "${WORKSPACE}/susemanager-ci/jenkins_pipelines/scripts/test_environment_cleaner/test_environment_cleaner_program/TestEnvironmentCleaner.py"
-        GString tfvarsPrepareScript = "${WORKSPACE}/susemanager-ci/jfenkins_pipelines/scripts/tf_vars_generator/prepare_tfvars.py"
+        GString tfvarsPrepareScript = "${WORKSPACE}/susemanager-ci/jenkins_pipelines/scripts/tf_vars_generator/prepare_tfvars.py"
 
         deployed = false
         env.resultdir = "${WORKSPACE}/results"
@@ -93,7 +93,7 @@ def run(params) {
                     }
 
                     def locationFile = "susemanager-ci/terracumber_config/tf_files/tfvars/location.tfvars"
-                    def outputFile = "${localSumaformDirPath}/terraform.tfvars"
+                    def outputFile = "${localSumaformDirPath}terraform.tfvars"
 
                     // Build Common Arguments
                     def commonArgs = " --output \"${outputFile}\""
