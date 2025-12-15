@@ -763,6 +763,7 @@ def clientMigrationStages() {
             stage("${minion} migration") {
                 res_minion_migration = runCucumberRakeTarget("cucumber:build_validation_migration_${minion}", true)
                 echo "${minion} migration status code: ${res_minion_migration}"
+                echoHtmlReportPath("cucumber:build_validation_migration_${minion}")
                 if (res_minion_migration != 0) {
                     error("Migration test for ${minion} failed with status code: ${res_minion_migration}")
                 }
