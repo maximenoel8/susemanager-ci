@@ -60,6 +60,7 @@ module "cucumber_testsuite" {
   # when changing images, please also keep in mind to adjust the image matrix at the end of the README.
   host_settings = {
     controller = {
+      name = "poc-host"
       provider_settings = {
         mac       = var.ENVIRONMENT_CONFIGURATION[var.ENVIRONMENT].mac["controller"]
         vcpu = 4
