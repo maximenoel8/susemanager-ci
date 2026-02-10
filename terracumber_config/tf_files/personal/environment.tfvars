@@ -134,7 +134,7 @@ ENVIRONMENT_CONFIGURATION = {
   }
   maxime = {
     mac = {
-      controller     = "aa:b2:93:01:01:8c"
+      controller     = "aa:b2:93:01:01:96"
       server         = "aa:b2:93:01:01:8d"
       proxy          = "aa:b2:93:01:01:8e"
       suse-client    = "aa:b2:93:01:01:8f"
