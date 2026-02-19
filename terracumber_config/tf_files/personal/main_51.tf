@@ -37,6 +37,7 @@ module "cucumber_testsuite" {
 
   images = ["rocky8o", "opensuse156o", "ubuntu2404o", "sles15sp7o", "slmicro61o"]
 
+  ssh_key_path = "/home/jenkins/.ssh/id_ed25519.pub"
   use_avahi    = false
   name_prefix   = "${var.ENVIRONMENT}-"
   domain       = "mgr.suse.de"
@@ -145,7 +146,7 @@ module "cucumber_testsuite" {
       hypervisor = {
         host        = var.ENVIRONMENT_CONFIGURATION[var.ENVIRONMENT].hypervisor
         user        = var.ENVIRONMENT_CONFIGURATION[var.ENVIRONMENT].dhcp_user
-        private_key = file("~/.ssh/id_ed25519")
+        private_key = file("/home/jenkins/.ssh/id_ed25519")
       }
     }
   }
