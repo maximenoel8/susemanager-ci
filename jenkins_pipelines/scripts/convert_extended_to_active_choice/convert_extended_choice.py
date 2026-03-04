@@ -1,241 +1,149 @@
 #!/usr/bin/env python3
 """
-convert_extended_choice.py
-Safely converts extendedChoice parameters to choice in Jenkins pipeline files
+Simple extendedChoice to activeChoice converter
+Handles variable references and maintains proper formatting
 """
 
 import re
 import sys
-import argparse
 from pathlib import Path
 from datetime import datetime
-from typing import Tuple
 
 
-from typing import Tuple
+def convert_extended_choice_block(block: str, indent: str) -> str:
+    """Convert a single extendedChoice block"""
 
-class SafeExtendedChoiceConverter:
-    def __init__(self, dry_run: bool = False):
-        self.dry_run = dry_run
-        self.files_processed = 0
-        self.files_changed = 0
+    # Extract parameters
+    name = re.search(r"name:\s*['\"]([^'\"]+)['\"]", block)
+    choice_type = re.search(r"type:\s*['\"]([^'\"]+)['\"]", block)
+    value = re.search(r"value:\s*([^,\n]+)", block)
+    desc = re.search(r"description:\s*['\"]([^'\"]+)['\"]", block)
 
-    def convert_file_content(self, content: str) -> Tuple[str, bool]:
-        """
-        Convert extendedChoice to choice - line by line for safety.
-        Only converts simple single-line extendedChoice declarations.
-        Returns (new_content, was_changed)
-        """
-        lines = content.split('\n')
-        new_lines = []
-        changed = False
-        i = 0
+    if not name:
+        return block  # Can't parse
 
-        while i < len(lines):
-            line = lines[i]
+    name = name.group(1)
+    choice_type = choice_type.group(1) if choice_type else 'PT_CHECKBOX'
+    value_raw = value.group(1).strip() if value else ''
+    description = desc.group(1) if desc else ''
 
-            # Check if this line starts an extendedChoice
-            if 'extendedChoice(' in line:
-                # Collect the full extendedChoice block (handle multi-line)
-                block_lines = [line]
-                paren_count = line.count('(') - line.count(')')
+    # Build activeChoice
+    result = f"{indent}activeChoice(\n"
+    result += f"{indent}    name: '{name}',\n"
+    result += f"{indent}    choiceType: '{choice_type}',\n"
+    result += f"{indent}    script: [\n"
+    result += f"{indent}        $class: 'GroovyScript',\n"
+    result += f"{indent}        script: [script: 'return {value_raw}']\n"
+    result += f"{indent}    ]"
 
-                # Continue collecting lines until parentheses are balanced
-                j = i + 1
-                while paren_count > 0 and j < len(lines):
-                    block_lines.append(lines[j])
-                    paren_count += lines[j].count('(') - lines[j].count(')')
-                    j += 1
+    if description:
+        result += f",\n{indent}    description: '{description}'"
 
-                # Join the block
-                block = '\n'.join(block_lines)
+    result += f"\n{indent}),"  # ADD COMMA HERE
 
-                # Try to convert this block
-                converted = self.convert_extended_choice_block(block)
-                if converted != block:
-                    new_lines.append(converted)
-                    changed = True
-                    i = j  # Skip the lines we consumed
-                    continue
+    return result
 
-            new_lines.append(line)
-            i += 1
 
-        return '\n'.join(new_lines), changed
+def convert_file(filepath: Path, dry_run: bool = False):
+    """Convert one file"""
 
-    def convert_extended_choice_block(self, block: str) -> str:
-        """Convert a single extendedChoice block to choice"""
+    content = filepath.read_text()
 
-        # Extract parameters using regex
-        name_match = re.search(r'name:\s*[\'"]([^\'"]+)[\'"]', block)
-        type_match = re.search(r'type:\s*[\'"]?([^\'"]+)[\'"]?', block)
-        value_match = re.search(r'value:\s*[\'"]([^\'"]+)[\'"]', block)
-        desc_match = re.search(r'description:\s*[\'"]([^\'"]+)[\'"]', block)
+    if 'extendedChoice' not in content:
+        return False
 
-        if not (name_match and value_match):
-            # Can't parse, return original
-            return block
+    print(f"Processing: {filepath.name}")
 
-        name = name_match.group(1)
-        values = [v.strip() for v in value_match.group(1).split(',')]
-        description = desc_match.group(1) if desc_match else ''
-        choice_type = type_match.group(1) if type_match else 'PT_SINGLE_SELECT'
+    lines = content.split('\n')
+    new_lines = []
+    i = 0
+    changed = False
 
-        # Only convert PT_SINGLE_SELECT to simple choice
-        if 'PT_SINGLE_SELECT' not in choice_type:
-            # For other types, keep original or use activeChoice
-            return self.convert_to_active_choice(name, values, description, choice_type)
+    while i < len(lines):
+        line = lines[i]
 
-        # Build choice parameter
-        indent = self.get_indent(block)
-        choices_str = ', '.join([f"'{v}'" for v in values])
+        if 'extendedChoice(' in line:
+            # Get indent
+            indent = re.match(r'^(\s*)', line).group(1)
 
-        result = f"{indent}choice(\n"
-        result += f"{indent}    name: '{name}',\n"
-        result += f"{indent}    choices: [{choices_str}]"
-        if description:
-            result += f",\n{indent}    description: '{description}'"
-        result += f"\n{indent})"
+            # Collect full block
+            block_lines = [line]
+            paren_depth = line.count('(') - line.count(')')
 
-        return result
+            j = i + 1
+            while paren_depth > 0 and j < len(lines):
+                block_lines.append(lines[j])
+                paren_depth += lines[j].count('(') - lines[j].count(')')
+                j += 1
 
-    def convert_to_active_choice(self, name: str, values: list, description: str, choice_type: str) -> str:
-        """Convert to activeChoice for multi-select types"""
-        indent = "        "
-
-        type_map = {
-            'PT_CHECKBOX': 'PT_CHECKBOX',
-            'PT_MULTI_SELECT': 'PT_CHECKBOX',
-            'PT_RADIO': 'PT_RADIO'
-        }
-        choice_type = type_map.get(choice_type, 'PT_SINGLE_SELECT')
-
-        choices_str = ', '.join([f'"{v}"' for v in values])
-
-        result = f"{indent}activeChoice(\n"
-        result += f"{indent}    name: '{name}',\n"
-        result += f"{indent}    choiceType: '{choice_type}',\n"
-        result += f"{indent}    script: [\n"
-        result += f"{indent}        $class: 'GroovyScript',\n"
-        result += f"{indent}        script: [script: 'return [{choices_str}]']\n"
-        result += f"{indent}    ]"
-        if description:
-            result += f",\n{indent}    description: '{description}'"
-        result += f"\n{indent})"
-
-        return result
-
-    def get_indent(self, text: str) -> str:
-        """Get the indentation from the first line"""
-        match = re.match(r'^(\s*)', text)
-        return match.group(1) if match else ''
-
-    def convert_file(self, filepath: Path) -> bool:
-        """Convert a single file. Returns True if changed."""
-        try:
-            # Read file
-            content = filepath.read_text(encoding='utf-8')
-
-            # Check if contains extendedChoice
-            if 'extendedChoice' not in content:
-                return False
-
-            self.files_processed += 1
-            print(f"Processing: {filepath}")
+            block = '\n'.join(block_lines)
 
             # Convert
-            new_content, changed = self.convert_file_content(content)
+            converted = convert_extended_choice_block(block, indent)
 
-            if not changed:
-                print(f"  ⊘ No changes needed")
-                return False
+            new_lines.append(converted)
+            changed = True
+            i = j
+            print(f"  ✓ Converted extendedChoice")
+            continue
 
-            if self.dry_run:
-                print(f"  [DRY RUN] Would modify file")
-                print(f"  Preview of changes:")
-                # Show a diff-like output
-                old_lines = content.split('\n')
-                new_lines = new_content.split('\n')
-                for i, (old, new) in enumerate(zip(old_lines, new_lines), 1):
-                    if old != new:
-                        print(f"    Line {i}:")
-                        print(f"      - {old}")
-                        print(f"      + {new}")
-                return False
+        new_lines.append(line)
+        i += 1
 
-            # Create backup
-            timestamp = datetime.now().strftime('%Y%m%d-%H%M%S')
-            backup_path = filepath.with_suffix(f'.backup-{timestamp}')
-            filepath.write_text(content, encoding='utf-8')  # Write original as backup
-            backup_path.write_text(content, encoding='utf-8')
+    if not changed:
+        print(f"  ⊘ No changes")
+        return False
 
-            # Write converted content
-            filepath.write_text(new_content, encoding='utf-8')
+    new_content = '\n'.join(new_lines)
 
-            print(f"  ✓ Converted")
-            print(f"  ✓ Backup: {backup_path.name}")
+    if dry_run:
+        print(f"  [DRY RUN] Preview:")
+        print(new_content[:500])
+        return False
 
-            self.files_changed += 1
-            return True
+    # Create backup
+    backup = filepath.with_suffix(f'.backup-{datetime.now().strftime("%Y%m%d-%H%M%S")}')
+    backup.write_text(content)
+    print(f"  ✓ Backup: {backup.name}")
 
-        except Exception as e:
-            print(f"  ✗ Error: {e}")
-            import traceback
-            traceback.print_exc()
-            return False
+    # Write new content
+    filepath.write_text(new_content)
+    print(f"  ✓ Saved")
 
-    def process_path(self, path: Path):
-        """Process a file or directory"""
-        if path.is_file():
-            self.convert_file(path)
-        else:
-            print(f"Searching in: {path}\n")
-            for filepath in sorted(path.rglob('*')):
-                # Skip if not a file
-                if not filepath.is_file():
-                    continue
-
-                # Skip backup files
-                if '.backup-' in filepath.name or filepath.name.endswith('-BACKUP'):
-                    continue
-
-                # Skip hidden files
-                if any(part.startswith('.') for part in filepath.parts):
-                    continue
-
-                self.convert_file(filepath)
-
-    def print_summary(self):
-        """Print summary"""
-        print("\n" + "="*60)
-        print(f"Files processed: {self.files_processed}")
-        print(f"Files changed:   {self.files_changed}")
-        print("="*60)
+    return True
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Convert extendedChoice to choice/activeChoice')
-    parser.add_argument('path', type=Path, help='File or directory to process')
-    parser.add_argument('--dry-run', action='store_true', help='Preview changes without modifying files')
-
-    args = parser.parse_args()
-
-    if not args.path.exists():
-        print(f"Error: {args.path} does not exist")
+    if len(sys.argv) < 2:
+        print("Usage: python3 convert.py <file_or_directory> [--dry-run]")
         sys.exit(1)
 
-    print("╔══════════════════════════════════════════════════════════╗")
-    print("║  Extended Choice Converter                               ║")
-    print("╚══════════════════════════════════════════════════════════╝\n")
+    path = Path(sys.argv[1])
+    dry_run = '--dry-run' in sys.argv
 
-    converter = SafeExtendedChoiceConverter(dry_run=args.dry_run)
-    converter.process_path(args.path)
-    converter.print_summary()
+    print("="*60)
+    print("Extended Choice to Active Choice Converter")
+    print("="*60)
+    print()
+
+    if path.is_file():
+        convert_file(path, dry_run)
+    else:
+        for f in sorted(path.rglob('*')):
+            if not f.is_file():
+                continue
+            if '-BACKUP' in f.name or '.backup-' in f.name:
+                continue
+            if f.name.startswith('.'):
+                continue
+
+            convert_file(f, dry_run)
+
+    print()
+    print("="*60)
+    print("Done!")
+    print("="*60)
 
 
 if __name__ == '__main__':
-    try:
-        main()
-    except KeyboardInterrupt:
-        print("\nInterrupted")
-        sys.exit(1)
+    main()
