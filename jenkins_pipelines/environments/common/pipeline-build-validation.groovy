@@ -112,8 +112,8 @@ def run(params) {
                         commonArgs += " --inject SERVER_CONTAINER_IMAGE=${server_container_image}"
                         commonArgs += " --inject CUCUMBER_GITREPO=${params.cucumber_gitrepo}"
                         commonArgs += " --inject CUCUMBER_BRANCH=${params.cucumber_ref}"
-                        commonArgs += " --inject PRIVATE_SSH_KEY_PATH=\"./salt/controller/id_ed25519\""
-                        commonArgs += " --inject PUBLIC_SSH_KEY_PATH=\"./salt/controller/id_ed25519.pub\""
+                        commonArgs += " --inject PRIVATE_SSH_KEY_PATH=\"/home/jenkins/.ssh/id_ed25519\""
+                        commonArgs += " --inject PUBLIC_SSH_KEY_PATH=\"/home/jenkins/.ssh/id_ed25519.pub\""
                         if (product_version) { commonArgs += " --inject PRODUCT_VERSION=${product_version}" }
                         if (base_os) { commonArgs += " --inject BASE_OS=${base_os}" }
                         if (fileExists('custom_repositories.json')) {
