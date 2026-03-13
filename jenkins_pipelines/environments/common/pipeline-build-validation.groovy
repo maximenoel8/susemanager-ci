@@ -69,9 +69,10 @@ def run(params) {
 
             stage('Deploy') {
                 // Restore Terraform states from artifacts
-                if (params.use_previous_terraform_state) {
-                    copyArtifacts projectName: currentBuild.projectName, selector: specific("${currentBuild.previousBuild.number}")
-                }
+                copyArtifacts(
+                        projectName: currentBuild.projectName,
+                        selector: [$class: 'SpecificBuildSelector', buildNumber: "${currentBuild.previousBuild.number}"]
+                )
 
                 if (params.must_deploy) {
                     withCredentials([string(credentialsId: 'sumaform-secrets', variable: 'SECRET_CONTENT')]) {
