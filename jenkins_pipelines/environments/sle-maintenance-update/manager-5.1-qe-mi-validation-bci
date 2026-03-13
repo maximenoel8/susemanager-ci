@@ -3,7 +3,7 @@
 node('sumaform-cucumber') {
     def minionList = 'sles15sp7_minion'
     properties([
-        buildDiscarder(logRotator(numToKeepStr: '5', artifactNumToKeepStr: '3')),
+        buildDiscarder(logRotator(numToKeepStr: '12', artifactNumToKeepStr: '3')),
         disableConcurrentBuilds(),
         pipelineTriggers([
                 pollSCM('')  // Empty schedule - only polls when webhook triggers
