@@ -1,4 +1,5 @@
 import argparse
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from functools import cache
 import json
 import requests
@@ -48,7 +49,7 @@ def clean_mi_ids(mi_ids: list[str]) -> set[str]:
 def create_url(mi_id: str, suffix: str) -> str:
     url = f"{IBS_MAINTENANCE_URL_PREFIX}{mi_id}{suffix}"
 
-    res: requests.Response = requests.get(url, timeout=(3, 6))
+    res: requests.Response = requests.get(url, timeout=(1, 2))
     return url if res.ok else ""
 
 def validate_and_store_results(expected_ids: set [str], custom_repositories: dict[str, dict[str, str]], output_file: str = JSON_OUTPUT_FILE_NAME):
@@ -92,7 +93,17 @@ def update_custom_repositories(custom_repositories: dict[str, dict[str, str]], n
     custom_repositories[node] = node_ids
 
 
-def find_valid_repos(mi_ids: set[str], version: str):
+def find_valid_repos(mi_ids: set[str], version: str, max_workers: int = 20):
+    """
+    Find valid repository URLs for given MI IDs and version.
+
+    Uses parallel HTTP requests to check repository existence.
+
+    Args:
+        mi_ids: Set of MI ID strings
+        version: SUMA version (43, 50-sles, 51-sles, etc.)
+        max_workers: Number of concurrent HTTP requests (default: 20)
+    """
     version_data = get_version_nodes(version)
 
     static_repos = version_data.get("static", {})
@@ -100,13 +111,41 @@ def find_valid_repos(mi_ids: set[str], version: str):
 
     custom_repositories = init_custom_repositories(version, static_repos)
 
+    # Build list of all (node, mi_id, repo) combinations to check
+    tasks = []
     for node, repositories in dynamic_nodes.items():
         for mi_id in mi_ids:
             for repo in repositories:
-                repo_url: str = create_url(mi_id, repo)
-                if repo_url:
-                    update_custom_repositories(custom_repositories, node, mi_id, repo_url)
+                tasks.append((node, mi_id, repo))
 
+    logging.info(f"Checking {len(tasks)} repository URLs in parallel (max_workers={max_workers})")
+
+    # Execute HTTP requests in parallel
+    import threading
+    lock = threading.Lock()
+    found_count = 0
+
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
+        # Submit all tasks
+        future_to_task = {
+            executor.submit(create_url, mi_id, repo): (node, mi_id, repo)
+            for node, mi_id, repo in tasks
+        }
+
+        # Collect results as they complete
+        for future in as_completed(future_to_task):
+            node, mi_id, repo = future_to_task[future]
+            try:
+                repo_url = future.result()
+                if repo_url:
+                    # Thread-safe update
+                    with lock:
+                        update_custom_repositories(custom_repositories, node, mi_id, repo_url)
+                        found_count += 1
+            except Exception as exc:
+                logging.warning(f"Error checking {mi_id}{repo}: {exc}")
+
+    logging.info(f"Found {found_count} valid repositories out of {len(tasks)} checked")
     validate_and_store_results(mi_ids, custom_repositories)
 
 def main():
