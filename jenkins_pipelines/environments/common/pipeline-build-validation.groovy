@@ -947,8 +947,6 @@ def echoHtmlReportPath(String rake_target) {
             echo "Warning: Failed to fetch HTML path file. HTTP Status: ${response.status}"
         }
     } catch (Exception e) {
-        // This catches network errors, DNS failures, or httpRequest throwing
-        // an exception if throwExceptionOnError is true (e.g., 404 response).
         echo "Error fetching HTML path from ${path_export_url}: ${e.getMessage()}"
     }
 }
