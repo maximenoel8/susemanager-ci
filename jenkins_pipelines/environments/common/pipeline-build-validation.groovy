@@ -115,7 +115,7 @@ def run(params) {
                     //  -- Personal BV Arguments --
                     if (params.environment) {
                         // We construct from env reference. No cleaning needed as we only add selected minions.
-                        scenarioArgs += " --env-file \"${tfRefEnvironmentFile}\" --user \"${params.environment}\""
+                        scenarioArgs += " --env-file \"${tfRefEnvironmentFile}\" --user \"${params.environment}\" --product-version \"${params.product_version}\""
                         scenarioArgs += " --minion1 \"${params.minion1}\""
                         scenarioArgs += " --minion2 \"${params.minion2}\""
                         scenarioArgs += " --minion3 \"${params.minion3}\""
