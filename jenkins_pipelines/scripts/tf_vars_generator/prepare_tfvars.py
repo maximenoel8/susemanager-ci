@@ -91,23 +91,37 @@ class TfvarsGenerator:
             'minion7': 'kvm-host',
         }
 
+        product_version = params.get("product_version", "5.1-released")
+        is_43 = "4.3" in product_version
+
         env_config = {
             'controller': {'mac': macs.get("controller", "MISSING"), 'name': "controller"},
-            'server_containerized': {
+            'product_version': product_version,
+            'name_prefix': f"{user}-",
+        }
+
+        if is_43:
+            env_config['server'] = {
+                'mac': macs.get("server", "MISSING"),
+                'name': "server",
+            }
+            env_config['proxy'] = {
+                'mac': macs.get("proxy", "MISSING"),
+                'name': "proxy",
+            }
+        else:
+            env_config['server_containerized'] = {
                 'mac': macs.get("server", "MISSING"),
                 'name': "server",
                 'image': params.get("base_os", "slmicro61o"),
                 'string_registry': params.get("string_registry", "false")
-            },
-            'proxy_containerized': {
+            }
+            env_config['proxy_containerized'] = {
                 'mac': macs.get("proxy", "MISSING"),
                 'name': "proxy",
                 'image': params.get("base_os", "slmicro61o"),
                 'string_registry': params.get("string_registry", "false")
-            },
-            'product_version': params.get("product_version", "5.1-released"),
-            'name_prefix': f"{user}-",
-        }
+            }
 
         for param_key, mac_key in slot_mapping.items():
             minion_type = params.get(param_key)
