@@ -127,21 +127,21 @@ def run(params) {
                         // Personal scenario specific arguments
                         def scenarioArgs = ""
 
-                        //  -- Personal BV Arguments --
-                        if (params.environment) {
-                            // We construct from env reference. No cleaning needed as we only add selected minions.
-                            scenarioArgs += " --env-file \"${tfRefEnvironmentFile}\" --user \"${params.environment}\""
-                            scenarioArgs += " --minion1 \"${params.minion1}\""
-                            scenarioArgs += " --minion2 \"${params.minion2}\""
-                            scenarioArgs += " --minion3 \"${params.minion3}\""
-                            scenarioArgs += " --minion4 \"${params.minion4}\""
-                            scenarioArgs += " --minion5 \"${params.minion5}\""
-                            scenarioArgs += " --minion6 \"${params.minion6}\""
-                            scenarioArgs += " --minion7 \"${params.minion7}\""
-                            scenarioArgs += " --base-os \"${params.base_os}\""
-                            scenarioArgs += " --string-registry \"${params.string_registry}\""
-                            if (params.deploy_retail) { scenarioArgs += " --deploy-retail" }
-                            scenarioArgs += " --merge-files \"${locationFile}\"" // Merge location only
+                    //  -- Personal BV Arguments --
+                    if (params.environment) {
+                        // We construct from env reference. No cleaning needed as we only add selected minions.
+                        scenarioArgs += " --env-file \"${tfRefEnvironmentFile}\" --user \"${params.environment}\" --product-version \"${params.product_version}\""
+                        scenarioArgs += " --minion1 \"${params.minion1}\""
+                        scenarioArgs += " --minion2 \"${params.minion2}\""
+                        scenarioArgs += " --minion3 \"${params.minion3}\""
+                        scenarioArgs += " --minion4 \"${params.minion4}\""
+                        scenarioArgs += " --minion5 \"${params.minion5}\""
+                        scenarioArgs += " --minion6 \"${params.minion6}\""
+                        scenarioArgs += " --minion7 \"${params.minion7}\""
+                        scenarioArgs += " --base-os \"${params.base_os}\""
+                        scenarioArgs += " --string-registry \"${params.string_registry}\""
+                        if (params.deploy_retail) { scenarioArgs += " --deploy-retail" }
+                        scenarioArgs += " --merge-files \"${locationFile}\"" // Merge location only
 
                         } else if (params.get('deployment_tfvars')) {
                             // -- Common BV arguments --
