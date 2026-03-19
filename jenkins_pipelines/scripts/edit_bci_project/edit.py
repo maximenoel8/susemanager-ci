@@ -294,8 +294,8 @@ def main():
                 xml_content = ET.tostring(root, encoding='unicode')
                 logging.debug(f"Uploading project metadata:\n{xml_content}")
                 tmp.write(xml_content)
-                run_osc_command(["osc", "-A", args.api_url, "meta", "prj", args.container_project, "-F", tmp.name])
-            os.remove(tmp.name)
+                run_osc_command(["osc", "-A", args.api_url, "--verbose", "meta", "prj", args.container_project, "-F", tmp.name])
+            # os.remove(tmp.name)
 
             # --- Verify metadata was correctly applied before wiping ---
             verify_metadata(args.api_url, args.container_project, args.mi_project)
