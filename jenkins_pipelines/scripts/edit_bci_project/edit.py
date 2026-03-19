@@ -290,6 +290,7 @@ def main():
                 repo_node.insert(insertion_index + i, new_path)
 
             with tempfile.NamedTemporaryFile(mode='w', delete=False) as tmp:
+                ET.indent(root)
                 xml_content = ET.tostring(root, encoding='unicode')
                 logging.debug(f"Uploading project metadata:\n{xml_content}")
                 tmp.write(xml_content)
