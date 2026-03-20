@@ -387,50 +387,48 @@ def run(params) {
                         input 'Press any key to start running the retail tests'
                     }
                     def nodesHandler = getNodesHandler(params)
-                    // Filter the nodeList for items that are terminals
-                    // The handler already identifies 'terminal' strings in the state
                     Set<String> terminalsList = nodesHandler.fullNodeList.findAll { it.contains('terminal') }
                             .collect { it.replace('_terminal', '') }
                     echo "Dynamic Terminal List detected from Handler: ${terminalsList}"
                     if (terminalsList.isEmpty()) {
                         error "No terminal modules found in Terraform state!"
                     }
-                    // ----- End: Get Terminal List -----
 
-                    def terminal_deployment_testing = [:]
-                    // PENDING = Not run yet
-                    // SUCCESS = Configured successfully
-                    // FAILURE = Configured failed, do not retry
-                    def retailProxyStatus = [status: 'PENDING']
+                    // --- Phase 1: Build images for ALL terminals in parallel ---
+                    def build_image_stages = [:]
+                    def buildResults = [:]  // track per-terminal build outcome
+
                     terminalsList.each { terminal ->
-                        terminal_deployment_testing["${terminal}"] = {
+                        build_image_stages["${terminal}"] = {
                             stage("Build image for ${terminal}") {
                                 def res_build_image = runCucumberRakeTarget("cucumber:build_validation_retail_build_image_${terminal}", true)
+                                buildResults[terminal] = (res_build_image == 0) ? 'SUCCESS' : 'FAILURE'
                                 sh "exit ${res_build_image}"
                             }
-                            // TODO: Move back configure retail proxy to Retail: Bootstrap build hosts stage once 4.3 and 5.0 are EOL
-                            // Need to be executed after building images for 5.0
-                            // Using lock and proxyHandler to make sure to run it only once, first to start.
-                            stage("Configure retail proxy (${terminal})") {
-                                lock(resource: retailProxyConfigurationLock) {
-                                    if (retailProxyStatus['status'] == 'FAILURE') {
-                                        error "Aborting ${terminal}: Retail proxy configuration failed by another branch."
-                                    } else if (retailProxyStatus['status'] == 'SUCCESS') {
-                                        echo "Configure retail proxy already completed (skipped for ${terminal})"
-                                    } else {
-                                        def res_configure_retail_proxy = runCucumberRakeTarget('cucumber:build_validation_retail_configure_proxy', true)
-                                        if (res_configure_retail_proxy != 0) {
-                                            // CRITICAL: Mark as FAILURE before throwing error so other waiting threads see it
-                                            retailProxyStatus['status'] = 'FAILURE'
-                                            error "Retail proxy configuration failed with exit code: ${res_configure_retail_proxy}"
-                                        } else {
-                                            // Mark as SUCCESS
-                                            retailProxyStatus['status'] = 'SUCCESS'
-                                            echo "Proxy successfully configured by ${terminal}"
-                                        }
-                                    }
-                                }
-                            }
+                        }
+                    }
+                    // failFast: false ensures all terminals attempt to build even if one fails
+                    build_image_stages.failFast = false
+                    parallel build_image_stages
+
+                    // --- Phase 2: Configure retail proxy ONCE (after all builds attempted) ---
+                    def successfulTerminals = buildResults.findAll { it.value == 'SUCCESS' }.keySet()
+                    if (successfulTerminals.isEmpty()) {
+                        error "All terminal image builds failed — skipping proxy configuration and deployment."
+                    }
+
+                    stage("Configure retail proxy") {
+                        def res_configure_retail_proxy = runCucumberRakeTarget('cucumber:build_validation_retail_configure_proxy', true)
+                        if (res_configure_retail_proxy != 0) {
+                            error "Retail proxy configuration failed with exit code: ${res_configure_retail_proxy}"
+                        }
+                        echo "Retail proxy successfully configured."
+                    }
+
+                    // --- Phase 3: Prepare and deploy only successfully built terminals in parallel ---
+                    def deploy_stages = [:]
+                    successfulTerminals.each { terminal ->
+                        deploy_stages["${terminal}"] = {
                             stage("Prepare group and saltboot for ${terminal}") {
                                 def res_prepare_group_saltboot = runCucumberRakeTarget("cucumber:build_validation_retail_prepare_group_saltboot_${terminal}", true)
                                 sh "exit ${res_prepare_group_saltboot}"
@@ -441,7 +439,7 @@ def run(params) {
                             }
                         }
                     }
-                    parallel terminal_deployment_testing
+                    parallel deploy_stages
                 }
             }
             /** Retail stages end **/
