@@ -21,11 +21,13 @@ ENVIRONMENT_CONFIGURATION = {
     name = "monitoring"
     image = "sles15sp7o"
   }
-
-  # Build Hosts
-  sles15sp4_buildhost = {
-    mac  = "aa:b2:93:04:05:71"
-    name = "sles15sp4-build"
+  sles15sp6_buildhost = {
+    mac  = "aa:b2:93:04:05:72"
+    name = "sles15sp6-build"
+  }
+  sles15sp7_buildhost = {
+    mac  = "aa:b2:93:04:05:73"
+    name = "sles15sp7-build"
   }
 
   # Standard Minions
@@ -141,6 +143,10 @@ ENVIRONMENT_CONFIGURATION = {
     mac  = "aa:b2:93:04:05:98"
     name = "slmicro61-minion"
   }
+  slmicro62_minion = {
+    mac  = "aa:b2:93:04:05:99"
+    name = "slmicro62-minion"
+  }
 
   # SSH Minions
   sles12sp5_sshminion = {
@@ -253,7 +259,7 @@ BASE_CONFIGURATIONS = {
     hypervisor         = "cosmopolitan.mgr.slc1.suse.org"
   }
   base_new_sle = {
-    images             = [ "sles15sp3o", "sles15sp4o", "sles15sp5o", "sles15sp6o", "sles15sp7o", "slemicro52-ign", "slemicro53-ign" , "slemicro54-ign", "slemicro55o", "slmicro60o", "slmicro61o", "tumbleweedo" ]
+    images             = [ "sles15sp3o", "sles15sp4o", "sles15sp5o", "sles15sp6o", "sles15sp7o", "slemicro52-ign", "slemicro53-ign" , "slemicro54-ign", "slemicro55o", "slmicro60o", "slmicro61o", "slmicro62o", "tumbleweedo" ]
     pool               = "ssd"
     bridge             = "br1"
     additional_network = null
