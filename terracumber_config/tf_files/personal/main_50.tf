@@ -36,7 +36,7 @@ module "cucumber_testsuite" {
 
   images = ["rocky8o", "opensuse156o", "ubuntu2404o", "sles15sp7o", "slemicro55o"]
 
-  ssh_key_path = "/home/jenkins/.ssh/id_ed25519.pub"
+  ssh_key_path = "/home/jenkins/.ssh/id_ed25519.controller.pub"
   use_avahi    = false
   name_prefix   = "${var.ENVIRONMENT}-"
   domain       = "mgr.suse.de"
