@@ -31,6 +31,7 @@ node('sumaform-cucumber') {
                     choiceType: 'PT_CHECKBOX',
                     script: [
                             $class: 'GroovyScript',
+                            groovyHtml: true,
                             script: [
                                     $class: 'SecureGroovyScript',
                                     script: """
