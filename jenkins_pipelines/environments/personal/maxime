@@ -36,7 +36,7 @@ node('sumaform-cucumber') {
                                     $class: 'SecureGroovyScript',
                                     script: """
                 return [
-                    '\u0040scope_smdba', '\\@scope_spacecmd', '@scope_spacewalk_utils', '@scope_visualization',
+                    '\u0040scope_smdba', '@scope_spacecmd', '@scope_spacewalk_utils', '@scope_visualization',
                     '@scope_notification_message', '@scope_virtual_host_manager', '@scope_subscription_matching',
                     '@scope_formulas', '@scope_sp_migration', '@scope_cve_audit', '@scope_onboarding',
                     '@scope_content_lifecycle_management', '@scope_res', '@scope_recurring_actions',
