@@ -31,7 +31,7 @@ node('sumaform-cucumber') {
                     choiceType: 'PT_CHECKBOX',
                     script: [
                             $class: 'GroovyScript',
-//                            groovyHtml: true,
+                            groovyHtml: true,
                             script: [
                                     $class: 'SecureGroovyScript',
                                     script: """
@@ -49,7 +49,7 @@ node('sumaform-cucumber') {
                     '@scope_retracted_patches', '@scope_ansible'
                 ]
             """.stripIndent(),
-                                    sandbox: true
+                                    sandbox: false
                             ],
                             fallbackScript: [
                                     $class: 'SecureGroovyScript',
