@@ -136,13 +136,16 @@ def run(params) {
                     }
 
                     def cucumberCmd1 = "${tags_list}cd /root/spacewalk/testsuite; ${exports} rake cucumber:secondary"
-                    def statusCode1 = sh script: """./terracumber-cli ${common_params} --logfile ${resultdirbuild}/testsuite.log --runstep cucumber --cucumber-cmd '${cucumberCmd1}'""", returnStatus: true
-
                     def cucumberCmd2 = "${tags_list}cd /root/spacewalk/testsuite; ${exports} rake ${params.rake_namespace}:secondary_parallelizable"
-                    def statusCode2 = sh script: """./terracumber-cli ${common_params} --logfile ${resultdirbuild}/testsuite.log --runstep cucumber --cucumber-cmd '${cucumberCmd2}'""", returnStatus: true
-
                     def cucumberCmd3 = "${tags_list}cd /root/spacewalk/testsuite; ${exports} rake ${params.rake_namespace}:secondary_finishing"
-                    def statusCode3 = sh script: """./terracumber-cli ${common_params} --logfile ${resultdirbuild}/testsuite.log --runstep cucumber --cucumber-cmd '${cucumberCmd3}'""", returnStatus: true
+
+                    def encoded1 = cucumberCmd1.bytes.encodeBase64().toString()
+                    def encoded2 = cucumberCmd2.bytes.encodeBase64().toString()
+                    def encoded3 = cucumberCmd3.bytes.encodeBase64().toString()
+
+                    def statusCode1 = sh script: "./terracumber-cli ${common_params} --logfile ${resultdirbuild}/testsuite.log --runstep cucumber --cucumber-cmd 'echo ${encoded1} | base64 -d | bash'", returnStatus: true
+                    def statusCode2 = sh script: "./terracumber-cli ${common_params} --logfile ${resultdirbuild}/testsuite.log --runstep cucumber --cucumber-cmd 'echo ${encoded2} | base64 -d | bash'", returnStatus: true
+                    def statusCode3 = sh script: "./terracumber-cli ${common_params} --logfile ${resultdirbuild}/testsuite.log --runstep cucumber --cucumber-cmd 'echo ${encoded3} | base64 -d | bash'", returnStatus: true
                     sh "exit \$(( ${statusCode1}|${statusCode2}|${statusCode3} ))"
                 }
             }
