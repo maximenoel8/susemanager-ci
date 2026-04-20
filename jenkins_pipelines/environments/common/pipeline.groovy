@@ -131,7 +131,7 @@ def run(params) {
                 def tags_list = ""
                 if (params.functional_scopes) {
                     def transformed_scopes = params.functional_scopes.replaceAll(',', ' or ')
-                    tags_list += "export TAGS=${transformed_scopes}; "
+                    tags_list += "export TAGS='${transformed_scopes}'; "
                 }
                 def statusCode1 = sh script:"./terracumber-cli ${common_params} --logfile ${resultdirbuild}/testsuite.log --runstep cucumber --cucumber-cmd '${tags_list} cd /root/spacewalk/testsuite; ${env.exports} rake cucumber:secondary'", returnStatus:true
                 def statusCode2 = sh script:"./terracumber-cli ${common_params} --logfile ${resultdirbuild}/testsuite.log --runstep cucumber --cucumber-cmd '${tags_list} cd /root/spacewalk/testsuite; ${env.exports} rake ${params.rake_namespace}:secondary_parallelizable'", returnStatus:true
