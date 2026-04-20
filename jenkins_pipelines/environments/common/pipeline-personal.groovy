@@ -130,9 +130,12 @@ def run(params) {
             stage('Secondary features') {
                 if (params.run_secondary) {
                     def tags_list = ""
+                    echo "functional_scopes: ${params.functional_scopes}"
                     if (params.functional_scopes) {
                         def transformed_scopes = params.functional_scopes.replaceAll(',', ' or ')
-                        tags_list += "export TAGS='${transformed_scopes}'; "
+                        echo "Formated scops: ${transformed_scopes}"
+                        tags_list = "export TAGS='${transformed_scopes}'; "
+                        echo "Tag list: ${tags_list}"
                     }
                     def statusCode1 = sh script: "./terracumber-cli ${common_params} --logfile ${resultdirbuild}/testsuite.log --runstep cucumber --cucumber-cmd '${tags_list} cd /root/spacewalk/testsuite; ${exports} rake cucumber:secondary'", returnStatus: true
                     def statusCode2 = sh script: "./terracumber-cli ${common_params} --logfile ${resultdirbuild}/testsuite.log --runstep cucumber --cucumber-cmd '${tags_list} cd /root/spacewalk/testsuite; ${exports} rake ${params.rake_namespace}:secondary_parallelizable'", returnStatus: true
