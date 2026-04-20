@@ -134,7 +134,7 @@ def run(params) {
                     if (params.functional_scopes) {
                         def transformed_scopes = params.functional_scopes.replaceAll(',', ' or ')
                         echo "Formated scops: ${transformed_scopes}"
-                        tags_list = 'TAGS=' + transformed_scopes + '; export TAGS; '
+                        tags_list = "TAGS='" + transformed_scopes + "'; export TAGS; "
                         echo "Tag list: ${tags_list}"
                     }
                     echo "Command: ./terracumber-cli ${common_params} --logfile ${resultdirbuild}/testsuite.log --runstep cucumber --cucumber-cmd '${tags_list} cd /root/spacewalk/testsuite; ${exports} rake cucumber:secondary'"
