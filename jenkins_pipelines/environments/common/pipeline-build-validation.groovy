@@ -518,7 +518,26 @@ def run(params) {
                             reportFiles: 'cucumber_report.html',
                             reportName: "Build Validation report"]
                     )
-//                    junit allowEmptyResults: true, testResults: "${junit_resultdir}/*.xml"
+                    // Publish Cucumber JSON reports (requires Cucumber Reports plugin)
+                    cucumber(
+                            fileIncludePattern: '**/*.json',
+                            jsonReportDirectory: "${resultdirbuild}",
+                            reportTitle: 'Cucumber Build Validation',
+                            buildStatus: 'UNSTABLE',
+                            trendsLimit: 10,
+                            failedFeaturesNumber: -1,
+                            failedScenariosNumber: -1,
+                            failedStepsNumber: -1,
+                            pendingStepsNumber: -1,
+                            skippedStepsNumber: -1,
+                            undefinedStepsNumber: -1
+                    )
+                    // Publish JUnit XML results (requires JUnit plugin)
+                    junit(
+                            allowEmptyResults: true,
+                            testResults: "${junit_resultdir}/*.xml",
+                            keepLongStdio: true
+                    )
                 }
                 // Clean up old results
                 sh "./clean-old-results -r ${resultdir}"
