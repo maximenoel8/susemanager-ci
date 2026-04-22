@@ -25,7 +25,7 @@ import os
 import argparse
 
 BV_DEFAULT  = os.path.join(os.path.dirname(__file__), '../../environments/build-validation')
-BAC_DEFAULT = os.path.join(os.path.dirname(__file__), '../../environments/build-validation-active-choice')
+BAC_DEFAULT = os.path.join(os.path.dirname(__file__), '../../environments/build-validation')
 
 # Match the minionList variable block (stops before properties/stage/other def)
 minion_block_re = re.compile(
