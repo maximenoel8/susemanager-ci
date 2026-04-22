@@ -1,0 +1,530 @@
+#!/usr/bin/python3
+"""CLI tool to use terracumber"""
+import argparse
+import datetime
+import json
+import os
+import paramiko
+import re
+import sys
+import terracumber.config
+import terracumber.git
+import terracumber.terraformer
+import terracumber.cucumber
+import terracumber.junit
+import terracumber.mailer
+import terracumber.utils
+import logging
+
+# Set up logger
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+handler = logging.StreamHandler()
+handler.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
+logger.addHandler(handler)
+
+def parse_args():
+    """Parse arguments"""
+    parser = argparse.ArgumentParser(description='Run terrafrom and cucumber')
+    parser.add_argument('--tf', help='Path to main.tf file', required=True)
+    parser.add_argument('--tf_configuration_files', action='append', help='Path to terraform configuration file ('
+                        'tfvars)', required=False, default=[])
+    parser.add_argument('--tf_variables_description_file', help='Path to variables description file (variables.tf)',
+                        required=False, default='')
+    parser.add_argument('--tf_variables_product_file', help='Path to variables product file (variables.tf)',
+                        required=False, default='')
+    parser.add_argument('--gitrepo',
+                        help='URL to the git repository containing terraform definitions',
+                        default='https://github.com/uyuni-project/sumaform.git')
+    parser.add_argument('--gitref', help='Git reference to be used (branch or tag name)',
+                        default='master')
+    parser.add_argument('--gitfolder', help='Folder to store the git clone',
+                        default='/tmp/sumaform')
+    parser.add_argument('--gituser',
+                        help='GitHub user. Required only with --runall or --runstep gitclone',
+                        default=None)
+    parser.add_argument('--gitpassword', help='GitHub password', default=None)
+    parser.add_argument(
+        '--logfile', help='File to store the log', default='/tmp/sumaform.log')
+    parser.add_argument('--outputdir', help='Folder to store the cucumber outputs',
+                        default='/tmp/sumaform_outputs')
+    parser.add_argument('--destroy', help="""Destroy the environment and create it again from scratch
+                                             Valid when using --runall or --runstep provision.""",
+                        action='store_true', default=False)
+    parser.add_argument('--taint', help="""A regex with the resources to taint before provisioning
+                                           the environment. If not present, and --destroy is not used,
+                                           the environment will be reused.
+                                           Valid when using --runall or --runstep provision.
+                                           Example: '.*(domain|main_disk).*'""",
+                        default=False)
+    parser.add_argument('--init', help="""Initialize terraform (required during the first run or if
+                                          new module were added). Valid when using --runall or
+                                          --runstep provision""",
+                        action='store_true')
+    parser.add_argument('--parallelism', help="""Define the number of parallel resource operations during a 'terraform
+                                                 apply'.""",
+                        dest='parallelism', default=10, type=int)
+    parser.add_argument('--terraform-bin', help='Path to the terraform binary that should be used',
+                        default='/usr/bin/terraform')
+    parser.add_argument('--nlines', help="""Number of lines to be attached to the email if errors
+                                            are found (either lines from the log, or failed tests
+                                            from cucumber""",
+                        default=50)
+    parser.add_argument('--runall', help="""Run all steps: clone terraform repository, provision
+                                            environment run cucumber with the command from the TF
+                                            file, get results and send email""",
+                        action='store_true')
+    parser.add_argument('--runstep', help="""Run a step. Usual order is: gitsync, provision,
+                                             cucumber (one or more times), getresults, mail.
+                                             For cucumber, --cucumber-cmd must be present, and
+                                             either environment variable BUILD_NUMBER from Jenkins
+                                             or BUILD_TIMESTAMP variable (manually managed) must be
+                                             exported""",
+                        choices=['gitsync', 'provision', 'cucumber', 'getresults', 'mail',
+                                 'saltshaker', 'saltshaker_getresults', 'saltshaker_mail'], default=False)
+    parser.add_argument('--cucumber-cmd', help="""The full and arbitrary command to be run for
+                                                  cucumber testing. Mandatory with
+                                                  --runstep cucumber""",
+                        dest='cucumber_cmd', default=False)
+    parser.add_argument('--saltshaker-cmd', help="""The full and arbitrary command to be run for
+                                                  Salt Shaker testing. Mandatory with
+                                                  --runstep saltshaker""",
+                        dest='saltshaker_cmd', default=False)
+    parser.add_argument('--custom-repositories', help="""Path to a JSON file listing custom repositories per host.
+                                                         This triggers two actions:
+                                                         1) it includes an additional repository on the server via sumaform
+                                                         2) it copies the JSON file into a testsuite sub-folder inside the controller""",
+                        dest='custom_repositories', default=None)
+    # I think this is sumaform specific, in the future we should
+    parser.add_argument('--sumaform-backend', help="""sumaform backend to be used. Only valid when using
+                                                      sumaformn. Possible values are libvirt, aws or null.
+                                                      libvirt is used by default""",
+                        choices=['libvirt', 'aws', 'null'], default="libvirt",
+                        dest='sumaform_backend')
+    parser.add_argument('--bastion_ssh_key', help="""Bastion key to be use""", dest='bastion_ssh_key', default=None)
+    parser.add_argument('--bastion_user', help="""Bastion user to be use""", dest='bastion_user', default='ec2-user')
+    parser.add_argument('--bastion_hostname', help="""Bastion hostname to use""", dest='bastion_hostname', default=None)
+    parser.add_argument(
+        '--use-tf-resource-cleaner',
+        help='Activate or deactivate the Terraform resource cleaner',
+        action='store_true',
+        default=False
+    )
+    parser.add_argument(
+        '--tf-resources-to-keep',
+        type=str,
+        nargs='*',
+        default=[],
+        help='Space-separated list of specific Terraform resources to keep (e.g., minions, clients)'
+    )
+    parser.add_argument(
+        '--tf-resources-delete-all',
+        help='If set, delete all resources except the default exclusions (e.g., minion, client, terminal, buildhost, proxy, dhcp_dns, monitoring_server). If not set, only client-related resources will be removed.',
+        action='store_true',
+        default=False
+    )
+    parser.add_argument(
+        '--skip-variables-check',
+        help='Skip validation of mandatory configuration variables (URL_PREFIX, MAIL_*, etc.)',
+        action='store_true',
+        default=False
+    )
+
+
+    args = parser.parse_args()
+    if args.runstep:
+        if args.runstep == 'cucumber' and not args.cucumber_cmd:
+            logger.error("--runstep cucumber requires --cucumber-cmd")
+            return False
+        if args.runstep == 'saltshaker' and not args.saltshaker_cmd:
+            logger.error("--runstep saltshaker requires --saltshaker-cmd")
+            return False
+        if 'BUILD_TIMESTAMP' not in os.environ and 'BUILD_NUMBER' not in os.environ:
+            logger.error("--runstep requires BUILD_TIMESTAMP or BUILD_NUMBER variables exported")
+            return False
+    elif args.runall:
+        pass
+    else:
+        logger.error("Either --runall or --runstep must be used")
+        return False
+    return args
+
+
+def read_config(tf_file, tf_variables_description_file, tf_variables_product_file):
+    """Read and validate the config from a tf file"""
+    if tf_variables_description_file != '':
+        config = terracumber.config.read_config(tf_variables_description_file)
+    else:
+        config = terracumber.config.read_config(tf_file)
+    for required in ['URL_PREFIX', 'CUCUMBER_COMMAND', 'CUCUMBER_BRANCH', 'CUCUMBER_RESULTS',
+                     'MAIL_SUBJECT', 'MAIL_TEMPLATE', 'MAIL_SUBJECT_ENV_FAIL',
+                     'MAIL_TEMPLATE_ENV_FAIL', 'MAIL_FROM', 'MAIL_TO']:
+        if required not in config:
+            logger.error("Variable %s does not exist in %s and is mandatory!", required, tf_file)
+            return False
+    if tf_variables_product_file != '':
+        with open(tf_variables_product_file, 'r') as f:
+            for line in f:
+                if line.startswith('#') or not line.strip():
+                    continue
+                key, value = line.split("=", 1)
+                key = key.strip()
+                value = value.strip().strip('"')
+                config[key] = value
+    return config
+
+
+def open_bastion_channel(args, tf_vars, bst_creds, ctl_creds):
+    if args.bastion_ssh_key:
+        """Set bastion and controller hostname"""
+        ctl_creds['hostname'] = get_controller_hostname(args, tf_vars)
+        bst_creds['hostname'] = get_bastion_hostname(args, tf_vars)
+        """Open connection with bastion"""
+        bastion = paramiko.SSHClient()
+        bastion.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        bastion.connect(**bst_creds)
+        bastion_transport = bastion.get_transport()
+        """Create port forward between bastion and controller"""
+        bastion_channel = bastion_transport.open_channel("direct-tcpip", (ctl_creds["hostname"], 22),
+                                                         (bst_creds["hostname"], 22))
+    else:
+        raise AttributeError('SSH key missing for bastion')
+    return bastion_channel
+
+
+def get_tf_vars():
+    """Create a dictionary with all TF_VAR_* environment variables"""
+    tf_vars = {}
+    for key, value in os.environ.items():
+        p = re.compile('^TF_VAR_(.*)$')
+        result = p.search(key)
+        if result:
+            tf_vars[result.group(1)] = value
+    return tf_vars
+
+
+def get_timestamp(args):
+    """Get BUILD_NUMBER on Jenkins or a timestamp otherwise"""
+    if 'BUILD_NUMBER' in os.environ:
+        return os.environ['BUILD_NUMBER']
+    if args.runall:
+        return datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
+    if args.runstep:
+        if 'BUILD_TIMESTAMP' in os.environ:
+            return os.environ['BUILD_TIMESTAMP']
+    return datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
+
+
+def create_outputdir(outputdir, timestamp):
+    """Create an outputdir with a timestamp"""
+    if not os.path.isdir(outputdir):
+        logger.error("ERROR: %s folder does not exist", outputdir)
+        return False
+    outputdir = '%s/%s/' % (outputdir.rstrip('/'), timestamp)
+    existed = True
+    if not os.path.isdir(outputdir):
+        existed = False
+        os.mkdir(outputdir)
+    return outputdir, existed
+
+
+def get_git_credentials(args, tf_vars):
+    """Create a dictionary with user and password from arguments, if present or from TF_VAR_*
+       environment variables otherwise"""
+    if args.gituser:
+        return {'user': args.gituser, 'password': args.gitpassword}
+    elif 'GIT_USER' in tf_vars:
+        return {'user': tf_vars['GIT_USER'], 'password': tf_vars['GIT_PASSWORD']}
+    return {'user': None, 'password': None}
+
+
+def run_terraform(args, tf_vars):
+    """ Prepare the environment """
+    terraform = terracumber.terraformer.Terraformer(args.gitfolder, args.tf,
+                                                    args.sumaform_backend, tf_vars,
+                                                    args.logfile, args.terraform_bin,
+                                                    args.tf_variables_description_file, args.tf_configuration_files)
+    if args.custom_repositories:
+        with open(args.custom_repositories, 'r') as repos_file:
+            error = terraform.inject_repos(repos_file)
+            if error == 1:
+                logger.error("ERROR: %s is not a well-formed JSON file", args.custom_repositories)
+                return False
+            elif error == 2:
+                logger.error("ERROR: Make sure to have exactly 1 placeholder for additional repositories in %s", args.tf)
+                return False
+            elif error == 3:
+                logger.warning("WARNING: Proxy or server is missing the placeholder for additional repositories in %s", args.tf)
+    if args.init:
+        terraform.init()
+    if args.taint:
+        terraform.taint(args.taint)
+    if args.destroy:
+        terraform.destroy()
+    result = terraform.apply(args.parallelism, args.use_tf_resource_cleaner, args.tf_resources_to_keep, args.tf_resources_delete_all)
+    if result == 0:
+        return True
+    return False
+
+
+def get_saltshaker_ipaddr(args, tf_vars):
+    """ Get ip address from salt shaker node"""
+    terraform = terracumber.terraformer.Terraformer(
+        args.gitfolder, args.tf, args.sumaform_backend, tf_vars, args.logfile)
+    return terraform.get_single_node_ipaddr()
+
+
+def get_controller_hostname(args, tf_vars):
+    """ Get controller hostname """
+    terraform = terracumber.terraformer.Terraformer(
+        args.gitfolder, args.tf, args.sumaform_backend, tf_vars, args.logfile)
+    return terraform.get_hostname('controller')
+
+
+def get_bastion_hostname(args, tf_vars):
+    """ Get bastion hostname """
+    if args.bastion_hostname:
+        return args.bastion_hostname
+    try:
+        terraform = terracumber.terraformer.Terraformer(
+            args.gitfolder, args.tf, args.sumaform_backend, tf_vars, args.logfile)
+        return terraform.get_hostname('bastion')
+    except (KeyError, FileNotFoundError) as error:
+        logger.error("Error occurred while getting bastion hostname: %s", error)
+        return None
+
+
+def get_results(args, tf_vars, config, ctl_creds):
+    """ Get results from the controller after a cucumber execution """
+    ctl = get_controller_hostname(args, tf_vars)
+    ctl_creds['hostname'] = ctl
+    cucumber = terracumber.cucumber.Cucumber(ctl_creds, False, 'AutoAddPolicy')
+    # Pending: Make the lists of files and directories part of the tf file
+    downloaded = cucumber.get_by_extensions(
+        config['CUCUMBER_RESULTS'], args.outputdir, ['.html', '.json'])
+    if not downloaded:
+        logger.warning("No .html or .json files found in %s at %s!",
+                       config['CUCUMBER_RESULTS'], ctl_creds['hostname'])
+    try:
+        cucumber.get('%s/%s' % (config['CUCUMBER_RESULTS'], 'spacewalk-debug\.tar\.bz2'),
+                     '%s' % args.outputdir)
+    except FileNotFoundError:
+        logger.warning("Nothing matched %s/%s at %s!", config['CUCUMBER_RESULTS'],
+                       'spacewalk-debug.tar.bz2', ctl_creds['hostname'])
+    directories = ['screenshots', 'cucumber_report', 'logs', 'results_junit']
+    for copydir in directories:
+        try:
+            cucumber.get_recursive('%s/%s' % (config['CUCUMBER_RESULTS'], copydir),
+                                   '%s/%s' % (args.outputdir, copydir))
+        except FileNotFoundError:
+            logger.warning("Remote directory %s/%s did not exist!", config['CUCUMBER_RESULTS'],
+                           copydir)
+    return True
+
+
+def get_results_saltshaker(args, tf_vars, config, ctl_creds):
+    """ Get results from the salt shaker node after a pytest execution """
+    ctl = get_saltshaker_ipaddr(args, tf_vars)
+    ctl_creds['hostname'] = ctl
+    cucumber = terracumber.cucumber.Cucumber(ctl_creds, False, 'AutoAddPolicy')
+    directories = ['results_junit']
+    for copydir in directories:
+        try:
+            cucumber.get_recursive('%s/%s' % (config['CUCUMBER_RESULTS'], copydir),
+                                   '%s/%s' % (args.outputdir, copydir))
+        except FileNotFoundError:
+            logger.error("Remote directory %s/%s did not exist!" % (config['CUCUMBER_RESULTS'],
+                                                             copydir))
+    return True
+
+
+def send_mail(args, config, template_data=None, cucumber=None, saltshaker=None):
+    """ Send email with the results """
+    template_data['urlprefix'] = config['URL_PREFIX']
+    junit = terracumber.junit.Junit('%s/results_junit' % args.outputdir)
+    if cucumber is not None or (os.listdir(args.outputdir) and junit.get_totals() is not None):
+        junit = terracumber.junit.Junit('%s/results_junit' % args.outputdir)
+        get_failures_func = junit.get_failures if saltshaker is None else junit.get_failures_saltshaker
+        with open(os.path.join(args.outputdir, "total_result.json"), 'w') as jtotal:
+            totals = junit.get_totals()
+            totals['timestamp'] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            json.dump(totals, jtotal)
+        # For that case when we send the email as standalone step, calculate
+        # cucumber result from junit outputs
+        if cucumber is None:
+            if len(get_failures_func(-1)) != 0:
+                cucumber = False
+            else:
+                cucumber = True
+        template_data = terracumber.utils.merge_two_dicts(
+            template_data, junit.get_totals())
+        template_data['failures_log'] = 'FAILURES'
+        if args.nlines > -1:
+            template_data['failures_log'] += ' (showing only up to %s):\n' % args.nlines
+        else:
+            template_data['failures_log'] += ':\n'
+        template_data['failures_log'] += '\n'.join(
+            get_failures_func(args.nlines))
+        template_data['urlprefix'] = config['URL_PREFIX']
+        template = config['MAIL_TEMPLATE']
+        subject = config['MAIL_SUBJECT']
+        if cucumber:
+            template_data['status'] = "PASSED"
+            template_data['failures_log'] = ''
+        else:
+            template_data['status'] = "FAILED"
+    else:
+        template = config['MAIL_TEMPLATE_ENV_FAIL']
+        subject = config['MAIL_SUBJECT_ENV_FAIL']
+    # The template is relative to the tf path
+    template = "%s/%s" % (os.path.dirname(os.path.abspath(args.tf)), template)
+    mail = terracumber.mailer.Mailer(template, config['MAIL_FROM'], config['MAIL_TO'], subject,
+                                     template_data)
+    try:
+        mail.send_email()
+        return True
+    except:
+        return False
+
+
+def cucumber_run(args, tf_vars, ctl_creds, cmd):
+    """ Run a command on the controller """
+    ctl = get_controller_hostname(args, tf_vars)
+    ctl_creds['hostname'] = ctl
+    cucumber = terracumber.cucumber.Cucumber(ctl_creds, False, 'AutoAddPolicy')
+    result = cucumber.run_command(cmd, tf_vars, output_file=args.logfile)
+    if result == 0:
+        return True
+    else:
+        return False
+
+
+def cucumber_put(args, tf_vars, ctl_creds, src, dest):
+    """ Copy a file on the controller """
+    ctl = get_controller_hostname(args, tf_vars)
+    if ctl is None:
+        logger.warning("WARNING: not injecting custom repositories to the controller, as it does not exist")
+    else:
+        ctl_creds['hostname'] = ctl
+        ctl_creds['timeout'] = 300
+        cucumber = terracumber.cucumber.Cucumber(ctl_creds, False, 'AutoAddPolicy')
+        cucumber.put_file(src, dest)
+
+
+def saltshaker_run(args, tf_vars, ctl_creds, cmd):
+    """ Run a command on the salt shaker node """
+    ctl = get_saltshaker_ipaddr(args, tf_vars)
+    ctl_creds['hostname'] = ctl
+    cucumber = terracumber.cucumber.Cucumber(ctl_creds, False, 'AutoAddPolicy')
+    result = cucumber.run_command(cmd, tf_vars, output_file=args.logfile)
+    if result == 0:
+        return True
+    else:
+        return False
+
+
+def main():
+    """Main function"""
+    args = parse_args()
+    tf_vars = get_tf_vars()
+    if not args:
+        sys.exit(1)
+    template_data = {}
+    template_data['timestamp'] = get_timestamp(args)
+    (args.outputdir, dir_existed) = create_outputdir(
+        args.outputdir, template_data['timestamp'])
+    if args.runall and dir_existed:
+        logger.warning("WARNING: %s directory already exists!" % args.outputdir)
+    if not os.path.isfile(args.tf):
+        logger.error("ERROR: file %s from --tf argument does not exist or is not a file" % args.tf)
+        sys.exit(1)
+    if not args.skip_variables_check:
+        config = read_config(args.tf, args.tf_variables_description_file, args.tf_variables_product_file)
+        if not config:
+            sys.exit(1)
+        config = terracumber.utils.overwrite_dict(config, tf_vars)
+    git_creds = get_git_credentials(args, tf_vars)
+    # Pending: Make credentials and port configurable, and allow keypairs usage both from file
+    # and agent (already supported by terraform.cucumber)
+    ctl_creds = {'hostname': None, 'username': 'root',
+                 'port': 22, 'password': 'linux', 'sock': None}
+    results = {}
+    results = {'git': None, 'terraform': None,
+               'output-tests': None, 'getresults': None, 'mail': None}
+    bastion_creds = {'hostname': None, 'username': args.bastion_user,
+                     'port': 22, 'key_filename': args.bastion_ssh_key}
+    if args.runall or args.runstep == 'gitsync':
+        logger.info("Cloning/Updating repository to/at %s...", args.gitfolder)
+        try:
+            git_repo = terracumber.git.Git(args.gitrepo, args.gitref,
+                                args.gitfolder, auth=git_creds, auto=True,logger=logger)
+            results['git'] = True
+            logger.info("Repository was succesfully cloned")
+            number_of_commits_to_be_retrieved = 10
+            commits = git_repo.get_a_given_number_of_commits(number_of_commits_to_be_retrieved)
+            if commits is not None:
+                logger.info("")
+                for commit in commits[::-1]:
+                    logger.info(f"{commit.short_id} {commit.author.name} {commit.message} ")
+        except Exception as e:
+            logger.error("ERROR: %s: %s" % (type(e).__name__, e))
+            results['git'] = False
+
+    if args.runall or args.runstep == 'provision':
+        logger.info("Running terraform...")
+        results['terraform'] = run_terraform(args, tf_vars)
+
+    if args.runstep == 'saltshaker':
+        logger.info("Running Salt Shaker tests...")
+        if args.saltshaker_cmd:
+            cmd = args.saltshaker_cmd
+        else:
+            cmd = config['CUCUMBER_COMMAND']
+        results['output-tests'] = saltshaker_run(args, tf_vars, ctl_creds, cmd)
+
+    if args.bastion_ssh_key:
+        if get_bastion_hostname(args, tf_vars) and (
+                args.runstep in ['cucumber', 'getresults'] or args.custom_repositories or args.runall):
+            channel = open_bastion_channel(args, tf_vars, bastion_creds, ctl_creds)
+            ctl_creds["sock"] = channel
+
+    # Copy a JSON file inside the controller which includes a list of custom repositories per host to be created by the QAM Cucumber Testsuite
+    if (args.custom_repositories and results['terraform']):
+        custom_repositories_path = '/root/spacewalk/testsuite/features/upload_files/custom_repositories.json'
+        cucumber_put(args, tf_vars, ctl_creds, args.custom_repositories, custom_repositories_path)
+
+    # Only if terraform was successful or step cucumber is called
+    if (args.runall and results['terraform']) or args.runstep == 'cucumber':
+        logger.info("Running command...")
+        if args.cucumber_cmd:
+            cmd = args.cucumber_cmd
+        else:
+            cmd = config['CUCUMBER_COMMAND']
+        results['output-tests'] = cucumber_run(args, tf_vars, ctl_creds, cmd)
+
+    if (args.runall and results['output-tests']) or args.runstep == 'getresults':
+        logger.info("Fetching files from controller to %s...", args.outputdir)
+        results['results'] = get_results(args, tf_vars, config, ctl_creds)
+
+    if args.runstep == 'saltshaker_getresults':
+        logger.info("Fetching files from Salt Shaker node to %s...", args.outputdir)
+        results['results'] = get_results_saltshaker(args, tf_vars, config, ctl_creds)
+
+    if args.runall or args.runstep == 'mail':
+        logger.info("Preparing and sending email")
+        results['mail'] = send_mail(
+            args, config, template_data, results['output-tests'])
+
+    if args.runstep == 'saltshaker_mail':
+        logger.info("Preparing and sending email for Salt Shaker")
+        results['mail'] = send_mail(
+            args, config, template_data, results['output-tests'], saltshaker=True)
+
+    for key, val in results.items():
+        if val not in [None, True]:
+            sys.exit(1)
+
+
+if __name__ == '__main__':
+    main()
+    sys.exit(0)
