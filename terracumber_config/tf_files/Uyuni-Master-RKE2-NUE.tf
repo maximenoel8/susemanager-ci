@@ -92,6 +92,13 @@ module "cucumber_testsuite" {
   source = "./modules/cucumber_testsuite"
 
   product_version = "uyuni-master"
+  kubernetes                     = true
+  use_devel_oci                  = true
+  install_mlm_server             = true
+  install_mlm_proxy              = true
+  install_traefik                = true
+  install_local_path_provisioner = true
+
 
   // Cucumber repository configuration for the controller
   git_username = var.GIT_USER
@@ -102,7 +109,7 @@ module "cucumber_testsuite" {
   cc_username = var.SCC_USER
   cc_password = var.SCC_PASSWORD
 
-  images = ["rocky8o", "opensuse156o", "ubuntu2404o", "sles15sp7o", "tumbleweedo"]
+  images = ["tumbleweedo", "opensuse156o"]
 
   use_avahi    = false
   name_prefix  = "uyuni-ci-master-rke2-"
@@ -140,13 +147,9 @@ module "cucumber_testsuite" {
       }
       runtime                        = "rke2"
       container_tag                  = "latest"
-      container_repository           = "registry.suse.de/devel/galaxy/manager/test/hexagon/containerfile/suse/multi-linux-manager/5.2/x86_64"
+      container_repository           = "registry.opensuse.org/systemsmanagement/uyuni/master/containerfile/uyuni"
       helm_chart_name                = "server-helm"
       helm_chart_url                 = "oci://registry.opensuse.org/systemsmanagement/uyuni/master/charts/uyuni"
-      install_mlm_server             = true
-      install_mlm_proxy              = true
-      install_traefik                = true
-      install_local_path_provisioner = true
 
       login_timeout = 28800
       main_disk_size = 40
@@ -163,52 +166,11 @@ module "cucumber_testsuite" {
       additional_packages = [ "venv-salt-minion" ]
       install_salt_bundle = true
       runtime = "rke2"
-      additional_repos = {
-          containerUtils = "https://download.opensuse.org/repositories/systemsmanagement:/Uyuni:/Master:/ContainerUtils/openSUSE_Leap_15.5/"
-      }
       container_tag = "latest"
-      container_repository = "registry.suse.de/devel/galaxy/manager/test/hexagon/containerfile/suse/multi-linux-manager/5.2/x86_64"
+      container_repository = "registry.opensuse.org/systemsmanagement/uyuni/master/containerfile/uyuni"
       helm_chart_name = "proxy-helm"
       helm_chart_url = "oci://registry.opensuse.org/systemsmanagement/uyuni/master/charts/uyuni"
-    }
-    suse_minion = {
-      image = "tumbleweedo"
-      provider_settings = {
-        mac = "aa:b2:93:01:00:16"
-      }
-    }
-    suse_sshminion = {
-      image = "tumbleweedo"
-      provider_settings = {
-        mac = "aa:b2:93:01:00:18"
-      }
-      additional_packages = [ "iptables" ]
-    }
-    rhlike_minion = {
-      image = "rocky8o"
-      provider_settings = {
-        mac = "aa:b2:93:01:00:1a"
-        // Since start of May we have problems with the instance not booting after a restart if there is only a CPU and only 1024Mb for RAM
-        // Also, openscap cannot run with less than 1.25 GB of RAM
-        memory = 2048
-        vcpu = 2
-      }
-    }
-    deblike_minion = {
-      image = "ubuntu2404o"
-      provider_settings = {
-        mac = "aa:b2:93:01:00:1b"
-      }
-    }
-    build_host = {
-      image = "sles15sp7o"
-      provider_settings = {
-        mac = "aa:b2:93:01:00:1d"
-        memory = 2048
-      }
-    }
-    pxeboot_minion = {
-      image = "sles15sp7o"
+      login_timeout = 28800
     }
   }
   
