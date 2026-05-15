@@ -95,7 +95,7 @@ def run(params) {
                             #!/bin/bash
                             set -e -o pipefail
                             ${credInit}
-                            ./terracumber-cli ${common_params} --gitrepo ${params.sumaform_gitrepo} --gitref ${params.sumaform_ref} --runstep gitsync
+                            ./terracumber-cli ${common_params} --gitrepo ${params.sumaform_gitrepo} --gitref ${params.sumaform_ref} --skip-variables-check --runstep gitsync
                         """
 
                         // Generate custom_repositories.json file in the workspace from the value passed by parameter
