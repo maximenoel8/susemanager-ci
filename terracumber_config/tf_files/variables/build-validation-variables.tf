@@ -46,6 +46,7 @@ variable "CUCUMBER_RESULTS" {
   type = string
   default = "/root/spacewalk/testsuite"
 }
+
 variable "URL_PREFIX" {
   type = string
   default = "Not Used for QE pipeline"

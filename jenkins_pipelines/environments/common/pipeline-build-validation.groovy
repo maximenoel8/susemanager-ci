@@ -69,7 +69,7 @@ def run(params) {
             stage('Build containers'){
                 if (params.container_project && params.mi_project && params.must_deploy) {
                     def SCRIPT_DIR = "${WORKSPACE}/susemanager-ci/jenkins_pipelines/scripts/edit_bci_project"
-                    sh "python3 -m venv ${WORKSPACE}/venv"
+                    sh "python3.6 -m venv ${WORKSPACE}/venv"
                     sh "${WORKSPACE}/venv/bin/pip install -r ${SCRIPT_DIR}/requirements.txt"
                     sh( script: "${WORKSPACE}/venv/bin/python ${SCRIPT_DIR}/edit.py --container-project ${params.container_project} --mi-project ${params.mi_project}", returnStdout: true)
                     custom_project_path = "registry.suse.de/${params.container_project.toLowerCase().replaceAll(':', '/')}/containerfile"
@@ -106,7 +106,7 @@ def run(params) {
                         if (params.mi_ids?.trim()) {
                             node('manager-jenkins-node') {
                                 checkout scm
-                                def res_python_script_ = sh(script: "python3 jenkins_pipelines/scripts/json_generator/maintenance_json_generator.py --mi_ids ${params.mi_ids}", returnStatus: true)
+                                def res_python_script_ = sh(script: "python3.6 jenkins_pipelines/scripts/json_generator/maintenance_json_generator.py --mi_ids ${params.mi_ids}", returnStatus: true)
                                 echo "Build Validation JSON script return code:\n ${res_python_script_}"
                                 if (res_python_script_ != 0) {
                                     error("MI IDs (${params.mi_ids}) passed by parameter are wrong (or already released)")
@@ -164,7 +164,7 @@ def run(params) {
                         }
 
                         // Generate the tfvars
-                        sh "python3 ${tfvarsPrepareScript} ${commonArgs} ${scenarioArgs}"
+                        sh "python3.6 ${tfvarsPrepareScript} ${commonArgs} ${scenarioArgs}"
 
                         // Deploy the environment
                         sh """
@@ -234,7 +234,7 @@ def run(params) {
                     if (params.mi_ids?.trim()) {
                         node('manager-jenkins-node') {
                             checkout scm
-                            def res_python_script_ = sh(script: "python3 jenkins_pipelines/scripts/json_generator/maintenance_json_generator.py --mi_ids ${params.mi_ids}", returnStatus: true)
+                            def res_python_script_ = sh(script: "python3.6 jenkins_pipelines/scripts/json_generator/maintenance_json_generator.py --mi_ids ${params.mi_ids}", returnStatus: true)
                             echo "Build Validation JSON script return code:\n ${res_python_script_}"
                             if (res_python_script_ != 0) {
                                 error("MI IDs (${params.mi_ids}) passed by parameter are wrong (or already released)")
