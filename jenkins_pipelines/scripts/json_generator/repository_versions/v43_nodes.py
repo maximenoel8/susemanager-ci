@@ -123,6 +123,9 @@ v43_static_slmicro_salt_repositories: Dict[str, Dict[str, str]] = {
             "SUSE-Manager-Tools-For-SL-Micro-6-x86_64/"
         ),
     },
+    "slmicro62_minion": {
+        "sles16_client_tools": "/SLFO:/Products:/MultiLinuxManagerTools-Beta:/SLES-16:/ToTest/product/repo/Multi-Linux-ManagerTools-Beta-SLE-16-x86_64/"
+    },
 }
 
 # Dictionary for SUMA 4.3 Server and Proxy
