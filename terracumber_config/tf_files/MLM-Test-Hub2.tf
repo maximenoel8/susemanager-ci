@@ -45,8 +45,8 @@ module "hub" {
   image              = "sles15sp7o"
   provider_settings  = {
     mac     = "aa:b2:93:01:01:c4"
-    memory  = 10240
-    vcpu    = 8
+    memory  = 20480
+    vcpu    = 10
   }
   install_salt_bundle = true
   runtime              = "podman"
