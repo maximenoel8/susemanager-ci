@@ -180,7 +180,7 @@ module "controller" {
   server_configuration = module.hub.configuration
   proxy_configuration  = module.proxy.configuration
 
-  sle15sp4_minion_configuration = module.sles15sp7_minion.configuration
+  sle15sp7_minion_configuration = module.sles15sp7_minion.configuration
   sle15sp5_minion_configuration = module.sles15sp5_minion.configuration
   monitoringserver_configuration = module.monitoring_server.configuration
 
