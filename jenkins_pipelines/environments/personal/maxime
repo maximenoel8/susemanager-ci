@@ -51,6 +51,7 @@ node('sumaform-cucumber') {
         def newParams = [:] + params
         newParams.capybara_timeout = 10
         newParams.default_timeout = 250
+        newParams.reposync_timeout = 3600
         newParams.environment = 'maxime'
         def pipeline = load "jenkins_pipelines/environments/common/pipeline-personal.groovy"
         pipeline.run(newParams)
