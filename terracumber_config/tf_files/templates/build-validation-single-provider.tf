@@ -21,7 +21,7 @@ module "base_core" {
   name_prefix     = var.ENVIRONMENT_CONFIGURATION.name_prefix
   use_avahi       = false
   domain          = var.PLATFORM_LOCATION_CONFIGURATION[var.LOCATION].domain
-  ssh_key_path    = var.PUBLIC_SSH_KEY_PATH
+  ssh_key_path    = var.CONTROLLER_PUBLIC_SSH_KEY_PATH
   images = lookup(var.BASE_CONFIGURATIONS.base_core, "images", [
     "sles12sp5o",
     "sles15sp3o", "sles15sp4o", "sles15sp5o", "sles15sp6o", "sles15sp7o", "sles160o",
@@ -76,20 +76,22 @@ module "build_validation_module" {
   scc_ptf_user     = var.SCC_PTF_USER
   scc_ptf_password = var.SCC_PTF_PASSWORD
   zvm_admin_token  = var.ZVM_ADMIN_TOKEN
+  s390_local_user  = var.S390_LOCAL_USER
 
   git_user          = var.GIT_USER
   git_password      = var.GIT_PASSWORD
   cucumber_gitrepo  = var.CUCUMBER_GITREPO
   cucumber_branch   = var.CUCUMBER_BRANCH
 
-  server_container_repository = var.SERVER_CONTAINER_REPOSITORY
-  server_container_image      = var.SERVER_CONTAINER_IMAGE
-  server_additional_repos     = var.SERVER_ADDITIONAL_REPOS
-  proxy_container_repository  = var.PROXY_CONTAINER_REPOSITORY
-  proxy_additional_repos      = var.PROXY_ADDITIONAL_REPOS
-  base_os                     = var.BASE_OS
-  private_ssh_key_path        = var.PRIVATE_SSH_KEY_PATH
-  public_ssh_key_path         = var.PUBLIC_SSH_KEY_PATH
+  server_container_repository     = var.SERVER_CONTAINER_REPOSITORY
+  server_container_image          = var.SERVER_CONTAINER_IMAGE
+  server_additional_repos         = var.SERVER_ADDITIONAL_REPOS
+  proxy_container_repository      = var.PROXY_CONTAINER_REPOSITORY
+  proxy_additional_repos          = var.PROXY_ADDITIONAL_REPOS
+  base_os                         = var.BASE_OS
+  hypervisor_private_ssh_key_path = var.HYPERVISOR_PRIVATE_SSH_KEY_PATH
+  controller_private_ssh_key_path = var.CONTROLLER_PRIVATE_SSH_KEY_PATH
+  controller_public_ssh_key_path  = var.CONTROLLER_PUBLIC_SSH_KEY_PATH
 }
 
 output "configuration" {

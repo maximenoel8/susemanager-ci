@@ -1,3 +1,5 @@
+import org.jenkinsci.plugins.pipeline.modeldefinition.Utils
+
 def run(params) {
     timestamps {
         //Capybara configuration
@@ -75,6 +77,8 @@ def run(params) {
                     custom_project_path = "registry.suse.de/${params.container_project.toLowerCase().replaceAll(':', '/')}/containerfile"
                     server_container_repository = custom_project_path
                     proxy_container_repository = custom_project_path
+                } else if (isNewJenkins) {
+                    Utils.markStageSkippedForConditional(STAGE_NAME)
                 }
             }
 
@@ -125,8 +129,9 @@ def run(params) {
                         commonArgs += " --inject CUCUMBER_GITREPO=${params.cucumber_gitrepo}"
                         commonArgs += " --inject CUCUMBER_BRANCH=${params.cucumber_ref}"
                         if (isNewJenkins) {
-                            commonArgs += " --inject PRIVATE_SSH_KEY_PATH=\"/home/jenkins/.ssh/id_ed25519.oldworker\""
-                            commonArgs += " --inject PUBLIC_SSH_KEY_PATH=\"/home/jenkins/.ssh/id_ed25519.pub.controller\""
+                            commonArgs += " --inject HYPERVISOR_PRIVATE_SSH_KEY_PATH=\"/home/jenkins/.ssh/id_ed25519.worker\""
+                            commonArgs += " --inject CONTROLLER_PUBLIC_SSH_KEY_PATH=\"/home/jenkins/.ssh/id_ed25519.pub.controller\""
+                            commonArgs += " --inject S390_LOCAL_USER=\"jenkins@jenkins.mgr.suse.de\""
                         }
                         if (product_version) { commonArgs += " --inject PRODUCT_VERSION=${product_version}" }
                         if (base_os) { commonArgs += " --inject BASE_OS=${base_os}" }
@@ -190,6 +195,8 @@ def run(params) {
                         runCucumberRakeTarget('jenkins:generate_rake_files_build_validation')
                         deployed = true
                     }
+                } else if (isNewJenkins) {
+                    Utils.markStageSkippedForConditional(STAGE_NAME)
                 }
             }
 
@@ -218,6 +225,8 @@ def run(params) {
             stage('Run core features') {
                 if (params.must_run_core && (deployed || !params.must_deploy)) {
                     runCucumberRakeTarget('cucumber:build_validation_core')
+                } else if (isNewJenkins) {
+                    Utils.markStageSkippedForConditional(STAGE_NAME)
                 }
             }
 
@@ -242,6 +251,8 @@ def run(params) {
                         }
                     }
                     sh(script: "${TestEnvironmentCleanerProgram} --url ${env.controller_hostname} --mode update_custom_repositories")
+                } else if (isNewJenkins) {
+                    Utils.markStageSkippedForConditional(STAGE_NAME)
                 }
             }
 
@@ -252,6 +263,8 @@ def run(params) {
                     res_products = runCucumberRakeTarget('cucumber:build_validation_reposync', true, nodesHandler.envVariableListToDisable)
                     echo "Custom channels and MU repositories status code: ${res_products}"
                     sh "exit ${res_products}"
+                } else if (isNewJenkins) {
+                    Utils.markStageSkippedForConditional(STAGE_NAME)
                 }
             }
 
@@ -266,6 +279,8 @@ def run(params) {
                     res_mu_repos = runCucumberRakeTarget('cucumber:build_validation_add_maintenance_update_repositories_proxy', true)
                     echo "Custom channels and MU repositories status code: ${res_mu_repos}"
                     sh "exit ${res_mu_repos}"
+                } else if (isNewJenkins) {
+                    Utils.markStageSkippedForConditional(STAGE_NAME)
                 }
             }
             stage('Add Activation Keys Proxy') {
@@ -277,6 +292,8 @@ def run(params) {
                     res_add_keys = runCucumberRakeTarget('cucumber:build_validation_add_activation_key_proxy',true)
                     echo "Add Proxy Activation Key status code: ${res_add_keys}"
                     sh "exit ${res_add_keys}"
+                } else if (isNewJenkins) {
+                    Utils.markStageSkippedForConditional(STAGE_NAME)
                 }
             }
             stage('Create bootstrap repository Proxy') {
@@ -288,6 +305,8 @@ def run(params) {
                     res_create_bootstrap_repos = runCucumberRakeTarget('cucumber:build_validation_create_bootstrap_repository_proxy',true)
                     echo "Create Proxy bootstrap repository status code: ${res_create_bootstrap_repos}"
                     sh "exit ${res_create_bootstrap_repos}"
+                } else if (isNewJenkins) {
+                    Utils.markStageSkippedForConditional(STAGE_NAME)
                 }
             }
             stage('Bootstrap Proxy') {
@@ -298,6 +317,8 @@ def run(params) {
                     res_init_proxy = runCucumberRakeTarget('cucumber:build_validation_init_proxy', true)
                     echo "Init Proxy status code: ${res_init_proxy}"
                     sh "exit ${res_init_proxy}"
+                } else if (isNewJenkins) {
+                    Utils.markStageSkippedForConditional(STAGE_NAME)
                 }
             }
             /** Proxy stages end **/
@@ -315,6 +336,8 @@ def run(params) {
                             res_mu_repos = runCucumberRakeTarget('cucumber:build_validation_add_maintenance_update_repositories_monitoring_server', true)
                             echo "Custom channels and MU repositories status code: ${res_mu_repos}"
                             sh "exit ${res_mu_repos}"
+                        } else if (isNewJenkins) {
+                            Utils.markStageSkippedForConditional(STAGE_NAME)
                         }
                     }
                     stage('Add Activation Keys Monitoring') {
@@ -326,6 +349,8 @@ def run(params) {
                             res_add_keys = runCucumberRakeTarget('cucumber:build_validation_add_activation_key_monitoring_server', true)
                             echo "Add Server Monitoring Activation Key status code: ${res_add_keys}"
                             sh "exit ${res_add_keys}"
+                        } else if (isNewJenkins) {
+                            Utils.markStageSkippedForConditional(STAGE_NAME)
                         }
                     }
                     stage('Create bootstrap repository Monitoring') {
@@ -337,6 +362,8 @@ def run(params) {
                             res_create_bootstrap_repos = runCucumberRakeTarget('cucumber:build_validation_create_bootstrap_repository_monitoring_server', true)
                             echo "Create Server Monitoring bootstrap repository status code: ${res_create_bootstrap_repos}"
                             sh "exit ${res_create_bootstrap_repos}"
+                        } else if (isNewJenkins) {
+                            Utils.markStageSkippedForConditional(STAGE_NAME)
                         }
                     }
                     stage('Bootstrap Monitoring Server') {
@@ -348,6 +375,8 @@ def run(params) {
                             res_init_monitoring = runCucumberRakeTarget('cucumber:build_validation_init_monitoring', true)
                             echo "Init Monitoring Server status code: ${res_init_monitoring}"
                             sh "exit ${res_init_monitoring}"
+                        } else if (isNewJenkins) {
+                            Utils.markStageSkippedForConditional(STAGE_NAME)
                         }
                     }
                 } catch (Exception ex) {
@@ -376,6 +405,8 @@ def run(params) {
                 stage('Products and Salt migration stages') {
                     if(params.must_run_products_and_salt_migration_tests){
                         clientMigrationStages()
+                    } else if (isNewJenkins) {
+                        Utils.markStageSkippedForConditional(STAGE_NAME)
                     }
                 }
             } catch (Exception ex) {
@@ -406,6 +437,8 @@ def run(params) {
                                 }
                             }
                     )
+                } else if (isNewJenkins) {
+                    Utils.markStageSkippedForConditional(STAGE_NAME)
                 }
             }
             stage('Retail: Test terminal deployments') {
@@ -469,6 +502,8 @@ def run(params) {
                         }
                     }
                     parallel terminal_deployment_testing
+                } else if (isNewJenkins) {
+                    Utils.markStageSkippedForConditional(STAGE_NAME)
                 }
             }
             /** Retail stages end **/
@@ -487,6 +522,8 @@ def run(params) {
                         if (res_container_proxy != 0) {
                             error("Containerization test failed with status code: ${res_container_proxy}")
                         }
+                    } else if (isNewJenkins) {
+                        Utils.markStageSkippedForConditional(STAGE_NAME)
                     }
                 }
             } catch (Exception ex) {
@@ -632,7 +669,11 @@ def clientTestingStages(params) {
                             }
                         }
 
+                    } else if (env.JENKINS_URL?.contains('jenkins.mgr.suse.de')) {
+                        Utils.markStageSkippedForConditional(STAGE_NAME)
                     }
+                } else if (env.JENKINS_URL?.contains('jenkins.mgr.suse.de')) {
+                    Utils.markStageSkippedForConditional(STAGE_NAME)
                 }
                 // Don't update required_custom_channel_status for minion who needs non MU repositories
                 if (!json_matching_non_MU_data.containsKey(node)) {
@@ -656,8 +697,14 @@ def clientTestingStages(params) {
                                 required_custom_channel_status[node] = 'FAIL'
                                 error("Add common channels failed with status code: ${res_non_MU_repositories}")
                             }
+                        } else if (env.JENKINS_URL?.contains('jenkins.mgr.suse.de')) {
+                            Utils.markStageSkippedForConditional(STAGE_NAME)
                         }
+                    } else if (env.JENKINS_URL?.contains('jenkins.mgr.suse.de')) {
+                        Utils.markStageSkippedForConditional(STAGE_NAME)
                     }
+                } else if (env.JENKINS_URL?.contains('jenkins.mgr.suse.de')) {
+                    Utils.markStageSkippedForConditional(STAGE_NAME)
                 }
                 // Don't overwrite required_custom_channel_status variable for minions who don't need non MU repositories ( protect overwrite of add MU fails )
                 if (json_matching_non_MU_data.containsKey(node)) {
@@ -690,6 +737,8 @@ def clientTestingStages(params) {
                         bootstrap_repository_status[node] = 'FAIL'
                         error("Add Activation Keys failed with status code: ${res_add_keys}")
                     }
+                } else if (env.JENKINS_URL?.contains('jenkins.mgr.suse.de')) {
+                    Utils.markStageSkippedForConditional(STAGE_NAME)
                 }
             }
             stage("Create bootstrap repository ${node}") {
@@ -735,6 +784,8 @@ def clientTestingStages(params) {
                             }
                         }
                     }
+                } else if (env.JENKINS_URL?.contains('jenkins.mgr.suse.de')) {
+                    Utils.markStageSkippedForConditional(STAGE_NAME)
                 }
                 bootstrap_repository_status[node] = 'CREATED'
             }
@@ -754,6 +805,8 @@ def clientTestingStages(params) {
                     if (res_init_clients != 0) {
                         error("Bootstrap clients failed with status code: ${res_init_clients}")
                     }
+                } else if (env.JENKINS_URL?.contains('jenkins.mgr.suse.de')) {
+                    Utils.markStageSkippedForConditional(STAGE_NAME)
                 }
             }
             stage("Run Smoke Tests ${node}") {
@@ -769,6 +822,8 @@ def clientTestingStages(params) {
                     if (res_smoke_tests != 0) {
                         error("Run Smoke tests failed with status code: ${res_smoke_tests}")
                     }
+                } else if (env.JENKINS_URL?.contains('jenkins.mgr.suse.de')) {
+                    Utils.markStageSkippedForConditional(STAGE_NAME)
                 }
             }
         }

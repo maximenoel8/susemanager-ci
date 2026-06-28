@@ -159,14 +159,26 @@ variable "BASE_CONFIGURATIONS" {
   description = "Describe the base configuration (default core for NUE and all bases for SLC1)"
 }
 
-variable "PRIVATE_SSH_KEY_PATH" {
+variable "HYPERVISOR_PRIVATE_SSH_KEY_PATH" {
   type        = string
   default     = "~/.ssh/id_ed25519"
-  description = "Path to private ssh key used for access"
+  description = "Path to private key used to access hypervisor (dhcp deployment)"
 }
 
-variable "PUBLIC_SSH_KEY_PATH" {
+variable "CONTROLLER_PRIVATE_SSH_KEY_PATH" {
+  type        = string
+  default     = "./salt/controller/id_ed25519"
+  description = "Path to private ssh key used for minion connection"
+}
+
+variable "CONTROLLER_PUBLIC_SSH_KEY_PATH" {
   type        = string
   default     = "./salt/controller/id_ed25519.pub"
-  description = "Path to public ssh key used for access"
+  description = "Path to public ssh key used for minion connection"
+}
+
+variable "S390_LOCAL_USER" {
+  type        = string
+  default     = "jenkins@jenkins-worker.mgr.suse.de"
+  description = "Jenkins worker from where the deployment is executed."
 }

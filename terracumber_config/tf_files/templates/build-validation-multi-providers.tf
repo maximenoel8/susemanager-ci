@@ -50,7 +50,7 @@ module "base_core" {
 
   images            = var.BASE_CONFIGURATIONS.base_core.images
 
-  ssh_key_path      = var.PUBLIC_SSH_KEY_PATH
+  ssh_key_path      = var.CONTROLLER_PUBLIC_SSH_KEY_PATH
   mirror            = var.PLATFORM_LOCATION_CONFIGURATION[var.LOCATION].mirror
   use_mirror_images = true
   testsuite         = true
@@ -75,7 +75,7 @@ module "base_old_sle" {
 
   images            = var.BASE_CONFIGURATIONS.base_old_sle.images
 
-  ssh_key_path      = var.PUBLIC_SSH_KEY_PATH
+  ssh_key_path      = var.CONTROLLER_PUBLIC_SSH_KEY_PATH
   mirror            = var.PLATFORM_LOCATION_CONFIGURATION[var.LOCATION].mirror
   use_mirror_images = true
   testsuite         = true
@@ -100,7 +100,7 @@ module "base_rhlike" {
 
   images            = var.BASE_CONFIGURATIONS.base_old_sle.images
 
-  ssh_key_path      = var.PUBLIC_SSH_KEY_PATH
+  ssh_key_path      = var.CONTROLLER_PUBLIC_SSH_KEY_PATH
   mirror            = var.PLATFORM_LOCATION_CONFIGURATION[var.LOCATION].mirror
   use_mirror_images = true
   testsuite         = true
@@ -125,7 +125,7 @@ module "base_new_sle" {
 
   images            = var.BASE_CONFIGURATIONS.base_new_sle.images
 
-  ssh_key_path      = var.PUBLIC_SSH_KEY_PATH
+  ssh_key_path      = var.CONTROLLER_PUBLIC_SSH_KEY_PATH
   mirror            = var.PLATFORM_LOCATION_CONFIGURATION[var.LOCATION].mirror
   use_mirror_images = true
   testsuite         = true
@@ -149,7 +149,7 @@ module "base_retail" {
 
   images            = var.BASE_CONFIGURATIONS.base_retail.images
 
-  ssh_key_path      = var.PUBLIC_SSH_KEY_PATH
+  ssh_key_path      = var.CONTROLLER_PUBLIC_SSH_KEY_PATH
   mirror            = var.PLATFORM_LOCATION_CONFIGURATION[var.LOCATION].mirror
   use_mirror_images = true
   testsuite         = true
@@ -175,7 +175,7 @@ module "base_deblike" {
 
   images            = var.BASE_CONFIGURATIONS.base_deblike.images
 
-  ssh_key_path      = var.PUBLIC_SSH_KEY_PATH
+  ssh_key_path      = var.CONTROLLER_PUBLIC_SSH_KEY_PATH
   mirror            = var.PLATFORM_LOCATION_CONFIGURATION[var.LOCATION].mirror
   use_mirror_images = true
   testsuite         = true
@@ -221,20 +221,22 @@ module "build_validation_module" {
   scc_ptf_user     = var.SCC_PTF_USER
   scc_ptf_password = var.SCC_PTF_PASSWORD
   zvm_admin_token  = var.ZVM_ADMIN_TOKEN
+  s390_local_user  = var.S390_LOCAL_USER
 
   git_user          = var.GIT_USER
   git_password      = var.GIT_PASSWORD
   cucumber_gitrepo  = var.CUCUMBER_GITREPO
   cucumber_branch   = var.CUCUMBER_BRANCH
 
-  server_container_repository = var.SERVER_CONTAINER_REPOSITORY
-  server_container_image      = var.SERVER_CONTAINER_IMAGE
-  server_additional_repos     = var.SERVER_ADDITIONAL_REPOS
-  proxy_container_repository  = var.PROXY_CONTAINER_REPOSITORY
-  proxy_additional_repos      = var.PROXY_ADDITIONAL_REPOS
-  base_os                     = var.BASE_OS
-  private_ssh_key_path        = var.PRIVATE_SSH_KEY_PATH
-  public_ssh_key_path         = var.PUBLIC_SSH_KEY_PATH
+  server_container_repository     = var.SERVER_CONTAINER_REPOSITORY
+  server_container_image          = var.SERVER_CONTAINER_IMAGE
+  server_additional_repos         = var.SERVER_ADDITIONAL_REPOS
+  proxy_container_repository      = var.PROXY_CONTAINER_REPOSITORY
+  proxy_additional_repos          = var.PROXY_ADDITIONAL_REPOS
+  base_os                         = var.BASE_OS
+  hypervisor_private_ssh_key_path = var.HYPERVISOR_PRIVATE_SSH_KEY_PATH
+  controller_private_ssh_key_path = var.CONTROLLER_PRIVATE_SSH_KEY_PATH
+  controller_public_ssh_key_path  = var.CONTROLLER_PUBLIC_SSH_KEY_PATH
 }
 
 

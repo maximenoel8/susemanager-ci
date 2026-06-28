@@ -1,9 +1,11 @@
 import argparse
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from functools import cache
 import json
 import os
 import requests
 import logging
+import threading
 
 from ibs_osc_client import IbsOscClient
 from repository_versions import VersionNodes, nodes_by_version
@@ -11,6 +13,12 @@ from repository_versions import VersionNodes, nodes_by_version
 IBS_MAINTENANCE_URL_PREFIX: str = 'http://download.suse.de/ibs/SUSE:/Maintenance:/'
 IBS_URL_PREFIX: str = 'http://download.suse.de/ibs/SUSE:'
 JSON_OUTPUT_FILE_NAME: str = 'custom_repositories.json'
+
+# Short timeouts are intentional: thousands of parallel checks are made and
+# @cache prevents retrying the same URL, so false negatives are cheap to
+# accept in exchange for overall throughput. Increase if IBS is unreachable.
+REQUEST_CONNECT_TIMEOUT: float = 1
+REQUEST_READ_TIMEOUT: float = 2
 
 def setup_logging():
     logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -38,7 +46,7 @@ def parse_cli_args() -> argparse.Namespace:
         dest="slfo_pull_request",
         metavar="ID",
         type=_slfo_pr_id,
-        help="SLFO PullRequest id for sles160_minion and slmicro62_minion (stable 51-* / 52-* only; beta uses :ToTest automatically)",
+        help="SLFO PullRequest id for sle160_minion, slmicro62_minion (x86_64), and opensuse160arm_minion (aarch64) on stable 51-* / 52-* only; rejected for *-beta versions (beta uses :ToTest automatically)",
     )
     args = parser.parse_args()
     if args.slfo_pull_request is not None:
@@ -72,7 +80,7 @@ def clean_mi_ids(mi_ids: list[str]) -> set[str]:
 def create_url(mi_id: str, suffix: str) -> str:
     url = f"{IBS_MAINTENANCE_URL_PREFIX}{mi_id}{suffix}"
 
-    res: requests.Response = requests.get(url, timeout=(3, 6))
+    res: requests.Response = requests.get(url, timeout=(REQUEST_CONNECT_TIMEOUT, REQUEST_READ_TIMEOUT))
     return url if res.ok else ""
 
 def validate_and_store_results(expected_ids: set [str], custom_repositories: dict[str, dict[str, str]], output_file: str = JSON_OUTPUT_FILE_NAME):
@@ -111,16 +119,16 @@ def init_custom_repositories(static_repos: dict[str, dict[str, str]] | None = No
 def supports_slfo_pull_request(version: str) -> bool:
     return version.startswith("51") or version.startswith("52")
 
-def slfo_pullrequest_client_tool_url(pr_id: str) -> str:
-    """Return the stable SLE-16 MultiLinuxManagerTools URL for the given PullRequest id.
+def slfo_pullrequest_client_tool_url(pr_id: str, arch: str = "x86_64") -> str:
+    """Return the stable SLE-16 MultiLinuxManagerTools URL for the given PullRequest id and architecture.
 
-    This URL is used for both sles160_minion and slmicro62_minion: SL Micro 6.2
-    consumes the same SLE-16 client-tools repo on the stable PullRequest path.
-    Beta client tools do not use PullRequest URLs - they are served from a static
-    :ToTest project baked into repository_versions/v52_nodes.py.
+    This URL is used for sle160_minion, slmicro62_minion (x86_64), and opensuse160arm_minion (aarch64).
+    SL Micro 6.2 consumes the same SLE-16 client-tools repo on the stable PullRequest path.
+    Beta client tools do not use PullRequest URLs - they are served from static
+    :ToTest definitions in repository_versions/*_nodes.py.
     """
     root = "/SLFO:/Products:/MultiLinuxManagerTools:/PullRequest"
-    tail = f":/{pr_id}:/SLES/product/repo/Multi-Linux-ManagerTools-SLE-16-x86_64/"
+    tail = f":/{pr_id}:/SLES/product/repo/Multi-Linux-ManagerTools-SLE-16-{arch}/"
     return f"{IBS_URL_PREFIX}{root}{tail}"
 
 
@@ -132,10 +140,16 @@ def slfo_pullrequest_repo_key(pr_id: str) -> str:
 def apply_slfo_pullrequest_client_tools(
     custom_repositories: dict[str, dict[str, str]], pr_id: str
 ) -> None:
-    url = slfo_pullrequest_client_tool_url(pr_id)
     repo_key = slfo_pullrequest_repo_key(pr_id)
-    update_custom_repositories(custom_repositories, "sles160_minion", repo_key, url)
-    update_custom_repositories(custom_repositories, "slmicro62_minion", repo_key, url)
+
+    # x86_64 minions
+    url_x86_64 = slfo_pullrequest_client_tool_url(pr_id, arch="x86_64")
+    update_custom_repositories(custom_repositories, "sle160_minion", repo_key, url_x86_64)
+    update_custom_repositories(custom_repositories, "slmicro62_minion", repo_key, url_x86_64)
+
+    # aarch64 minion
+    url_aarch64 = slfo_pullrequest_client_tool_url(pr_id, arch="aarch64")
+    update_custom_repositories(custom_repositories, "opensuse160arm_minion", repo_key, url_aarch64)
 
 
 def update_custom_repositories(custom_repositories: dict[str, dict[str, str]], node: str, mi_id: str, url: str):
@@ -149,7 +163,20 @@ def update_custom_repositories(custom_repositories: dict[str, dict[str, str]], n
     custom_repositories[node] = node_ids
 
 
-def find_valid_repos(mi_ids: set[str], version: str, slfo_pull_request_id: str | None = None):
+def find_valid_repos(mi_ids: set[str], version: str, slfo_pull_request_id: str | None = None, max_workers: int = 20):
+    """
+    Find valid repository URLs for given MI IDs and version.
+
+    Uses parallel HTTP requests to check repository existence.
+
+    Args:
+        mi_ids: Set of MI ID strings
+        version: SUMA version (43, 50-sles, 51-sles, etc.)
+        slfo_pull_request_id: Optional SLFO PullRequest id for sle160_minion,
+            slmicro62_minion (x86_64), and opensuse160arm_minion (aarch64); only
+            valid for stable 51-* / 52-* versions.
+        max_workers: Number of concurrent HTTP requests (default: 20)
+    """
     version_data = get_version_nodes(version)
 
     static_repos = version_data.get("static", {})
@@ -157,12 +184,38 @@ def find_valid_repos(mi_ids: set[str], version: str, slfo_pull_request_id: str |
 
     custom_repositories = init_custom_repositories(static_repos)
 
+    # Build a list of all (node, mi_id, repo) combinations to check
+    tasks = []
     for node, repositories in dynamic_nodes.items():
         for mi_id in mi_ids:
             for repo in repositories:
-                repo_url: str = create_url(mi_id, repo)
+                tasks.append((node, mi_id, repo))
+
+    logging.info(f"Checking {len(tasks)} repository URLs in parallel (max_workers={max_workers})")
+
+    # Execute HTTP requests in parallel
+    lock = threading.Lock()
+    found_count = 0
+
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
+        # Submit all tasks
+        future_to_task = {
+            executor.submit(create_url, mi_id, repo): (node, mi_id, repo)
+            for node, mi_id, repo in tasks
+        }
+
+        # Collect results as they complete
+        for future in as_completed(future_to_task):
+            node, mi_id, repo = future_to_task[future]
+            try:
+                repo_url = future.result()
                 if repo_url:
-                    update_custom_repositories(custom_repositories, node, mi_id, repo_url)
+                    # Thread-safe update
+                    with lock:
+                        update_custom_repositories(custom_repositories, node, mi_id, repo_url)
+                        found_count += 1
+            except Exception as exc:
+                logging.warning(f"Error checking {mi_id}{repo}: {exc}")
 
     if slfo_pull_request_id is not None:
         if not supports_slfo_pull_request(version):
@@ -175,12 +228,21 @@ def find_valid_repos(mi_ids: set[str], version: str, slfo_pull_request_id: str |
             )
         apply_slfo_pullrequest_client_tools(custom_repositories, slfo_pull_request_id)
 
+    logging.info(f"Found {found_count} valid repositories out of {len(tasks)} checked")
     validate_and_store_results(mi_ids, custom_repositories)
 
 def main():
     setup_logging()
     args: argparse.Namespace = parse_cli_args()
     osc_client: IbsOscClient = IbsOscClient()
+
+    # Warn if using placeholder beta versions
+    if args.version in ("53-sles-beta", "53-micro-beta"):
+        logging.warning("=" * 80)
+        logging.warning("WARNING: 53-*-beta versions are PLACEHOLDERS and not yet ready for production!")
+        logging.warning("URLs in v53_nodes.py need to be updated when 5.3 beta project is created.")
+        logging.warning("The generated JSON may contain incorrect or non-existent repository URLs.")
+        logging.warning("=" * 80)
 
     mi_ids: set[str] = merge_mi_ids(args)
     logging.info(f"MI IDs: {mi_ids}")
@@ -194,6 +256,9 @@ def main():
         mi_ids = { id for id in mi_ids if not osc_client.mi_is_under_embargo(id) }
 
     find_valid_repos(mi_ids, args.version, args.slfo_pull_request)
+
+    logging.info("JSON file generated successfully: %s", JSON_OUTPUT_FILE_NAME)
+    logging.info("You can open it with: cat %s", JSON_OUTPUT_FILE_NAME)
 
 if __name__ == '__main__':
     main()

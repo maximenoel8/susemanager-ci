@@ -34,9 +34,9 @@ module "cucumber_testsuite" {
   cc_username = var.SCC_USER
   cc_password = var.SCC_PASSWORD
 
-  images = ["rocky8o", "opensuse156o", "ubuntu2404o", "sles15sp7o", "slmicro61o"]
+  images = ["rocky8o", "opensuse156o", "ubuntu2404o", "sles15sp7o", "slmicro62o"]
 
-  ssh_key_path = var.PUBLIC_SSH_KEY_PATH
+  ssh_key_path = var.CONTROLLER_PUBLIC_SSH_KEY_PATH
   use_avahi    = false
   name_prefix  = "${var.ENVIRONMENT}-"
   domain       = "mgr.suse.de"
@@ -58,12 +58,18 @@ module "cucumber_testsuite" {
   server_http_proxy        = "http-proxy.mgr.suse.de:3128"
   custom_download_endpoint = "ftp://minima-mirror-ci-bv.mgr.suse.de:445"
 
+  // Kubernetes variables
   kubernetes                     = true
   use_devel_oci                  = true
   install_mlm_server             = true
   install_mlm_proxy              = true
   install_traefik                = true
   install_local_path_provisioner = true
+  deploy_coco_attestation        = true
+  deploy_saline                  = true
+  deploy_tftp                    = true
+  install_kubectl_helm           = false
+  kubeconfig_path                = null
 
   # when changing images, please also keep in mind to adjust the image matrix at the end of the README.
   host_settings = {
@@ -75,6 +81,7 @@ module "cucumber_testsuite" {
       }
     }
     server_kubernetes = {
+      image = "slmicro62o"
       provider_settings = {
         mac    = var.ENVIRONMENT_CONFIGURATION[var.ENVIRONMENT].mac["server"]
         vcpu   = 2
@@ -153,7 +160,7 @@ module "cucumber_testsuite" {
       hypervisor  = {
         host        = var.ENVIRONMENT_CONFIGURATION[var.ENVIRONMENT].hypervisor
         user        = var.ENVIRONMENT_CONFIGURATION[var.ENVIRONMENT].dhcp_user
-        private_key = file(pathexpand(var.PRIVATE_SSH_KEY_PATH))
+        private_key = file(pathexpand(var.HYPERVISOR_PRIVATE_SSH_KEY_PATH))
       }
     }
   }

@@ -85,7 +85,7 @@ terraform {
 }
 
 provider "libvirt" {
-  uri = "qemu+tcp://suma-16.mgr.suse.de/system"
+  uri = "qemu+tcp://https://moscowmule.mgr.slc1.suse.org//system"
 }
 
 module "cucumber_testsuite" {
@@ -118,7 +118,7 @@ module "cucumber_testsuite" {
   images = ["tumbleweedo", "opensuse156o"]
 
   use_avahi    = false
-  name_prefix  = "uyuni-ci-master-rke2-"
+  name_prefix  = "uyuni-ci-master-benchmark-rke2-"
   domain       = "mgr.suse.de"
   from_email   = "root@suse.de"
 
@@ -143,40 +143,6 @@ module "cucumber_testsuite" {
       provider_settings = {
         mac = "aa:b2:93:01:00:10"
       }
-    }
-    server_kubernetes = {
-      image = "tumbleweedo"
-      provider_settings = {
-        mac = "aa:b2:93:01:00:11"
-        vcpu = 8
-        memory = 32768
-      }
-      runtime                        = "rke2"
-      container_tag                  = "latest"
-      container_repository           = "registry.opensuse.org/systemsmanagement/uyuni/master/containerfile/uyuni"
-      helm_chart_name                = "server-helm"
-      helm_chart_url                 = "oci://registry.opensuse.org/systemsmanagement/uyuni/master/charts/uyuni"
-
-      login_timeout = 28800
-      main_disk_size = 40
-      repository_disk_size = 300
-      database_disk_size = 60
-    }
-    proxy_kubernetes = {
-      image = "tumbleweedo"
-      provider_settings = {
-        mac = "aa:b2:93:01:00:12"
-        vcpu = 2
-        memory = 16384
-      }
-      additional_packages = [ "venv-salt-minion" ]
-      install_salt_bundle = true
-      runtime = "rke2"
-      container_tag = "latest"
-      container_repository = "registry.opensuse.org/systemsmanagement/uyuni/master/containerfile/uyuni"
-      helm_chart_name = "proxy-helm"
-      helm_chart_url = "oci://registry.opensuse.org/systemsmanagement/uyuni/master/charts/uyuni"
-      login_timeout = 28800
     }
   }
   
