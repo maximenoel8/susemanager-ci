@@ -54,6 +54,9 @@ module "hub" {
   #container_repository = "registry.suse.de/devel/galaxy/manager/main/mlm-beta-products-sle15/containerfile"
   container_tag        = "latest"
   ssh_key_path         = var.PUBLIC_SSH_KEY_PATH
+  main_disk_size       = 100
+  repository_disk_size           = 500
+  database_disk_size             = 80
   server_hub_main      = true
   hub_peripheral_fqdns = [local.prh1_hostname, local.prh2_hostname]
   large_deployment     = false
