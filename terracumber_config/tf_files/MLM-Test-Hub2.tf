@@ -34,7 +34,7 @@ module "base_core" {
     network_name = null
     bridge       = "br0"
   }
-  ssh_key_path      = var.PUBLIC_SSH_KEY_PATH
+  ssh_key_path      = var.CONTROLLER_PUBLIC_SSH_KEY_PATH
 }
 
 module "hub" {
@@ -53,7 +53,7 @@ module "hub" {
   container_repository = "registry.suse.de/suse/sle-15-sp7/update/products/multilinuxmanager52/totest/containerfile"
   #container_repository = "registry.suse.de/devel/galaxy/manager/main/mlm-beta-products-sle15/containerfile"
   container_tag        = "latest"
-  ssh_key_path         = var.PUBLIC_SSH_KEY_PATH
+  ssh_key_path         = var.CONTROLLER_PUBLIC_SSH_KEY_PATH
   main_disk_size       = 100
   repository_disk_size           = 500
   database_disk_size             = 80
@@ -77,7 +77,7 @@ module "prh1" {
   container_repository = "registry.suse.de/suse/sle-15-sp7/update/products/multilinuxmanager52/totest/containerfile"
   #container_repository = "registry.suse.de/devel/galaxy/manager/main/mlm-beta-products-sle15/containerfile"
   container_tag         = "latest"
-  ssh_key_path          = var.PUBLIC_SSH_KEY_PATH
+  ssh_key_path          = var.CONTROLLER_PUBLIC_SSH_KEY_PATH
   server_hub_peripheral = module.hub.configuration.hostname
   large_deployment      = false
   publish_private_ssl_key = false
@@ -98,7 +98,7 @@ module "prh2" {
   container_repository = "registry.suse.de/suse/sle-15-sp7/update/products/multilinuxmanager52/totest/containerfile"
   #container_repository = "registry.suse.de/devel/galaxy/manager/main/mlm-beta-products-sle15/containerfile"
   container_tag         = "latest"
-  ssh_key_path          = var.PUBLIC_SSH_KEY_PATH
+  ssh_key_path          = var.CONTROLLER_PUBLIC_SSH_KEY_PATH
   server_hub_peripheral = module.hub.configuration.hostname
   large_deployment      = false
   publish_private_ssl_key = false
@@ -116,7 +116,7 @@ module "proxy" {
   runtime               = "podman"
   container_repository  = "registry.suse.de/suse/sle-15-sp7/update/products/multilinuxmanager52/totest/containerfile"
   container_tag         = "latest"
-  ssh_key_path          = var.PUBLIC_SSH_KEY_PATH
+  ssh_key_path          = var.CONTROLLER_PUBLIC_SSH_KEY_PATH
   auto_configure       = false
 }
 
@@ -130,7 +130,7 @@ module "debian13_minion" {
   provider_settings = {
     mac = "aa:b2:93:01:01:c8"
   }
-  ssh_key_path      = var.PUBLIC_SSH_KEY_PATH
+  ssh_key_path      = var.CONTROLLER_PUBLIC_SSH_KEY_PATH
 }
 
 module "sles15sp7_minion" {
@@ -143,7 +143,7 @@ module "sles15sp7_minion" {
     mac = "aa:b2:93:01:01:c9"
   }
   install_salt_bundle = true
-  ssh_key_path      = var.PUBLIC_SSH_KEY_PATH
+  ssh_key_path      = var.CONTROLLER_PUBLIC_SSH_KEY_PATH
 }
 
 module "monitoring_server" {
@@ -157,7 +157,7 @@ module "monitoring_server" {
   }
   additional_packages = [ "venv-salt-minion" ]
   install_salt_bundle = true
-  ssh_key_path      = var.PUBLIC_SSH_KEY_PATH
+  ssh_key_path      = var.CONTROLLER_PUBLIC_SSH_KEY_PATH
 }
 
 module "controller" {
