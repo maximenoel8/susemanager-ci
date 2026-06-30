@@ -118,11 +118,11 @@ module "proxy" {
 }
 
 
-module "sles15sp5_minion" {
+module "debian13_minion" {
   source = "./modules/minion"
   base_configuration = module.base_core.configuration
   name = "sles15sp5-minion"
-  image = "sles15sp5o"
+  image = "debian13o"
   server_configuration = module.prh1.configuration
   provider_settings = {
     mac = "aa:b2:93:01:01:c8"
@@ -181,7 +181,7 @@ module "controller" {
   proxy_configuration  = module.proxy.configuration
 
   sle15sp7_minion_configuration = module.sles15sp7_minion.configuration
-  sle15sp5_minion_configuration = module.sles15sp5_minion.configuration
+  debian13_minion_configuration = module.debian13_minion.configuration
   monitoringserver_configuration = module.monitoring_server.configuration
 
   provider_settings = {
@@ -195,7 +195,7 @@ output "configuration" {
     prh1 = module.prh1.configuration
     prh2 = module.prh2.configuration
     sles15sp7_minion = module.sles15sp7_minion.configuration
-    sles15sp5_minion = module.sles15sp5_minion.configuration
+    debian13_minion = module.debian13_minion.configuration
     controller = module.controller.configuration
   }
 }
