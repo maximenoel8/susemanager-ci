@@ -24,7 +24,7 @@ module "base_core" {
   cc_username = var.SCC_USER
   cc_password = var.SCC_PASSWORD
 
-  images = ["opensuse156o", "sles15sp5o", "sles15sp7o"]
+  images = ["opensuse156o", "debian13o", "sles15sp7o"]
   use_avahi    = false
   name_prefix  = "mlm-qetesthub-"
   domain       = "mgr.suse.de"
