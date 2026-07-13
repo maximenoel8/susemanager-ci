@@ -7,26 +7,26 @@ ENVIRONMENT_CONFIGURATION = {
   server_containerized = {
     mac   = "aa:b2:93:01:01:31"
     name  = "hub"
-    image = "sles15sp7o"
+    image = "slmicro62o"
     string_registry = true
     server_hub_main = true
   }
   server2_containerized = {
     mac   = "aa:b2:93:01:01:32"
     name  = "prh1"
-    image = "sles15sp7o"
+    image = "slmicro62o"
     string_registry = true
   }
   server3_containerized = {
     mac   = "aa:b2:93:01:01:33"
     name  = "prh2"
-    image = "sles15sp7o"
+    image = "slmicro62o"
     string_registry = true
   }
   proxy_containerized = {
     mac   = "aa:b2:93:01:01:34"
     name  = "proxy"
-    image = "sles15sp7o"
+    image = "slmicro62o"
     string_registry = true
   }
 
@@ -55,7 +55,7 @@ BASE_CONFIGURATIONS = {
     bridge             = "br0"
     hypervisor         = "cthulhu.mgr.suse.de"
     additional_network = null
-    images             = ["sles15sp7o", "opensuse156o", "sles15sp5o"]
+    images = ["opensuse156o", "sles15sp7o", "slmicro62o", "sles15sp5o"]
   }
 }
 MAIL_SUBJECT          = "Results 5.2 Build Validation $status: $tests scenarios ($failures failed, $errors errors, $skipped skipped, $passed passed)"
