@@ -184,7 +184,7 @@ pipeline {
                 retry(5) {
                     sleep(10) // Wait 10 seconds between retries
                     echo 'Verifying OAuth protected resource endpoint...'
-                    sh "curl -sS --fail http://${params.OAUTH_TEST_SERVER_HOSTNAME}:8000/.well-known/oauth-protected-resource | jq"
+                    sh "curl -sS --fail http://${params.OAUTH_TEST_SERVER_HOSTNAME}:8000/.well-known/oauth-protected-resource/mcp | jq"
                 }
                 retry(3) {
                     echo 'Fetching access token from Keycloak...'
