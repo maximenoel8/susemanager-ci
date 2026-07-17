@@ -1,5 +1,10 @@
 def run(params) {
     timestamps {
+        // Null-safe defaults for optional stage-control parameters (backward compat with env files that don't declare them)
+        def runDeploy    = params.deploy    == null ? true : params.deploy
+        def runCore      = params.core      == null ? true : params.core
+        def runSecondary = params.secondary == null ? true : params.secondary
+
         // Init path env variables
         GString resultdir = "${WORKSPACE}/results"
         GString resultdirbuild = "${resultdir}/${BUILD_NUMBER}"
@@ -84,34 +89,38 @@ def run(params) {
                     sh "ssh root@minima-mirror-ci-bv.`hostname -d` -t \"test -x /usr/local/bin/minima-${mirror_scope}.sh && /usr/local/bin/minima-${mirror_scope}.sh || echo 'no mirror script for this scope'\""
                 }
             }
-            stage('Deploy') {
-                // Provision the environment
-                if (params.terraform_init) {
-                    env.TERRAFORM_INIT = '--init'
-                } else {
-                    env.TERRAFORM_INIT = ''
-                }
-                env.TERRAFORM_TAINT = ''
-                if (params.terraform_taint) {
-                    switch(params.sumaform_backend) {
-                        case "libvirt":
-                            env.TERRAFORM_TAINT = " --taint '.*(domain|combustion_disk|cloudinit_disk|ignition_disk|main_disk|data_disk|database_disk|standalone_provisioning).*'";
-                            break;
-                        case "aws":
-                            env.TERRAFORM_TAINT = " --taint '.*(host).*'";
-                            env.exports = "${env.exports} export PUBLISH_CUCUMBER_REPORT=true;";
-                            break;
-                        default:
-                            println("ERROR: Unknown backend ${params.sumaform_backend}");
-                            sh "exit 1";
-                            break;
+            if (runDeploy) {
+                stage('Deploy') {
+                    // Provision the environment
+                    if (params.terraform_init) {
+                        env.TERRAFORM_INIT = '--init'
+                    } else {
+                        env.TERRAFORM_INIT = ''
                     }
+                    env.TERRAFORM_TAINT = ''
+                    if (params.terraform_taint) {
+                        switch(params.sumaform_backend) {
+                            case "libvirt":
+                                env.TERRAFORM_TAINT = " --taint '.*(domain|combustion_disk|cloudinit_disk|ignition_disk|main_disk|data_disk|database_disk|standalone_provisioning).*'";
+                                break;
+                            case "aws":
+                                env.TERRAFORM_TAINT = " --taint '.*(host).*'";
+                                env.exports = "${env.exports} export PUBLISH_CUCUMBER_REPORT=true;";
+                                break;
+                            default:
+                                println("ERROR: Unknown backend ${params.sumaform_backend}");
+                                sh "exit 1";
+                                break;
+                        }
+                    }
+                    sh "set +x; source /home/jenkins/.credentials set -x; set -o pipefail; export TF_VAR_CUCUMBER_GITREPO=${params.cucumber_gitrepo}; export TF_VAR_CUCUMBER_BRANCH=${params.cucumber_ref}; export TERRAFORM=${params.bin_path}; export TERRAFORM_PLUGINS=${params.bin_plugins_path}; ./terracumber-cli ${common_params} --logfile ${resultdirbuild}/sumaform.log ${env.TERRAFORM_INIT} ${env.TERRAFORM_TAINT} --sumaform-backend ${params.sumaform_backend} --runstep provision | sed -E 's/([^.]+)module\\.([^.]+)\\.module\\.([^.]+)(\\.module\\.[^.]+)?(\\[[0-9]+\\])?(\\.module\\.[^.]+)?(\\.[^.]+)?(.*)/\\1\\2.\\3\\8/'"
+                    deployed = true
+                    // Collect and tag Flaky tests from the GitHub Board
+                    def rakeTarget = ci_label ? "utils:collect_and_tag_flaky_tests[${ci_label}]" : "utils:collect_and_tag_flaky_tests"
+                    def statusCode = sh script:"./terracumber-cli ${common_params} --logfile ${resultdirbuild}/testsuite.log --runstep cucumber --cucumber-cmd 'cd /root/spacewalk/testsuite; ${env.exports} rake ${rakeTarget}'", returnStatus:true
                 }
-                sh "set +x; source /home/jenkins/.credentials set -x; set -o pipefail; export TF_VAR_CUCUMBER_GITREPO=${params.cucumber_gitrepo}; export TF_VAR_CUCUMBER_BRANCH=${params.cucumber_ref}; export TERRAFORM=${params.bin_path}; export TERRAFORM_PLUGINS=${params.bin_plugins_path}; ./terracumber-cli ${common_params} --logfile ${resultdirbuild}/sumaform.log ${env.TERRAFORM_INIT} ${env.TERRAFORM_TAINT} --sumaform-backend ${params.sumaform_backend} --runstep provision | sed -E 's/([^.]+)module\\.([^.]+)\\.module\\.([^.]+)(\\.module\\.[^.]+)?(\\[[0-9]+\\])?(\\.module\\.[^.]+)?(\\.[^.]+)?(.*)/\\1\\2.\\3\\8/'"
+            } else {
                 deployed = true
-                // Collect and tag Flaky tests from the GitHub Board
-                def rakeTarget = ci_label ? "utils:collect_and_tag_flaky_tests[${ci_label}]" : "utils:collect_and_tag_flaky_tests"
-                def statusCode = sh script:"./terracumber-cli ${common_params} --logfile ${resultdirbuild}/testsuite.log --runstep cucumber --cucumber-cmd 'cd /root/spacewalk/testsuite; ${env.exports} rake ${rakeTarget}'", returnStatus:true
             }
             stage('Product changes') {
                 if (params.show_product_changes) {
@@ -130,26 +139,30 @@ def run(params) {
             stage('Sanity Check') {
                 sh "./terracumber-cli ${common_params} --logfile ${resultdirbuild}/testsuite.log --runstep cucumber --cucumber-cmd 'cd /root/spacewalk/testsuite; ${env.exports} rake cucumber:sanity_check'"
             }
-            stage('Core - Setup') {
-                sh "./terracumber-cli ${common_params} --logfile ${resultdirbuild}/testsuite.log --runstep cucumber --cucumber-cmd 'cd /root/spacewalk/testsuite; ${env.exports} rake cucumber:core'"
-                sh "./terracumber-cli ${common_params} --logfile ${resultdirbuild}/testsuite.log --runstep cucumber --cucumber-cmd 'cd /root/spacewalk/testsuite; ${env.exports} rake cucumber:reposync'"
-            }
-            stage('Core - Proxy') {
-                sh "./terracumber-cli ${common_params} --logfile ${resultdirbuild}/testsuite.log --runstep cucumber --cucumber-cmd 'cd /root/spacewalk/testsuite; ${env.exports} rake cucumber:proxy'"
-            }
-            stage('Core - Initialize clients') {
-                sh "./terracumber-cli ${common_params} --logfile ${resultdirbuild}/testsuite.log --runstep cucumber --cucumber-cmd 'cd /root/spacewalk/testsuite; ${env.exports} rake parallel:init_clients'"
-            }
-            stage('Secondary features') {
-                def tags_list = ""
-                if (params.functional_scopes) {
-                    def transformed_scopes = params.functional_scopes.replaceAll(',', ' or ')
-                    tags_list += "export TAGS=${transformed_scopes}; "
+            if (runCore) {
+                stage('Core - Setup') {
+                    sh "./terracumber-cli ${common_params} --logfile ${resultdirbuild}/testsuite.log --runstep cucumber --cucumber-cmd 'cd /root/spacewalk/testsuite; ${env.exports} rake cucumber:core'"
+                    sh "./terracumber-cli ${common_params} --logfile ${resultdirbuild}/testsuite.log --runstep cucumber --cucumber-cmd 'cd /root/spacewalk/testsuite; ${env.exports} rake cucumber:reposync'"
                 }
-                def statusCode1 = sh script:"./terracumber-cli ${common_params} --logfile ${resultdirbuild}/testsuite.log --runstep cucumber --cucumber-cmd '${tags_list} cd /root/spacewalk/testsuite; ${env.exports} rake cucumber:secondary'", returnStatus:true
-                def statusCode2 = sh script:"./terracumber-cli ${common_params} --logfile ${resultdirbuild}/testsuite.log --runstep cucumber --cucumber-cmd '${tags_list} cd /root/spacewalk/testsuite; ${env.exports} rake ${params.rake_namespace}:secondary_parallelizable'", returnStatus:true
-                def statusCode3 = sh script:"./terracumber-cli ${common_params} --logfile ${resultdirbuild}/testsuite.log --runstep cucumber --cucumber-cmd '${tags_list} cd /root/spacewalk/testsuite; ${env.exports} rake ${params.rake_namespace}:secondary_finishing'", returnStatus:true
-                sh "exit \$(( ${statusCode1}|${statusCode2}|${statusCode3} ))"
+                stage('Core - Proxy') {
+                    sh "./terracumber-cli ${common_params} --logfile ${resultdirbuild}/testsuite.log --runstep cucumber --cucumber-cmd 'cd /root/spacewalk/testsuite; ${env.exports} rake cucumber:proxy'"
+                }
+                stage('Core - Initialize clients') {
+                    sh "./terracumber-cli ${common_params} --logfile ${resultdirbuild}/testsuite.log --runstep cucumber --cucumber-cmd 'cd /root/spacewalk/testsuite; ${env.exports} rake parallel:init_clients'"
+                }
+            }
+            if (runSecondary) {
+                stage('Secondary features') {
+                    def tags_list = ""
+                    if (params.functional_scopes) {
+                        def transformed_scopes = params.functional_scopes.replaceAll(',', ' or ')
+                        tags_list += "export TAGS=${transformed_scopes}; "
+                    }
+                    def statusCode1 = sh script:"./terracumber-cli ${common_params} --logfile ${resultdirbuild}/testsuite.log --runstep cucumber --cucumber-cmd '${tags_list} cd /root/spacewalk/testsuite; ${env.exports} rake cucumber:secondary'", returnStatus:true
+                    def statusCode2 = sh script:"./terracumber-cli ${common_params} --logfile ${resultdirbuild}/testsuite.log --runstep cucumber --cucumber-cmd '${tags_list} cd /root/spacewalk/testsuite; ${env.exports} rake ${params.rake_namespace}:secondary_parallelizable'", returnStatus:true
+                    def statusCode3 = sh script:"./terracumber-cli ${common_params} --logfile ${resultdirbuild}/testsuite.log --runstep cucumber --cucumber-cmd '${tags_list} cd /root/spacewalk/testsuite; ${env.exports} rake ${params.rake_namespace}:secondary_finishing'", returnStatus:true
+                    sh "exit \$(( ${statusCode1}|${statusCode2}|${statusCode3} ))"
+                }
             }
         }
         finally {
