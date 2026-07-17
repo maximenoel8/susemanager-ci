@@ -1,9 +1,9 @@
 def run(params) {
     timestamps {
-        // Null-safe defaults for optional stage-control parameters (backward compat with env files that don't declare them)
-        def runDeploy    = params.deploy    == null ? true : params.deploy
-        def runCore      = params.core      == null ? true : params.core
-        def runSecondary = params.secondary == null ? true : params.secondary
+        // Stage-control params: run by default if not declared (null/"") in the env file, skip only when explicitly false
+        def runDeploy    = params.deploy    != false
+        def runCore      = params.core      != false
+        def runSecondary = params.secondary != false
 
         // Init path env variables
         GString resultdir = "${WORKSPACE}/results"
@@ -69,7 +69,7 @@ def run(params) {
                     // Rename build using product commit hash
                     currentBuild.description =  "[${product_commit}]"
                 }
-                
+
                 // Create a directory for  to place the directory with the build results (if it does not exist)
                 sh "mkdir -p ${resultdir}"
                 git url: params.terracumber_gitrepo, branch: params.terracumber_ref
@@ -78,7 +78,7 @@ def run(params) {
                 }
                 // Clone sumaform
                 sh "set +x; source /home/jenkins/.credentials set -x; ./terracumber-cli ${common_params} --gitrepo ${params.sumaform_gitrepo} --gitref ${params.sumaform_ref} --runstep gitsync"
-            
+
                 // Restore Terraform states from artifacts
                 if (params.use_previous_terraform_state) {
                     copyArtifacts projectName: currentBuild.projectName, selector: specific("${currentBuild.previousBuild.number}")
@@ -89,8 +89,10 @@ def run(params) {
                     sh "ssh root@minima-mirror-ci-bv.`hostname -d` -t \"test -x /usr/local/bin/minima-${mirror_scope}.sh && /usr/local/bin/minima-${mirror_scope}.sh || echo 'no mirror script for this scope'\""
                 }
             }
-            if (runDeploy) {
-                stage('Deploy') {
+
+            stage('Deploy') {
+                if (runDeploy) {
+
                     // Provision the environment
                     if (params.terraform_init) {
                         env.TERRAFORM_INIT = '--init'
@@ -99,7 +101,7 @@ def run(params) {
                     }
                     env.TERRAFORM_TAINT = ''
                     if (params.terraform_taint) {
-                        switch(params.sumaform_backend) {
+                        switch (params.sumaform_backend) {
                             case "libvirt":
                                 env.TERRAFORM_TAINT = " --taint '.*(domain|combustion_disk|cloudinit_disk|ignition_disk|main_disk|data_disk|database_disk|standalone_provisioning).*'";
                                 break;
@@ -117,11 +119,12 @@ def run(params) {
                     deployed = true
                     // Collect and tag Flaky tests from the GitHub Board
                     def rakeTarget = ci_label ? "utils:collect_and_tag_flaky_tests[${ci_label}]" : "utils:collect_and_tag_flaky_tests"
-                    def statusCode = sh script:"./terracumber-cli ${common_params} --logfile ${resultdirbuild}/testsuite.log --runstep cucumber --cucumber-cmd 'cd /root/spacewalk/testsuite; ${env.exports} rake ${rakeTarget}'", returnStatus:true
+                    def statusCode = sh script: "./terracumber-cli ${common_params} --logfile ${resultdirbuild}/testsuite.log --runstep cucumber --cucumber-cmd 'cd /root/spacewalk/testsuite; ${env.exports} rake ${rakeTarget}'", returnStatus: true
+                } else {
+                    deployed = true
                 }
-            } else {
-                deployed = true
             }
+
             stage('Product changes') {
                 if (params.show_product_changes) {
                     sh """
@@ -167,7 +170,7 @@ def run(params) {
         }
         finally {
             stage('Save TF state') {
-                    archiveArtifacts artifacts: "results/sumaform/terraform.tfstate, results/sumaform/.terraform/**/*"
+                archiveArtifacts artifacts: "results/sumaform/terraform.tfstate, results/sumaform/.terraform/**/*"
             }
 
             stage('Get results') {
@@ -205,12 +208,12 @@ def run(params) {
                         }
                     }
                     publishHTML( target: [
-                                allowMissing: true,
-                                alwaysLinkToLastBuild: false,
-                                keepAll: true,
-                                reportDir: "${resultdirbuild}/results/cucumber_report/",
-                                reportFiles: 'index.html',
-                                reportName: "TestSuite Report"]
+                            allowMissing: true,
+                            alwaysLinkToLastBuild: false,
+                            keepAll: true,
+                            reportDir: "${resultdirbuild}/results/cucumber_report/",
+                            reportFiles: 'index.html',
+                            reportName: "TestSuite Report"]
                     )
                     // skipPublishingChecks: Checks API not configured on this instance
                     catchError(buildResult: 'FAILURE', stageResult: 'SUCCESS') {
