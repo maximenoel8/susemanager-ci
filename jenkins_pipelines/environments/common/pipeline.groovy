@@ -12,7 +12,7 @@ def run(params) {
         // The junit plugin doesn't affect full paths
         GString junit_resultdir = "results/${env.BUILD_NUMBER}/results_junit"
         // Mutable: the AWS backend appends PUBLISH_CUCUMBER_REPORT below
-        def exports = "export BUILD_NUMBER=${env.BUILD_NUMBER}; export CAPYBARA_TIMEOUT=${params.capybara_timeout}; export DEFAULT_TIMEOUT=${params.default_timeout}; export CUCUMBER_PUBLISH_QUIET=true;"
+        def exports = "export BUILD_NUMBER=${env.BUILD_NUMBER}; export CAPYBARA_TIMEOUT=${capybara_timeout}; export DEFAULT_TIMEOUT=${default_timeout}; export CUCUMBER_PUBLISH_QUIET=true;"
         GString common_params = "--outputdir ${resultdir} --tf ${params.tf_file} --gitfolder ${resultdir}/sumaform --terraform-bin ${params.bin_path}"
 
 
