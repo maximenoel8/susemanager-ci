@@ -12,16 +12,18 @@ ENVIRONMENT_CONFIGURATION = {
     server_hub_main = true
   }
   server2_containerized = {
-    mac   = "aa:b2:93:01:01:32"
-    name  = "prh1"
-    image = "sles15sp7o"
+    mac             = "aa:b2:93:01:01:32"
+    name            = "prh1"
+    image           = "sles15sp7o"
     string_registry = true
+    use_mirror      = false
   }
   server3_containerized = {
-    mac   = "aa:b2:93:01:01:33"
-    name  = "prh2"
-    image = "sles15sp7o"
+    mac             = "aa:b2:93:01:01:33"
+    name            = "prh2"
+    image           = "sles15sp7o"
     string_registry = true
+    use_mirror      = false
   }
   proxy_containerized = {
     mac   = "aa:b2:93:01:01:34"
