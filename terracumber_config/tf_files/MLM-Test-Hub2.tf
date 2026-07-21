@@ -57,7 +57,7 @@ module "hub" {
   main_disk_size       = 100
   repository_disk_size           = 500
   database_disk_size             = 80
-  server_hub_main      = true
+  deploy_hub_api       = true
   hub_peripheral_fqdns = [local.prh1_hostname, local.prh2_hostname]
   large_deployment     = false
 }
