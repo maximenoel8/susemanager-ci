@@ -17,6 +17,7 @@ ENVIRONMENT_CONFIGURATION = {
     image           = "sles15sp7o"
     string_registry = true
     use_mirror      = false
+    deploy_hub_api  = false
   }
   server3_containerized = {
     mac             = "aa:b2:93:01:01:33"
@@ -24,6 +25,7 @@ ENVIRONMENT_CONFIGURATION = {
     image           = "sles15sp7o"
     string_registry = true
     use_mirror      = false
+    deploy_hub_api  = false
   }
   proxy_containerized = {
     mac   = "aa:b2:93:01:01:34"
