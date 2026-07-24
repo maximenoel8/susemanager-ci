@@ -5,27 +5,30 @@ ENVIRONMENT_CONFIGURATION = {
     name = "controller"
   }
   server_containerized = {
-    mac   = "aa:b2:93:01:01:31"
-    name  = "hub"
-    image = "slmicro62o"
-    string_registry = true
-    deploy_hub_api  = true
+    mac                 = "aa:b2:93:01:01:31"
+    name                = "hub"
+    image               = "slmicro62o"
+    string_registry     = true
+    deploy_hub_api      = true
+    skip_server_install = true
   }
   server2_containerized = {
-    mac             = "aa:b2:93:01:01:32"
-    name            = "prh1"
-    image           = "slmicro62o"
-    string_registry = true
-    use_mirror      = false
-    deploy_hub_api  = false
+    mac                 = "aa:b2:93:01:01:32"
+    name                = "prh1"
+    image               = "slmicro62o"
+    string_registry     = true
+    use_mirror          = false
+    deploy_hub_api      = false
+    skip_server_install = true
   }
   server3_containerized = {
-    mac             = "aa:b2:93:01:01:33"
-    name            = "prh2"
-    image           = "slmicro62o"
-    string_registry = true
-    use_mirror      = false
-    deploy_hub_api  = false
+    mac                 = "aa:b2:93:01:01:33"
+    name                = "prh2"
+    image               = "slmicro62o"
+    string_registry     = true
+    use_mirror          = false
+    deploy_hub_api      = false
+    skip_server_install = true
   }
   proxy_containerized = {
     mac   = "aa:b2:93:01:01:34"
