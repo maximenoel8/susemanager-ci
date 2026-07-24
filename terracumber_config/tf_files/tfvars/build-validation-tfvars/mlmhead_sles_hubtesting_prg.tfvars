@@ -10,7 +10,7 @@ ENVIRONMENT_CONFIGURATION = {
     image               = "slmicro62o"
     string_registry     = true
     deploy_hub_api      = true
-    skip_server_install = true
+    skip_server_install = false
   }
   server2_containerized = {
     mac                 = "aa:b2:93:01:01:32"
