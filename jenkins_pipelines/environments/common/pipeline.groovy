@@ -288,11 +288,9 @@ def run(params) {
                                 reportName           : "TestSuite Report"]
                         )
                         // skipPublishingChecks: Checks API not configured on this instance
-                        catchError(buildResult: 'FAILURE', stageResult: 'SUCCESS') {
-                            junit allowEmptyResults: true,
-                                    testResults: "${junit_resultdir}/*.xml",
-                                    skipPublishingChecks: true
-                        }
+                        junit allowEmptyResults: true,
+                                testResults: "${junit_resultdir}/*.xml",
+                                skipPublishingChecks: true
                         // Test Report Summary
                         try {
                             sh "python3 -m venv ${env.WORKSPACE}/venv"
