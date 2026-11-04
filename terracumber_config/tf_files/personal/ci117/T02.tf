@@ -1,4 +1,4 @@
-// spec #117 comparison T02: OS spread: SLES 15 SP7 server, Leap 16 proxy, SLES 16 minion, Rocky 9, SL Micro sshminion
+// spec #117 comparison T02: OS spread: SLES 15 SP7 server and proxy, SLES 16 minion, Rocky 9 (Salt-valid: Leap 16 proxy and SL Micro sshminion fail on the Salt side)
 // Same file runs on the Salt side (nanuk) and the Ansible side (apprentice); only sumaform_ref differs.
 // Base: main_51.tf. See /home/claude/workspace/output/ansible-117-compare-plan.md
 
@@ -39,7 +39,7 @@ module "cucumber_testsuite" {
   cc_ptf_username = var.SCC_PTF_USER
   cc_ptf_password = var.SCC_PTF_PASSWORD
 
-  images = ["rocky9o", "opensuse160o", "ubuntu2404o", "sles15sp7o", "sles160o", "slmicro61o"]
+  images = ["rocky9o", "opensuse160o", "ubuntu2404o", "sles15sp7o", "sles160o"]
 
   ssh_key_path = var.CONTROLLER_PUBLIC_SSH_KEY_PATH
   use_avahi    = false
@@ -89,7 +89,7 @@ module "cucumber_testsuite" {
 
     }
     proxy_containerized = {
-      image = "opensuse160o"
+      image = "sles15sp7o"
       provider_settings = {
         mac = var.ENVIRONMENT_CONFIGURATION[var.ENVIRONMENT].mac["proxy"]
         vcpu = 2
@@ -109,7 +109,7 @@ module "cucumber_testsuite" {
       }
     }
     suse_sshminion = {
-      image = "slmicro61o"
+      image = "sles15sp7o"
       provider_settings = {
         mac = var.ENVIRONMENT_CONFIGURATION[var.ENVIRONMENT].mac["suse-sshminion"]
         vcpu = 2
