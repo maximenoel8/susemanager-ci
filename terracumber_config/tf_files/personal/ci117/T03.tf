@@ -1,4 +1,4 @@
-// spec #117 comparison T03: server and proxy knobs: smaller disk, no large deployment, optional containers off, release updates, salt bundle off on one minion
+// spec #117 comparison T03: server and proxy knobs: smaller disk, no large deployment, optional containers off, release updates, vim on a SLES minion, classic salt on the sshminion (Salt-valid: vim on the SL Micro server and the classic minion on Ubuntu fail on the Salt side)
 // Same file runs on the Salt side (nanuk) and the Ansible side (apprentice); only sumaform_ref differs.
 // Base: main_51.tf. See /home/claude/workspace/output/ansible-117-compare-plan.md
 
@@ -84,7 +84,6 @@ module "cucumber_testsuite" {
       }
       main_disk_size       = 300
       large_deployment     = false
-      additional_packages  = ["vim"]
       runtime              = "podman"
       container_registry   = var.CONTAINER_REGISTRY
       container_tag        = "latest"
@@ -104,6 +103,7 @@ module "cucumber_testsuite" {
     }
     suse_minion = {
       image = "sles15sp7o"
+      additional_packages = [ "vim" ]
       provider_settings = {
         mac = var.ENVIRONMENT_CONFIGURATION[var.ENVIRONMENT].mac["suse-minion"]
         vcpu = 2
@@ -112,6 +112,7 @@ module "cucumber_testsuite" {
     }
     suse_sshminion = {
       image = "sles15sp7o"
+      install_salt_bundle = false
       provider_settings = {
         mac = var.ENVIRONMENT_CONFIGURATION[var.ENVIRONMENT].mac["suse-sshminion"]
         vcpu = 2
@@ -131,7 +132,6 @@ module "cucumber_testsuite" {
     }
     deblike_minion = {
       image = "ubuntu2404o"
-      install_salt_bundle = false
       provider_settings = {
         mac = var.ENVIRONMENT_CONFIGURATION[var.ENVIRONMENT].mac["deblike-minion"]
         vcpu = 2
