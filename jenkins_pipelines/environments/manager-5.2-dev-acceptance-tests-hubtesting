@@ -13,7 +13,7 @@ node('sumaform-cucumber') {
             string(name: 'deploy_parallelism', defaultValue: '', description: 'Advanced: Define the number of parallel resource operations for the executable binary'),
             string(name: 'terracumber_gitrepo', defaultValue: 'https://github.com/uyuni-project/terracumber.git', description: 'Terracumber Git Repository'),
             string(name: 'terracumber_ref', defaultValue: 'master', description: 'Terracumber Git ref (branch, tag...)'),
-            string(name: 'product_version', defaultValue: '5.2-nightly', description: 'Server product version'),
+            string(name: 'product_version', defaultValue: '5.1-nightly', description: 'Server product version'),
             choice(name: 'base_os', choices: ['slmicro62o','slmicro61o', 'sles15sp7o', 'slemicro55o', 'sles15sp6o'], description: 'Server and Proxy base OS'),
             string(name: 'server_container_registry', defaultValue: 'registry.suse.de', description: 'Server container registry'),
             string(name: 'proxy_container_registry', defaultValue: 'registry.suse.de', description: 'Proxy container registry'),
@@ -42,9 +42,6 @@ node('sumaform-cucumber') {
                     'scope_software_channels_and_repositories', 'scope_ssm'
                 ]
             """.stripIndent()], fallbackScript: [$class: 'SecureGroovyScript', sandbox: true, script: "return ['error_loading_scopes']"]]),
-            choice(name: 'json_generator_version', choices: ['52-micro', '52-sles'], description: 'Version the MI Identifiers below are resolved for. Has to match base_os: a SL Micro base_os is 52-micro, a SLES one 52-sles'),
-            text(name: 'mi_ids', defaultValue: '', description: 'MI Identifiers separated by comma or whitespaces (Option A)'),
-            text(name: 'custom_repositories', defaultValue: '{}', description: 'MU Repositories in json format (Option B)')
             ])
     ])
 
